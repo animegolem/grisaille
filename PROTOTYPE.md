@@ -64,6 +64,10 @@ renderer could use them later.
   `j`/`k` move vertically, `l` opens and `h` returns to the parent. Escape also
   returns to the parent. Enter plays a track or opens an album/artist.
   In an input, letters remain text; Up/Down choose matches.
+- Clicking a queue, album-track or artist-list row selects it without scrolling
+  the viewport. Keyboard navigation and search still reveal the selected item;
+  history restores its saved viewport. Pointer queue drops also avoid an extra
+  automatic jump to the moved row.
 - Space toggles playback. Album and artist text navigate into the library.
 - The album header offers Play album and Queue album. Both append the album in
   disc/track order; Play album starts its first new queue occurrence. The existing
@@ -178,6 +182,10 @@ python3 scripts/package-mac.py
   to the previously selected queue row with `o`, and reopened the selected album
   track with `i`. Repeating after scrolling to the last track retained both the
   selection and viewport. The playing occurrence and paused state were unchanged.
+- The pointer-selection correction was checked in the native live queue: clicking
+  a lower track title or row background kept the visible rows at the same positions,
+  including in an already scrolled viewport. Clicking the same selected row again
+  then using `j` still revealed the next keyboard selection.
 - Native screenshots checked the queue, cover/metadata pane, album shelf,
   record track list and global prompt. Fixed fragmented metadata text and
   queue rows that failed to fill their available width.

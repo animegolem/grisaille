@@ -1,4 +1,4 @@
-import { Children, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Children, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type SetStateAction } from 'react';
 import { flushSync, motion, render, useGpuixRequired, useWindowSize, type EventPayload, type PublicInstance, type StyleDesc } from '@gpuix/react';
 import type { GpuixRenderer } from '@gpuix/native';
 import { DemoBackend } from './demo';
@@ -76,7 +76,13 @@ function App() {
   const [libraryView, setLibraryView] = useState<'covers' | 'artists'>('covers');
   const [artist, setArtist] = useState<Artist>();
   const [record, setRecord] = useState<Album>();
-  const [selection, setSelection] = useState(0);
+  const [selection, updateSelection] = useState(0);
+  const selectionScroll = useRef<'reveal' | 'preserve'>('reveal');
+  function setSelection(next: SetStateAction<number>, scroll: 'reveal' | 'preserve' = 'reveal') {
+    selectionScroll.current = scroll;
+    updateSelection(next);
+  }
+  function selectFromPointer(index: number) { clearFocus(); setSelection(index, 'preserve'); }
   const [notice, setNotice] = useState('Connecting…');
   const [problem, setProblem] = useState('');
   const [actionProblem, setActionProblem] = useState('');
@@ -209,12 +215,16 @@ function App() {
     if (prompt === 'local' && query.trim() && matches.length) setSelection(matches[0]!);
   }, [query, prompt]);
   useEffect(() => {
+    const scroll = selectionScroll.current;
+    selectionScroll.current = 'reveal';
     if (activeDrag.current?.startY !== undefined) return;
     const ref = view === 'queue' ? queueRef : isArtists ? artistListRef : listRef;
     const saved = pendingViewport.current;
     pendingViewport.current = undefined;
     if (saved?.kind === 'list' && ref.current && !isGrid) { renderer.scrollToItem?.(ref.current.id, saved.index, saved.offset); return; }
     if (saved?.kind === 'grid' && saved.columns === columns && albumGridRef.current && isGrid) { renderer.scrollTo?.(albumGridRef.current.id, saved.x, saved.y); return; }
+    // A click chooses an already visible item; only navigation should reveal it.
+    if (scroll === 'preserve') return;
     if (ref.current && !isGrid) renderer.scrollToItem?.(ref.current.id, selection);
     if (isGrid) {
       const row = Math.floor((selection % pageSize) / columns);
@@ -384,7 +394,7 @@ function App() {
     const before = d.target > source ? snapshot.queue[d.target + 1]?.queueId ?? null : snapshot.queue[d.target]?.queueId ?? null;
     updateDrag(undefined);
     if (d.target !== source) void act(() => backend.move(d.id, before), 'Queue order updated');
-    setSelection(d.target);
+    setSelection(d.target, d.startY === undefined ? 'reveal' : 'preserve');
   }
   useLayoutEffect(() => {
     dispatchKey = event => {
@@ -453,12 +463,12 @@ function App() {
   function queueRow(track: QueueTrack, index: number) {
     const held = drag?.id === track.queueId;
     const destination = !!drag && drag.target === index && !held;
-    return <div key={track.queueId} testId={`queue-${track.queueId}`} onClick={() => { clearFocus(); setSelection(index); }} style={{ width: '100%', height: ROW, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 8, paddingRight: 10, borderBottomWidth: destination ? 2 : 1, borderColor: destination ? theme.borders.queueInsertion : theme.borders.queueRow, ...surface(selection === index ? 'queueRowSelected' : 'queueRow'), hover: selection === index ? undefined : surface('queueRowHover'), opacity: held ? theme.opacity.heldSource : 1, userSelect: 'none' }}>
-      <div testId={`handle-${track.queueId}`} onMouseDown={e => { if (e.button === 0) flushSync(() => { clearFocus(); setSelection(index); updateDrag({ id: track.queueId, target: index, startY: e.y ?? 0, dy: 0 }); }); }} style={{ width: 18, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab' }}><Text color={C.muted}>⠿</Text></div>
+    return <div key={track.queueId} testId={`queue-${track.queueId}`} onClick={() => selectFromPointer(index)} style={{ width: '100%', height: ROW, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 8, paddingRight: 10, borderBottomWidth: destination ? 2 : 1, borderColor: destination ? theme.borders.queueInsertion : theme.borders.queueRow, ...surface(selection === index ? 'queueRowSelected' : 'queueRow'), hover: selection === index ? undefined : surface('queueRowHover'), opacity: held ? theme.opacity.heldSource : 1, userSelect: 'none' }}>
+      <div testId={`handle-${track.queueId}`} onMouseDown={e => { if (e.button === 0) flushSync(() => { selectFromPointer(index); updateDrag({ id: track.queueId, target: index, startY: e.y ?? 0, dy: 0 }); }); }} style={{ width: 18, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab' }}><Text color={C.muted}>⠿</Text></div>
       <Text size={11} color={snapshot.currentId === track.queueId ? C.accent : C.muted} style={{ width: 18 }}>{snapshot.currentId === track.queueId ? '▸' : String(track.number).padStart(2, '0')}</Text>
       <Cover track={track} size={44} onClick={() => openTrack(track)} />
       <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
-        <Text onClick={() => { clearFocus(); setSelection(index); }} style={{ cursor: 'pointer' }}>{track.title}</Text>
+        <Text onClick={() => selectFromPointer(index)} style={{ cursor: 'pointer' }}>{track.title}</Text>
         <div style={{ display: 'flex', flexDirection: 'row', gap: 5, minWidth: 0 }}>
           <Link muted size={11} onClick={() => openArtist(track.artist)} style={{ flexShrink: 1 }}>{track.artist}</Link>
           <Text size={11} color={C.muted}>·</Text>
@@ -502,7 +512,7 @@ function App() {
           </>}
         </div>
         {isArtists ? <virtual-list ref={artistListRef} estimatedItemHeight={88} style={{ width: '100%', flexGrow: 1, minHeight: 0, ...surface('artistList') }}>
-          {artists.map((a, index) => <div key={a.name} onClick={() => { clearFocus(); setSelection(index); }} style={{ width: '100%', height: 88, padding: 12, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, ...surface(selection === index ? 'artistRowSelected' : 'artistRow'), hover: selection === index ? undefined : surface('artistRowHover'), borderBottomWidth: 1, borderColor: theme.borders.artistRow }}>
+          {artists.map((a, index) => <div key={a.name} onClick={() => selectFromPointer(index)} style={{ width: '100%', height: 88, padding: 12, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, ...surface(selection === index ? 'artistRowSelected' : 'artistRow'), hover: selection === index ? undefined : surface('artistRowHover'), borderBottomWidth: 1, borderColor: theme.borders.artistRow }}>
             <Cover track={a.albums[0]?.tracks[0]} size={60} onClick={() => openArtist(a.name)} />
             <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
               <Link size={16} onClick={() => openArtist(a.name)}>{a.name}</Link>
@@ -532,7 +542,7 @@ function App() {
               <Button id="queue-album" onClick={() => void act(() => backend.enqueueAlbum(record), `Queued ${record.title}`)}>Queue album</Button>
             </> : snapshot.queue.length > 0 && <Button id="remove-track" onClick={removeSelected}>Remove</Button>}
           </div>
-          {view === 'queue' ? <virtual-list ref={queueRef} estimatedItemHeight={ROW} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>{snapshot.queue.map(queueRow)}</virtual-list> : <virtual-list ref={listRef} estimatedItemHeight={ROW} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>{record?.tracks.map((t, i) => <div key={t.uri} onClick={() => { clearFocus(); setSelection(i); }} style={{ width: '100%', height: ROW, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, ...surface(selection === i ? 'recordRowSelected' : 'recordRow'), hover: selection === i ? undefined : surface('recordRowHover'), borderBottomWidth: 1, borderColor: theme.borders.recordRow, cursor: 'pointer' }}><Text size={12} color={C.muted} style={{ width: 22 }}>{String(t.number).padStart(2, '0')}</Text><Cover track={t} size={40} /><Text style={{ flexGrow: 1 }}>{t.title}</Text><Text color={C.muted}>{duration(t.duration)}</Text></div>)}</virtual-list>}
+          {view === 'queue' ? <virtual-list ref={queueRef} estimatedItemHeight={ROW} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>{snapshot.queue.map(queueRow)}</virtual-list> : <virtual-list ref={listRef} estimatedItemHeight={ROW} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>{record?.tracks.map((t, i) => <div key={t.uri} onClick={() => selectFromPointer(i)} style={{ width: '100%', height: ROW, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, ...surface(selection === i ? 'recordRowSelected' : 'recordRow'), hover: selection === i ? undefined : surface('recordRowHover'), borderBottomWidth: 1, borderColor: theme.borders.recordRow, cursor: 'pointer' }}><Text size={12} color={C.muted} style={{ width: 22 }}>{String(t.number).padStart(2, '0')}</Text><Cover track={t} size={40} /><Text style={{ flexGrow: 1 }}>{t.title}</Text><Text color={C.muted}>{duration(t.duration)}</Text></div>)}</virtual-list>}
           {loading && <Text color={C.muted}>Reading the library…</Text>}
           {!loading && buffer.length === 0 && <Text color={C.muted}>Queue is empty. Find an album with :</Text>}
           <div style={{ display: 'flex', flexDirection: 'row' }}><Text size={11} color={C.muted} style={{ flexGrow: 1 }}>{drag ? 'hjkl / arrows move · enter drop · esc cancel' : view === 'queue' ? 'enter play · m move · ⌫ remove · o/i history' : 'enter play · h artist · / find · o/i history'}</Text><Text size={11} color={C.muted}>{duration(buffer.reduce((n, t) => n + t.duration, 0))} total</Text></div>
