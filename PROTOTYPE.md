@@ -57,9 +57,11 @@ One context cover uses OpenTUI's negotiated Kitty graphics, Sixel or coloured
 block fallback. `--no-images` forces the coloured block fallback. The detail pane
 hides below 78 columns or 19 rows, keeping the list and prompt usable; the minimum
 layout is 40 by 12. Images unmount while the global prompt is open. OpenTUI owns
-image placement, deletion and terminal restoration. Actual Ghostty artwork and
-visual layout still need a native window check: Computer Use refused Ghostty
-access during this sitting. Protocol/PTY evidence is not that visual acceptance.
+image placement, deletion and terminal restoration. An owner-provided Ghostty
+screenshot confirms a square cover contained within the detail pane in the demo
+artist view. It shows the earlier `music`/`DEMO` header, so the latest header,
+status line and sort menu still need a check after relaunch. Computer Use refused
+Ghostty access during this sitting; the screenshot supplied the visual evidence.
 
 ## Interaction
 
@@ -215,6 +217,11 @@ python3 scripts/package-mac.py
   and three deletions across opening/closing the prompt. Exit restored the alternate
   screen and cursor. The queue, current song ID, paused state and volume matched
   their pre-check values. This validates protocol output, not a Ghostty screenshot.
+- The owner's subsequent Ghostty screenshot showed My Bloody Valentine's artist
+  view with `Isn't Anything` selected, its square cover inside the right pane,
+  readable metadata and no visible image overlap. This verifies cover appearance
+  in an actual terminal window. The earlier `music`/`DEMO` header was still present;
+  the image does not verify the later header, status-line or sort-menu changes.
 - Native continuous browsing checks scrolled through the live 1,508-album shelf
   and 1,118-artist list. NOFX's sixteenth album was reached by scrolling directly
   past the former fifteen-album page boundary. Sorting by album title, artists
