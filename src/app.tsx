@@ -6,6 +6,8 @@ import { FocusSteps } from './focus';
 import { albumsOf, artistsOf, albumKey, duration, fuzzyScore, searchLibrary, type Album, type Artist, type MusicBackend, type QueueTrack, type Result, type Snapshot, type Track } from './model';
 import { directionOf, gridSelection, pageShortcut, pointerDrag } from './navigation';
 import { inputTheme, surface, theme } from './theme';
+import { NavigationHistory, type Place, type Route, type Viewport } from './history';
+import { NavigationLog } from './navigation-log';
 
 const C = theme.colors;
 const FONT = 'Menlo';
@@ -17,6 +19,7 @@ let didFocusControl: () => void = () => {};
 const empty: Snapshot = { queue: [], state: 'stop', elapsed: 0, volume: 0 };
 const demo = process.argv.includes('--demo');
 const backend: MusicBackend = demo ? new DemoBackend() : new MpdBackend();
+const navigationLog = new NavigationLog(demo ? 'demo' : 'mpd');
 
 function Text({ children, size = 13, color = C.text, style = {}, onClick }: { children: ReactNode; size?: number; color?: string; style?: StyleDesc; onClick?: () => void }) {
   // GPUIX lays out separate primitive children as separate native text nodes.
@@ -79,7 +82,8 @@ function App() {
   const [query, setQuery] = useState('');
   const [resultIndex, setResultIndex] = useState(0);
   const [drag, setDrag] = useState<QueueDrag>();
-  const [albumPage, setAlbumPage] = useState(0);
+  const history = useMemo(() => new NavigationHistory({ route: { page: 'queue' }, selection: 0 }, event => navigationLog.append(event)), []);
+  const pendingViewport = useRef<Viewport | undefined>(undefined);
   const [playClock, setPlayClock] = useState(0);
   const queueRef = useRef<PublicInstance>(null);
   const listRef = useRef<PublicInstance>(null);
@@ -111,6 +115,7 @@ function App() {
   const artSize = Math.max(120, Math.min(350, Math.floor(width * (narrow ? 0.32 : 0.36) - 55), artHeightBudget));
   const columns = Math.max(3, Math.floor((width - 48) / 190));
   const pageSize = columns * 3;
+  const albumPage = Math.floor(selection / pageSize);
   const albumTileSize = Math.floor((width - 44 - (columns - 1) * 20) / columns);
   const elapsed = Math.min(current?.duration || 0, snapshot.elapsed + playClock);
 
@@ -151,23 +156,93 @@ function App() {
   useEffect(() => {
     if (activeDrag.current?.startY !== undefined) return;
     const ref = view === 'queue' ? queueRef : isArtists ? artistListRef : listRef;
+    const saved = pendingViewport.current;
+    pendingViewport.current = undefined;
+    if (saved?.kind === 'list' && ref.current && !isGrid) { renderer.scrollToItem?.(ref.current.id, saved.index, saved.offset); return; }
+    if (saved?.kind === 'grid' && saved.columns === columns && albumGridRef.current && isGrid) { renderer.scrollTo?.(albumGridRef.current.id, saved.x, saved.y); return; }
     if (ref.current && !isGrid) renderer.scrollToItem?.(ref.current.id, selection);
     if (isGrid) {
-      setAlbumPage(Math.floor(selection / pageSize));
       const row = Math.floor((selection % pageSize) / columns);
       if (albumGridRef.current) renderer.scrollTo?.(albumGridRef.current.id, 0, -row * (albumTileSize + 78));
     }
-  }, [selection, view, libraryView, pageSize, columns, albumTileSize, albumPage]);
+  }, [selection, view, libraryView, artist?.name, record?.key, pageSize, columns, albumTileSize]);
+  useEffect(() => {
+    history.checkpoint({ ...history.current, route: currentRoute(), selection, selected: placeKey(currentRoute(), buffer[selection]) });
+  }, [selection, view, libraryView, artist?.name, record?.key, buffer.length]);
   useEffect(() => { updateDrag(undefined); }, [width, height, view, snapshot.queue]);
   useEffect(() => {
     if (prompt === 'global' && promptListRef.current) renderer.scrollToItem?.(promptListRef.current.id, resultIndex);
   }, [prompt, resultIndex, results.length, height]);
 
+  function currentRoute(): Route {
+    if (view === 'record' && record) return { page: 'record', key: record.key };
+    if (view === 'artist' && artist) return { page: 'artist', name: artist.name };
+    return view === 'library' ? { page: 'library', mode: libraryView } : { page: 'queue' };
+  }
+  function placeKey(route: Route, track?: Track): string | undefined {
+    if (!track) return;
+    if (route.page === 'queue') return `queue:${(track as QueueTrack).queueId}`;
+    if (route.page === 'library' && route.mode === 'artists') return `artist:${track.artist}`;
+    if (route.page === 'artist' || route.page === 'library') return `album:${albumKey(track)}`;
+    return `track:${track.uri}`;
+  }
+  function capturePlace(): Place {
+    const route = currentRoute();
+    const point: Place = { route, selection, selected: placeKey(route, buffer[selection]) };
+    if (pendingViewport.current) point.viewport = pendingViewport.current;
+    else if (isGrid && albumGridRef.current) {
+      const offset = renderer.getScrollOffset?.(albumGridRef.current.id);
+      if (offset) point.viewport = { kind: 'grid', x: offset[0] || 0, y: offset[1] || 0, columns };
+    } else {
+      const ref = view === 'queue' ? queueRef : isArtists ? artistListRef : listRef;
+      const top = ref.current && renderer.getListScrollTop?.(ref.current.id);
+      if (top) point.viewport = { kind: 'list', index: top[0] || 0, offset: top[1] || 0, anchor: placeKey(route, buffer[top[0] || 0]) };
+    }
+    return point;
+  }
+  function resolvePlace(point: Place): Place {
+    const requested = point.route;
+    let route = requested;
+    const album = requested.page === 'record' ? albums.find(a => a.key === requested.key) : undefined;
+    const person = requested.page === 'artist' ? artists.find(a => a.name === requested.name) : undefined;
+    if ((route.page === 'record' && !album) || (route.page === 'artist' && !person)) route = { page: 'library', mode: 'covers' };
+    const items = route.page === 'queue' ? snapshot.queue : route.page === 'record' ? album!.tracks : route.page === 'artist' ? person!.albums.map(a => a.tracks[0]!) : route.mode === 'artists' ? artists.map(a => a.albums[0]!.tracks[0]!) : albums.map(a => a.tracks[0]!);
+    const found = point.selected ? items.findIndex(t => placeKey(route, t) === point.selected) : -1;
+    const index = Math.max(0, Math.min(items.length - 1, found >= 0 ? found : point.selection));
+    let viewport = point.viewport;
+    if (viewport?.kind === 'list') {
+      const anchorKey = viewport.anchor;
+      const anchor = anchorKey ? items.findIndex(t => placeKey(route, t) === anchorKey) : -1;
+      viewport = { ...viewport, index: Math.max(0, Math.min(items.length - 1, anchor >= 0 ? anchor : viewport.index)) };
+    }
+    return { route, selection: index, selected: placeKey(route, items[index]), viewport };
+  }
+  function applyPlace(point: Place) {
+    clearFocus(); updateDrag(undefined); setPrompt(null);
+    const route = point.route;
+    const album = route.page === 'record' ? albums.find(a => a.key === route.key) : undefined;
+    const person = route.page === 'artist' ? artists.find(a => a.name === route.name) : album ? artists.find(a => a.name === album.artist) : undefined;
+    setRecord(album); setArtist(person); setView(route.page);
+    if (route.page === 'library') setLibraryView(route.mode);
+    pendingViewport.current = point.viewport;
+    setSelection(point.selection);
+  }
+  function visit(route: Route, index = 0) {
+    const next = resolvePlace({ route, selection: index });
+    history.visit(next, capturePlace());
+    applyPlace(next);
+  }
+  function travel(direction: 'back' | 'forward') {
+    const point = history.step(direction, capturePlace());
+    if (!point) { setNotice(direction === 'back' ? 'At the beginning of navigation history' : 'At the end of navigation history'); return; }
+    const next = resolvePlace(point);
+    applyPlace(next);
+    const route = next.route;
+    setNotice(`${direction === 'back' ? 'Back' : 'Forward'} · ${route.page === 'queue' ? 'Now playing' : route.page === 'library' ? 'Library' : route.page === 'artist' ? route.name : albums.find(a => a.key === route.key)?.title || 'Album'}`);
+  }
   function openAlbum(album: Album, track?: Track) {
-    clearFocus(); updateDrag(undefined); setAlbumPage(0);
-    setArtist(artists.find(a => a.name === album.artist));
-    setRecord(album); setView('record'); setSelection(track ? Math.max(0, album.tracks.findIndex(t => t.uri === track.uri)) : 0);
-    setPrompt(null); setNotice(`${album.artist} · ${album.title}`);
+    visit({ page: 'record', key: album.key }, track ? Math.max(0, album.tracks.findIndex(t => t.uri === track.uri)) : 0);
+    setNotice(`${album.artist} · ${album.title}`);
   }
   function openTrack(track: Track) {
     const a = albums.find(a => a.key === albumKey(track));
@@ -177,10 +252,10 @@ function App() {
   function openArtist(name: string) {
     const found = artists.find(a => a.name === name);
     if (!found) return;
-    clearFocus(); updateDrag(undefined); setRecord(undefined); setArtist(found); setView('artist'); setSelection(0); setAlbumPage(0); setPrompt(null); setNotice(name);
+    visit({ page: 'artist', name }); setNotice(name);
   }
   function openPage(page: 'queue' | 'library', mode = libraryView) {
-    clearFocus(); updateDrag(undefined); setPrompt(null); setArtist(undefined); setRecord(undefined); setView(page); setLibraryView(mode); setSelection(0); setAlbumPage(0);
+    visit(page === 'queue' ? { page } : { page, mode });
   }
   function goBack() {
     if (view === 'record' && record) openArtist(record.artist);
@@ -264,6 +339,8 @@ function App() {
       }
       if (key === ':') openPrompt('global');
       else if (key === '/') openPrompt('local');
+      else if (key === 'o' || key === 'O') travel('back');
+      else if (key === 'i' || key === 'I') travel('forward');
       else if (direction) {
         if (isGrid) { clearFocus(); setSelection(gridSelection(selection, direction, columns, buffer.length)); }
         else if (direction === 'up' || direction === 'down') moveSelection(direction === 'down' ? 1 : -1);
@@ -358,7 +435,7 @@ function App() {
         </div>}
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {isGrid && <><Button onClick={() => setSelection(Math.max(0, (albumPage - 1) * pageSize))}>←</Button><Text color={C.muted}>{albumPage + 1} / {Math.max(1, Math.ceil(shelf.length / pageSize))}</Text><Button onClick={() => setSelection(Math.min(Math.max(0, shelf.length - 1), (albumPage + 1) * pageSize))}>→</Button></>}
-          <Text size={11} color={C.muted}>{isArtists ? 'j/k select · l open · h back' : 'hjkl / arrows select · enter open'} · / find · : prompt</Text>
+          <Text size={11} color={C.muted}>{isArtists ? 'j/k select · l open · h back' : 'hjkl / arrows select · enter open'} · / find · o/i history</Text>
         </div>
       </div> : <>
         <div style={{ flexGrow: 1, minWidth: 0, minHeight: 0, ...surface(view === 'queue' ? 'queue' : 'record'), display: 'flex', flexDirection: 'column', gap: 16, position: 'relative' }}>
@@ -369,7 +446,7 @@ function App() {
           {view === 'queue' ? <virtual-list ref={queueRef} estimatedItemHeight={ROW} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>{snapshot.queue.map(queueRow)}</virtual-list> : <virtual-list ref={listRef} estimatedItemHeight={ROW} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>{record?.tracks.map((t, i) => <div key={t.uri} onClick={() => { clearFocus(); setSelection(i); }} style={{ width: '100%', height: ROW, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, ...surface(selection === i ? 'recordRowSelected' : 'recordRow'), hover: selection === i ? undefined : surface('recordRowHover'), borderBottomWidth: 1, borderColor: theme.borders.recordRow, cursor: 'pointer' }}><Text size={12} color={C.muted} style={{ width: 22 }}>{String(t.number).padStart(2, '0')}</Text><Cover track={t} size={40} /><Text style={{ flexGrow: 1 }}>{t.title}</Text><Text color={C.muted}>{duration(t.duration)}</Text></div>)}</virtual-list>}
           {loading && <Text color={C.muted}>Reading the library…</Text>}
           {!loading && buffer.length === 0 && <Text color={C.muted}>Queue is empty. Find an album with :</Text>}
-          <div style={{ display: 'flex', flexDirection: 'row' }}><Text size={11} color={C.muted} style={{ flexGrow: 1 }}>{drag ? 'hjkl / arrows move · enter drop · esc cancel' : view === 'queue' ? 'j/k select · enter play · / find · m move' : 'j/k select · enter play · h artist · / find'}</Text><Text size={11} color={C.muted}>{duration(buffer.reduce((n, t) => n + t.duration, 0))} total</Text></div>
+          <div style={{ display: 'flex', flexDirection: 'row' }}><Text size={11} color={C.muted} style={{ flexGrow: 1 }}>{drag ? 'hjkl / arrows move · enter drop · esc cancel' : view === 'queue' ? 'enter play · / find · m move · o/i history' : 'enter play · h artist · / find · o/i history'}</Text><Text size={11} color={C.muted}>{duration(buffer.reduce((n, t) => n + t.duration, 0))} total</Text></div>
           {drag && (drag.startY !== undefined ? <div style={{ ...heldStyle, top: previewTop }}>{heldContent}</div> : <motion.div initial={false} animate={{ top: previewTop }} transition={{ duration: 0.10, ease: 'easeOut' }} style={heldStyle}>{heldContent}</motion.div>)}
         </div>
         <div style={{ width: artSize + 24, minWidth: 0, ...surface('detail'), borderLeftWidth: 1, borderColor: theme.borders.detail, paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -399,7 +476,7 @@ function App() {
       <Text size={11} color={C.muted}>{duration(current?.duration || 0)}</Text>
     </div>
     {prompt === 'local' && <div style={{ display: 'flex', flexDirection: 'row', gap: 12, alignItems: 'center', padding: 12, ...surface('localFind') }}><Text color={C.accent} style={{ width: 14, flexShrink: 0 }}>/</Text><input autoFocus value={query} placeholder={`Find in ${isArtists ? 'artists' : isGrid ? 'albums' : view}`} theme={inputTheme()} onChange={e => setQuery(e.value || '')} onSubmit={() => closePrompt(false)} style={{ flexGrow: 1, flexBasis: 0, minWidth: 0, height: 28, ...surface('localFindInput'), selectionColor: C.textSelection, color: C.text, fontSize: 14, fontFamily: FONT }} /><Text color={C.muted} style={{ flexShrink: 0 }}>{matches.length} matches</Text><Button onClick={() => closePrompt(true)}>esc</Button></div>}
-    <div style={{ height: 32, paddingLeft: 18, paddingRight: 18, ...surface('status'), display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10 }}><Text size={11} color={problem ? C.warning : C.muted} style={{ flexGrow: 1 }}>{problem ? `MPD: ${problem}` : notice}</Text><Text size={11} color={C.muted}>{demo ? 'DEMO · ' : ''}{library.length.toLocaleString()} songs</Text></div>
+    <div style={{ height: 32, paddingLeft: 18, paddingRight: 18, ...surface('status'), display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10 }}><Text size={11} color={problem || navigationLog.error ? C.warning : C.muted} style={{ flexGrow: 1 }}>{navigationLog.error ? `Navigation log: ${navigationLog.error}` : problem ? `MPD: ${problem}` : notice}</Text><Text size={11} color={C.muted}>{demo ? 'DEMO · ' : ''}{library.length.toLocaleString()} songs</Text></div>
 
     {drag && drag.startY !== undefined && <div
       onMouseMove={event => flushSync(() => { if (event.pressedButton === 0) positionDrag(event); else updateDrag(undefined); })}

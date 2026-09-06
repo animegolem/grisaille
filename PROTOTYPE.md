@@ -49,7 +49,13 @@ renderer could use them later.
   The header keeps a temporary path: Library → artist → album. Opening an album
   from any entry point retains its artist tab; clicking that tab steps back to
   the artist. Returning to Now playing or Library clears both context tabs and
-  their navigation state. It does not evict the library or artwork cache.
+  their active path. It does not erase history or evict the library/artwork cache.
+- `o` goes back through visited screens; `i` goes forward. For example, opening
+  an album from Now playing and pressing `o` returns directly to the queue,
+  with the previous selection and scroll position. `h` still opens the parent
+  artist. Moving the selection updates the current history entry; opening a
+  screen adds an entry. A new destination after going back replaces the forward
+  branch. History never replays playback or queue commands.
 - `:` opens a global prompt containing artists, albums, tracks and actions.
 - `/` finds within the current list; Enter retains the selection and Escape cancels.
 - Arrows and `hjkl` navigate. On a cover grid they move spatially; in lists,
@@ -62,6 +68,20 @@ renderer could use them later.
 - The small handle starts a pointer drag. Reordering preserves the current song ID.
   Pointer preview position follows unsnapped motion without easing; only the
   insertion target snaps. Keyboard moves retain the short held-row transition.
+
+## Local navigation journal
+
+Navigation appends to `~/Library/Application Support/Music Prototype/navigation/`
+in daily JSONL files. Each entry has a timestamp, session ID, sequence, backend
+mode, action, source and destination. Locations include the selected item and,
+on page transitions, the viewport. Typed queries and playback commands are not
+recorded. The directory is created with mode 0700 and new files with mode 0600.
+
+The back/forward stack holds up to 200 places in the current app session. The
+journal persists across launches, including discarded forward branches; it is
+not replayed on launch. Missing albums fall back to Library, and removed queue
+items fall back to the nearest surviving selection. Journal write failures
+appear in the status bar without blocking navigation.
 
 ## Colour addresses
 
@@ -117,9 +137,13 @@ python3 scripts/package-mac.py
 
 ## Verification on 6 September 2026
 
-- TypeScript check, standalone build and fifteen tests pass (49 assertions), covering
+- TypeScript check, standalone build and nineteen tests pass (65 assertions), covering
   model/MPD behavior, artist grouping/search, keyboard/grid semantics, pointer
-  insertion and delayed native focus. The packaged window opens with artwork.
+  insertion, delayed native focus and history. The packaged window opens with artwork.
+- Native history checks opened Loveless from Now playing, returned directly
+  to the previously selected queue row with `o`, and reopened the selected album
+  track with `i`. Repeating after scrolling to the last track retained both the
+  selection and viewport. The playing occurrence and paused state were unchanged.
 - Native screenshots checked the queue, cover/metadata pane, album shelf,
   record track list and global prompt. Fixed fragmented metadata text and
   queue rows that failed to fill their available width.
