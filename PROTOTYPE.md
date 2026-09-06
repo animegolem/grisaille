@@ -46,8 +46,10 @@ renderer could use them later.
   `Cmd+3` is reserved for a future Lyrics view and currently has no app action.
 - Library has Covers and Artists views. Artist links open that artist's albums,
   in year order; album links open its track list. They are separate focus targets.
-  The current artist or album gets a temporary header tab; it disappears on
-  return to Now playing or Library.
+  The header keeps a temporary path: Library → artist → album. Opening an album
+  from any entry point retains its artist tab; clicking that tab steps back to
+  the artist. Returning to Now playing or Library clears both context tabs and
+  their navigation state. It does not evict the library or artwork cache.
 - `:` opens a global prompt containing artists, albums, tracks and actions.
 - `/` finds within the current list; Enter retains the selection and Escape cancels.
 - Arrows and `hjkl` navigate. On a cover grid they move spatially; in lists,
@@ -154,6 +156,12 @@ python3 scripts/package-mac.py
 - The follow-up native check confirmed the restored temporary album tab,
   its removal on `Cmd+2`, and `Cmd+1` followed by `m`, `j`, Enter moving a queue
   track while retaining the current song.
+- The path refinement was checked by opening Loveless directly from its queue
+  album link, retaining the My Bloody Valentine tab, using that tab to return
+  to the artist's albums, and clearing the path with `Cmd+2`. Both tabs fit a
+  narrower native window; long names shorten while the prompt stays available.
+  The sample-library label now responds only to width, so changing pages does
+  not shift the permanent navigation buttons.
 - A source audit found no UI colour literals outside `src/theme.ts`. The solid
   palette was checked natively; a replacement gradient palette was not applied.
 

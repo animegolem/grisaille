@@ -165,6 +165,7 @@ function App() {
 
   function openAlbum(album: Album, track?: Track) {
     clearFocus(); updateDrag(undefined); setAlbumPage(0);
+    setArtist(artists.find(a => a.name === album.artist));
     setRecord(album); setView('record'); setSelection(track ? Math.max(0, album.tracks.findIndex(t => t.uri === track.uri)) : 0);
     setPrompt(null); setNotice(`${album.artist} · ${album.title}`);
   }
@@ -176,10 +177,10 @@ function App() {
   function openArtist(name: string) {
     const found = artists.find(a => a.name === name);
     if (!found) return;
-    clearFocus(); updateDrag(undefined); setArtist(found); setView('artist'); setSelection(0); setAlbumPage(0); setPrompt(null); setNotice(name);
+    clearFocus(); updateDrag(undefined); setRecord(undefined); setArtist(found); setView('artist'); setSelection(0); setAlbumPage(0); setPrompt(null); setNotice(name);
   }
   function openPage(page: 'queue' | 'library', mode = libraryView) {
-    clearFocus(); updateDrag(undefined); setPrompt(null); setView(page); setLibraryView(mode); setSelection(0); setAlbumPage(0);
+    clearFocus(); updateDrag(undefined); setPrompt(null); setArtist(undefined); setRecord(undefined); setView(page); setLibraryView(mode); setSelection(0); setAlbumPage(0);
   }
   function goBack() {
     if (view === 'record' && record) openArtist(record.artist);
@@ -320,11 +321,12 @@ function App() {
   return <div testId="music-root" style={{ width: '100%', height: '100%', ...surface('canvas'), selectionColor: C.textSelection, display: 'flex', flexDirection: 'column', position: 'relative' }}>
     <div style={{ height: 56, flexShrink: 0, paddingLeft: process.platform === 'darwin' ? 94 : 22, paddingRight: 18, ...surface('header'), borderBottomWidth: 1, borderColor: theme.borders.header, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, userSelect: 'none' }}>
       <Text size={14}>music</Text>
-      {!narrow && <Text size={11} color={C.muted}>{demo ? 'sample library' : 'MPD'}</Text>}
+      {width >= 1000 && <Text size={11} color={C.muted}>{demo ? 'sample library' : 'MPD'}</Text>}
       <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'row', gap: 6 }}>
         <Button tab active={view === 'queue'} onClick={() => openPage('queue')} id="view-queue">Now playing</Button>
         <Button tab active={view === 'library'} onClick={() => openPage('library')} id="view-library">Library</Button>
-        {(view === 'record' || view === 'artist') && <Button tab active id="view-context" style={{ minWidth: 0, maxWidth: narrow ? 140 : 280 }} onClick={() => view === 'record' && record ? openAlbum(record) : artist && openArtist(artist.name)}>{view === 'record' ? record?.title : artist?.name}</Button>}
+        {(view === 'artist' || view === 'record') && artist && <Button tab active={view === 'artist'} id="view-artist" style={{ minWidth: 0, maxWidth: narrow ? 110 : 220 }} onClick={() => openArtist(artist.name)}>{artist.name}</Button>}
+        {view === 'record' && record && <Button tab active id="view-record" style={{ minWidth: 0, maxWidth: narrow ? 110 : 220 }} onClick={() => openAlbum(record)}>{record.title}</Button>}
       </div>
       <Button id="open-prompt" onClick={() => openPrompt('global')}>Prompt :</Button>
     </div>
