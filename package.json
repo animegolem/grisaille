@@ -1,0 +1,23 @@
+{
+  "name": "mpd-ui-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/app.tsx",
+    "demo": "bun --hot src/app.tsx --demo",
+    "build": "bun build --compile src/app.tsx --outfile dist/music-ui",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@gpuix/react": "0.7.0",
+    "react": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.2.0",
+    "bun": "1.4.2",
+    "typescript": "^5.9.3"
+  }
+}
