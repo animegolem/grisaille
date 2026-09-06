@@ -41,3 +41,20 @@ test('shared location resolution survives changed queue IDs and missing library 
   const parent = artists.find(a => a.name === record.artist)!;
   expect(albumPlace(record, record.tracks[7], parent)).toMatchObject({ selection: 7, route: { artist: parent.name } });
 });
+
+test('MPD connection state changes on failed snapshot reads and clears on recovery', async () => {
+  const backend = new DemoBackend();
+  const snapshot = backend.snapshot.bind(backend);
+  const session = new MusicSession(backend); session.start();
+  try {
+    await session.refresh();
+    expect(session.getState().connection).toBe('connected');
+    backend.snapshot = async () => { throw new Error('Connection refused'); };
+    await session.refresh();
+    expect(session.getState().connection).toBe('down');
+    backend.snapshot = snapshot;
+    await session.refresh();
+    expect(session.getState().connection).toBe('connected');
+    expect(session.getState().problem).toBe('');
+  } finally { session.stop(); }
+});

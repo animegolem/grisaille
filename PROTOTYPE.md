@@ -47,6 +47,8 @@ identity/search, location resolution, history and navigation journal.
 Terminal mode includes the queue, album/artist lists, record tracks, global
 prompt, local find, `o`/`i` history, playback, seeking, removal and keyboard queue
 moves. `F1` opens Now playing; `F2` opens Library; Tab switches album/artist lists.
+On a library or artist page, `s` opens the sort dropdown; arrows choose and Enter
+applies it.
 `q` or Ctrl+C exits and restores the terminal. The remaining main keys match the
 GUI. Command-number shortcuts remain GUI-specific because terminal applications
 commonly reserve them. Terminal mode is keyboard-only in this proof.
@@ -64,8 +66,18 @@ access during this sitting. Protocol/PTY evidence is not that visual acceptance.
 - `Cmd+1` opens Now playing; `Cmd+2` opens Library. Bare numbers do not change pages.
   The eventual page order is Now playing, Lyrics, Library, Visualizer. Those
   later pages and their Command-number assignments have not been added yet.
-- Library has Covers and Artists views. Artist links open that artist's albums,
-  in year order; album links open its track list. They are separate focus targets.
+- Library has Covers and Artists views. Both the album shelf and artist lists
+  scroll continuously. The shelf retains spatial keyboard movement and mounts
+  only album rows near the viewport; there are no page controls. The sort dropdown
+  offers Artist A–Z, Album title A–Z, and year in either direction. Artist lists
+  offer A–Z/Z–A. An artist's albums default to oldest first and have their own sort
+  setting. Missing years sort last. Sorting retains the selected album/artist by
+  identity, including its viewport anchor. These sort choices last for the app
+  session; they are not persisted across launches.
+- The top bar contains navigation and the prompt. MPD connected / down / connecting
+  is shown in the status line; the sample mode is labelled there as simulated.
+  Connection state follows snapshot reads, independently of artwork failures.
+- Artist links open that artist's albums; album links open its track list. They are separate focus targets.
   The header keeps a temporary path: Library → artist → album. Opening an album
   from any entry point retains its artist tab; clicking that tab steps back to
   the artist. Returning to Now playing or Library clears both context tabs and
@@ -84,7 +96,8 @@ access during this sitting. Protocol/PTY evidence is not that visual acceptance.
   In an input, letters remain text; Up/Down choose matches.
 - Clicking a queue, album-track or artist-list row selects it without scrolling
   the viewport. Keyboard navigation and search still reveal the selected item;
-  history restores its saved viewport. Pointer queue drops also avoid an extra
+  history restores its saved viewport. Keyboard selection only scrolls when it
+  reaches an edge. Pointer queue drops also avoid an extra
   automatic jump to the moved row.
 - Space toggles playback. Album and artist text navigate into the library.
 - The album header offers Play album and Queue album. Both append the album in
@@ -192,7 +205,27 @@ python3 scripts/package-mac.py
 
 ## Verification on 6 September 2026
 
-- TypeScript check, standalone build and twenty-eight tests pass (101 assertions), covering
+- Current TypeScript check, standalone build and 39 tests pass (134 assertions).
+  The terminal tests render at 100×28, 65×16 and 44×12 and cover rapid input,
+  bracketed paste, search destinations, history without replaying commands,
+  queue controls, sorting, viewport restoration, action serialization and cleanup.
+  A short-terminal check keeps both the prompt input and chosen result visible.
+- The compiled terminal app ran from `/tmp` against live MPD in a PTY with emulated
+  Kitty capability replies. The capture contained image transfers, three placements
+  and three deletions across opening/closing the prompt. Exit restored the alternate
+  screen and cursor. The queue, current song ID, paused state and volume matched
+  their pre-check values. This validates protocol output, not a Ghostty screenshot.
+- Native continuous browsing checks scrolled through the live 1,508-album shelf
+  and 1,118-artist list. NOFX's sixteenth album was reached by scrolling directly
+  past the former fifteen-album page boundary. Sorting by album title, artists
+  Z–A and newest year retained the selected item. MPD connected appeared in the
+  footer, and the playing occurrence remained paused during these checks.
+- The pinned GPUIX wheel path did not emit visible-range changes. The surrounding
+  scroll event now reads the updated logical list anchor and mounts nearby rows;
+  programmatic jumps still use visible-range events. A native scroll regression
+  exposed the blank-window failure before this correction.
+
+- Earlier GUI verification had twenty-eight tests (101 assertions), covering
   model/MPD behavior, artist grouping/search, keyboard/grid semantics, pointer
   insertion, delayed native focus, history, album ordering, queue operations,
   bounded metadata reads and artwork validation. The packaged window opens with artwork.

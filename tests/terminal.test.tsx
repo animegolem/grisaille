@@ -93,3 +93,28 @@ test('terminal viewport and metadata keep control characters out of display cont
   expect(reveal(6, 1, 12, 5)).toBe(2);
   expect(plain('title\n\x1b]52;c;secret\x07')).toBe('title  ]52;c;secret ');
 });
+
+test('terminal sort dropdown reorders the shelf while retaining its selected album', async () => {
+  const view = await setup();
+  try {
+    view.mockInput.pressKey('F2');
+    await view.waitForFrame(frame => frame.includes('Library / Albums') && frame.includes('1/8'));
+    await view.mockInput.typeText('s', 0);
+    await view.waitForFrame(frame => frame.includes('Year · newest first'));
+    view.mockInput.pressArrow('down');
+    view.mockInput.pressEnter();
+    await view.waitForFrame(frame => frame.includes('Library / Albums') && frame.includes('5/8') && frame.includes('Album title A–Z'));
+    expect(view.events.filter(e => e.action === 'visit')).toHaveLength(1);
+    expect(view.captureCharFrame()).toContain('Love Ire & Song');
+  } finally { view.cleanup(); }
+});
+
+test('a short terminal keeps the prompt input and selected result visible', async () => {
+  const view = await setup(44, 12);
+  try {
+    await view.mockInput.typeText(':love ire', 0);
+    await view.waitForFrame(frame => frame.includes(': love ire') && frame.includes('album') && frame.includes('track'));
+    view.mockInput.pressArrow('down'); view.mockInput.pressEnter();
+    await view.waitForFrame(frame => frame.includes('6/14') && frame.includes('Love Ire & Song'));
+  } finally { view.cleanup(); }
+});

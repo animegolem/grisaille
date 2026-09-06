@@ -8,6 +8,7 @@ import { albumPlace, placeKey, resolvePlace, routeItems, routeTitle } from '../l
 import { albumKey, albumsOf, artistsOf, duration, fuzzyScore, searchLibrary, type Album, type Result, type Track } from '../model';
 import { directionOf } from '../navigation';
 import { theme } from '../theme';
+import { albumOrders, artistOrders, defaultOrder, orderAlbums, orderArtists, type LibraryOrder } from '../library-order';
 
 const C = theme.colors;
 // A terminal cell has one background; a future GUI gradient uses its first stop here.
@@ -41,11 +42,15 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   session: MusicSession; record?: (event: NavigationEvent) => void; quit?: () => void;
   protocol?: ImageRenderProtocol; logError?: () => string | undefined;
 }) {
-  const { library, snapshot, loading, notice, problem, actionProblem, playClock, act, reloadLibrary, setNotice } = useMusic(session);
+  const { library, snapshot, loading, connection, notice, problem, actionProblem, playClock, act, reloadLibrary, setNotice } = useMusic(session);
   const backend = session.backend;
   const { width, height } = useTerminalDimensions();
-  const albums = useMemo(() => albumsOf(library), [library]);
-  const artists = useMemo(() => artistsOf(albums), [albums]);
+  const [order, setOrder] = useState<LibraryOrder>(defaultOrder);
+  const [sortOpen, setSortOpen] = useState(false);
+  const [sortIndex, setSortIndex] = useState(0);
+  const baseAlbums = useMemo(() => albumsOf(library), [library]);
+  const albums = useMemo(() => orderAlbums(baseAlbums, order.albums), [baseAlbums, order.albums]);
+  const artists = useMemo(() => orderArtists(artistsOf(baseAlbums), order), [baseAlbums, order]);
   const catalogue = useMemo(() => ({ albums, artists, queue: snapshot.queue }), [albums, artists, snapshot.queue]);
   const history = useMemo(() => new NavigationHistory({ route: { page: 'queue' }, selection: 0 }, record), []);
   const [place, setPlace] = useState<Place>(history.current);
@@ -55,13 +60,18 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   const [priorPlace, setPriorPlace] = useState(place);
   const [held, setHeld] = useState<{ id: number; target: number }>();
   const route = place.route;
+  const orderContext = route.page === 'library' && route.mode === 'artists' ? 'artists' : route.page === 'artist' ? 'artistAlbums' : 'albums';
+  const sortOptions = orderContext === 'artists' ? artistOrders : albumOrders;
+  const sortLabel = sortOptions.find(option => option.value === order[orderContext])?.label || '';
   const items = useMemo(() => routeItems(route, catalogue), [route, catalogue]);
   const selected = items[place.selection];
   const current = snapshot.queue.find(t => t.queueId === snapshot.currentId);
   const shown = route.page === 'queue' ? current || selected : selected;
   const album = route.page === 'record' ? albums.find(a => a.key === route.key) : undefined;
   const parent = route.page === 'artist' ? artists.find(a => a.name === route.name) : route.page === 'record' ? artists.find(a => a.name === route.artist) : undefined;
-  const capacity = Math.max(1, Math.floor((height - 9 - (prompt === 'local' ? 2 : 0)) / 2));
+  const tight = height < 16;
+  const compactPrompt = height < 20;
+  const capacity = Math.max(1, Math.floor((height - (tight ? 8 : 10) - (prompt === 'local' ? tight ? 1 : 2 : 0)) / 2));
   const top = place.viewport?.kind === 'list' ? place.viewport.index : 0;
   const showDetail = width >= 78 && height >= 19 && prompt !== 'global';
   const detailWidth = Math.min(36, Math.floor(width * .35));
@@ -83,7 +93,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   }
   function visit(point: Place) {
     const next = position(point);
-    history.visit(next, place); setPlace(next); setPrompt(undefined); setHeld(undefined);
+    history.visit(next, place); setPlace(next); setPrompt(undefined); setHeld(undefined); setSortOpen(false);
     setNotice(routeTitle(next.route, albums));
   }
   function openAlbum(target: Album, track?: Track) { visit(albumPlace(target, track, parent)); }
@@ -121,6 +131,17 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   }
   function keypress(key: KeyEvent) {
     if (key.ctrl && key.name === 'c') { key.preventDefault(); quit(); return; }
+    if (sortOpen) {
+      key.preventDefault();
+      if (key.name === 'escape') setSortOpen(false);
+      else if (key.name === 'down' || key.sequence === 'j') setSortIndex(i => (i + 1) % sortOptions.length);
+      else if (key.name === 'up' || key.sequence === 'k') setSortIndex(i => (i - 1 + sortOptions.length) % sortOptions.length);
+      else if (key.name === 'return' && sortOptions[sortIndex]) {
+        const value = sortOptions[sortIndex]!.value;
+        setOrder(previous => ({ ...previous, [orderContext]: value })); setSortOpen(false);
+      }
+      return;
+    }
     if (prompt) {
       if (key.name === 'escape') { key.preventDefault(); if (prompt === 'local') { setPlace(priorPlace); history.checkpoint(priorPlace); } setPrompt(undefined); }
       if (key.name === 'up' || key.name === 'down') {
@@ -149,6 +170,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     else if (char === 'o') travel('back');
     else if (char === 'i') travel('forward');
     else if (char === 'q') quit();
+    else if (char === 's' && (route.page === 'library' || route.page === 'artist')) { setSortIndex(Math.max(0, sortOptions.findIndex(option => option.value === order[orderContext]))); setSortOpen(true); }
     else if (key.name === 'f1') visit({ route: { page: 'queue' }, selection: 0 });
     else if (key.name === 'f2') visit({ route: { page: 'library', mode: 'covers' }, selection: 0 });
     else if (direction === 'up' || direction === 'down') select(place.selection + (direction === 'down' ? 1 : -1));
@@ -179,9 +201,10 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   useEffect(() => { if (prompt === 'local' && query.trim() && matches.length) select(matches[0]!); }, [query]);
 
   const error = logError?.() || actionProblem || problem;
+  const status = backend.demo ? 'Demo · simulated' : connection === 'connected' ? 'MPD connected' : connection === 'down' ? 'MPD down' : 'MPD connecting';
   const heading = routeTitle(route, albums) + (route.page === 'library' ? route.mode === 'artists' ? ' / Artists' : ' / Albums' : route.page === 'record' ? ` / ${parent?.name || album?.artist || ''}` : '');
-  const resultTop = Math.max(0, resultIndex - Math.max(1, Math.floor((height - 13) / 2)) + 1);
-  const resultCount = Math.max(1, Math.floor((height - 13) / 2));
+  const resultCount = Math.max(1, Math.floor((height - (compactPrompt ? tight ? 8 : 9 : 16)) / 2));
+  const resultTop = Math.max(0, resultIndex - resultCount + 1);
   const input = <box height={1} flexDirection="row" gap={1}>
     <text fg={C.accent}>{prompt === 'global' ? ':' : '/'}</text>
     <input id="music-prompt" focused value={query} flexGrow={1} backgroundColor={fill('prompt')} textColor={C.text} focusedBackgroundColor={fill('prompt')} focusedTextColor={C.text} placeholderColor={C.muted} cursorColor={C.caret} placeholder={prompt === 'global' ? 'Find an artist, album, track or action' : 'Find in this list'} onInput={value => { setQuery(value); setResultIndex(0); }} onSubmit={() => { if (prompt === 'global') activateResult(results[resultIndex]); else setPrompt(undefined); }} />
@@ -189,12 +212,12 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   if (width < 40 || height < 12) return <box padding={1}><Line text="Music · enlarge to at least 40 × 12" /><Line text="q quit · Ctrl+C quit" color={C.muted} /></box>;
   return <box width="100%" height="100%" flexDirection="column" backgroundColor={fill('canvas')}>
     <box height={3} paddingLeft={2} paddingRight={2} paddingTop={1} flexDirection="row" gap={3} backgroundColor={fill('header')}>
-      <text fg={C.accent}><strong>music</strong></text><text fg={route.page === 'queue' ? C.text : C.muted}>F1 Now playing</text><text fg={route.page === 'library' ? C.text : C.muted}>F2 Library</text><text fg={C.muted}>{backend.demo ? 'DEMO' : 'MPD'}</text>
+      <text fg={route.page === 'queue' ? C.text : C.muted}>F1 Now playing</text><text fg={route.page === 'library' ? C.text : C.muted}>F2 Library</text>
     </box>
-    <box flexGrow={1} minHeight={0} paddingLeft={2} paddingRight={2} paddingTop={1} flexDirection="column">
-      {prompt === 'global' ? <box flexDirection="column" height="100%" gap={1} backgroundColor={fill('prompt')} padding={1}>
+    <box flexGrow={1} minHeight={0} paddingLeft={2} paddingRight={2} paddingTop={tight ? 0 : 1} flexDirection="column">
+      {prompt === 'global' ? <box flexDirection="column" height="100%" gap={compactPrompt ? 0 : 1} backgroundColor={fill('prompt')} padding={compactPrompt ? 0 : 1}>
         {input}
-        <Line text="Artists · albums · tracks · actions" color={C.muted} />
+        {!compactPrompt && <Line text="Artists · albums · tracks · actions" color={C.muted} />}
         <box flexGrow={1} minHeight={0} flexDirection="column">
           {results.slice(resultTop, resultTop + resultCount).map((result, i) => {
             const title = result.kind === 'artist' ? result.artist.name : result.kind === 'album' ? result.album.title : result.kind === 'track' ? result.track.title : result.title;
@@ -205,11 +228,11 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
           })}
           {!results.length && <Line text={loading ? 'Reading the library…' : 'No matches'} color={C.muted} />}
         </box>
-        <Line text="↑↓ choose · Enter open / run · Esc return" color={C.muted} />
+        {!compactPrompt && <Line text="↑↓ choose · Enter open / run · Esc return" color={C.muted} />}
       </box> : <>
-        <Line text={`${heading}   ${items.length ? place.selection + 1 : 0}/${items.length}${route.page === 'library' ? '   Tab albums / artists' : ''}`} color={C.accent} />
-        {prompt === 'local' && <box height={2} paddingTop={1}>{input}</box>}
-        <box flexDirection="row" gap={3} flexGrow={1} minHeight={0} paddingTop={1}>
+        <Line text={`${heading}   ${items.length ? place.selection + 1 : 0}/${items.length}${route.page === 'library' || route.page === 'artist' ? `   s ${sortLabel} ▾` : ''}`} color={C.accent} />
+        {prompt === 'local' && <box height={tight ? 1 : 2} paddingTop={tight ? 0 : 1}>{input}</box>}
+        <box flexDirection="row" gap={3} flexGrow={1} minHeight={0} paddingTop={tight ? 0 : 1}>
           <box flexDirection="column" flexGrow={1} minWidth={0}>
             {items.slice(top, top + capacity).map((track, i) => {
               const index = top + i;
@@ -234,7 +257,10 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     <box height={4} flexShrink={0} paddingLeft={2} paddingRight={2} paddingTop={1} backgroundColor={fill('transport')}>
       <Line text={`${snapshot.state === 'play' ? '▶' : snapshot.state === 'pause' ? 'Ⅱ' : '■'} ${current?.title || 'Nothing playing'}   ${duration(elapsed)} / ${duration(current?.duration || 0)}   ${snapshot.volume}%`} />
       <Line text={held ? 'Moving · arrows / hjkl position · Enter drop · Esc cancel' : 'hjkl / arrows · Enter play/open · Space pause · : prompt · o/i history · q quit'} color={C.muted} />
-      <Line text={error || notice} color={error ? C.warning : C.muted} />
+      <Line text={`${status} · ${error || notice}`} color={error ? C.warning : C.muted} />
     </box>
+    {sortOpen && <box position="absolute" top={5} right={2} width={Math.min(29, width - 4)} height={sortOptions.length + 2} padding={1} backgroundColor={fill('sortMenu')}>
+      {sortOptions.map((option, index) => <text key={option.value} height={1} fg={index === sortIndex ? C.accent : C.text} bg={index === sortIndex ? fill('sortItemSelected') : fill('sortMenu')}>{`${index === sortIndex ? '›' : ' '} ${option.label}`}</text>)}
+    </box>}
   </box>;
 }

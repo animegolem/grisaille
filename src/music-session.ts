@@ -2,7 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { MusicBackend, Snapshot, Track } from './model';
 
 export type MusicState = {
-  library: Track[]; snapshot: Snapshot; loading: boolean;
+  library: Track[]; snapshot: Snapshot; loading: boolean; connection: 'connecting' | 'connected' | 'down';
   notice: string; problem: string; actionProblem: string;
 };
 const messageOf = (error: unknown) => error instanceof Error ? error.message : String(error);
@@ -11,7 +11,7 @@ const messageOf = (error: unknown) => error instanceof Error ? error.message : S
 export class MusicSession {
   private state: MusicState = {
     library: [], snapshot: { queue: [], state: 'stop', elapsed: 0, volume: 0 },
-    loading: true, notice: 'Connecting…', problem: '', actionProblem: '',
+    loading: true, connection: 'connecting', notice: 'Connecting…', problem: '', actionProblem: '',
   };
   private listeners = new Set<() => void>();
   private active = false;
@@ -55,8 +55,8 @@ export class MusicSession {
         this.refreshAgain = false;
         try {
           const snapshot = await this.backend.snapshot();
-          if (generation === this.generation) this.update({ snapshot, problem: snapshot.error || '' });
-        } catch (error) { if (generation === this.generation) this.update({ problem: messageOf(error) }); }
+          if (generation === this.generation) this.update({ snapshot, problem: snapshot.error || '', connection: snapshot.error ? 'down' : 'connected' });
+        } catch (error) { if (generation === this.generation) this.update({ problem: messageOf(error), connection: 'down' }); }
       } while (this.active && generation === this.generation && this.refreshAgain);
     })().finally(() => { if (this.refreshTask === task) this.refreshTask = undefined; });
     this.refreshTask = task; return task;
@@ -71,7 +71,7 @@ export class MusicSession {
         this.libraryAgain = false;
         try {
           const library = await this.backend.library();
-          if (generation === this.generation) this.update({ library, notice: this.backend.demo ? 'Sample library · playback is simulated' : 'Connected to MPD' });
+          if (generation === this.generation) this.update({ library, notice: this.backend.demo ? 'Sample library · playback is simulated' : 'Library ready' });
         } catch (error) { if (generation === this.generation) this.update({ actionProblem: messageOf(error) }); }
       } while (this.active && generation === this.generation && this.libraryAgain);
       if (generation === this.generation) this.update({ loading: false });

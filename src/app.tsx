@@ -11,6 +11,7 @@ import { NavigationHistory, type Place, type Route, type Viewport } from './hist
 import { NavigationLog } from './navigation-log';
 import { MusicSession, useMusic } from './music-session';
 import { albumPlace, placeKey, resolvePlace as resolveLocation } from './locations';
+import { albumOrders, artistOrders, defaultOrder, orderAlbums, orderArtists, type LibraryOrder } from './library-order';
 
 const C = theme.colors;
 const FONT = 'Menlo';
@@ -74,8 +75,14 @@ function App() {
     return () => { didFocusControl = () => {}; focusSteps.cancel(); };
   }, [focusSteps]);
   const { width, height } = useWindowSize();
-  const { library, snapshot, loading, notice, problem, actionProblem, playClock, act, reloadLibrary, setNotice } = useMusic(session);
+  const { library, snapshot, loading, connection, notice, problem, actionProblem, playClock, act, reloadLibrary, setNotice } = useMusic(session);
   const [view, setView] = useState<'queue' | 'library' | 'artist' | 'record'>('queue');
+  const [order, setOrder] = useState<LibraryOrder>(defaultOrder);
+  const [sortOpen, setSortOpen] = useState(false);
+  const [sortIndex, setSortIndex] = useState(0);
+  const pendingSort = useRef<Place | undefined>(undefined);
+  const [gridWindow, setGridWindow] = useState({ key: '', start: 0, end: 6 });
+  const [artistWindow, setArtistWindow] = useState({ start: 0, end: 10 });
   const [libraryView, setLibraryView] = useState<'covers' | 'artists'>('covers');
   const [artist, setArtist] = useState<Artist>();
   const [record, setRecord] = useState<Album>();
@@ -105,8 +112,9 @@ function App() {
     activeDrag.current = next;
     setDrag(next);
   }
-  const albums = useMemo(() => albumsOf(library), [library]);
-  const artists = useMemo(() => artistsOf(albums), [albums]);
+  const baseAlbums = useMemo(() => albumsOf(library), [library]);
+  const albums = useMemo(() => orderAlbums(baseAlbums, order.albums), [baseAlbums, order.albums]);
+  const artists = useMemo(() => orderArtists(artistsOf(baseAlbums), order), [baseAlbums, order]);
   const shelf = view === 'artist' ? artist?.albums || [] : albums;
   const isGrid = view === 'artist' || (view === 'library' && libraryView === 'covers');
   const isArtists = view === 'library' && libraryView === 'artists';
@@ -121,13 +129,22 @@ function App() {
   const artHeightBudget = height - 360 - (view === 'record' ? 50 : 0) - (prompt === 'local' ? 56 : 0);
   const artSize = Math.max(120, Math.min(350, Math.floor(width * (narrow ? 0.32 : 0.36) - 55), artHeightBudget));
   const columns = Math.max(3, Math.floor((width - 48) / 190));
-  const pageSize = columns * 3;
-  const albumPage = Math.floor(selection / pageSize);
   const albumTileSize = Math.floor((width - 44 - (columns - 1) * 20) / columns);
+  const gridRowHeight = albumTileSize + 78;
+  const gridRows = Math.ceil(shelf.length / columns);
+  const gridKey = `${view}:${artist?.name || ''}:${columns}:${view === 'artist' ? order.artistAlbums : order.albums}`;
+  const gridRange = gridWindow.key === gridKey ? gridWindow : { start: 0, end: 6 };
+  const orderContext = isArtists ? 'artists' : view === 'artist' ? 'artistAlbums' : 'albums';
+  const sortOptions = isArtists ? artistOrders : albumOrders;
+  const sortLabel = sortOptions.find(option => option.value === order[orderContext])?.label || '';
   const elapsed = Math.min(current?.duration || 0, snapshot.elapsed + playClock);
   const error = actionProblem || problem;
 
   useLayoutEffect(() => {
+    if (pendingSort.current) {
+      const point = resolvePlace(pendingSort.current); pendingSort.current = undefined;
+      applyPlace(point); return;
+    }
     if (view === 'record' && record) {
       const updated = albums.find(a => a.key === record.key);
       if (updated) {
@@ -151,19 +168,26 @@ function App() {
     const scroll = selectionScroll.current;
     selectionScroll.current = 'reveal';
     if (activeDrag.current?.startY !== undefined) return;
-    const ref = view === 'queue' ? queueRef : isArtists ? artistListRef : listRef;
+    const ref = isGrid ? albumGridRef : view === 'queue' ? queueRef : isArtists ? artistListRef : listRef;
     const saved = pendingViewport.current;
     pendingViewport.current = undefined;
-    if (saved?.kind === 'list' && ref.current && !isGrid) { renderer.scrollToItem?.(ref.current.id, saved.index, saved.offset); return; }
-    if (saved?.kind === 'grid' && saved.columns === columns && albumGridRef.current && isGrid) { renderer.scrollTo?.(albumGridRef.current.id, saved.x, saved.y); return; }
+    if (saved?.kind === 'list' && ref.current) { renderer.scrollToItem?.(ref.current.id, isGrid ? Math.floor(saved.index / columns) : saved.index, saved.offset); return; }
+    if (saved?.kind === 'grid' && albumGridRef.current && isGrid) { renderer.scrollToItem?.(albumGridRef.current.id, Math.max(0, Math.floor(-saved.y / gridRowHeight))); return; }
     // A click chooses an already visible item; only navigation should reveal it.
-    if (scroll === 'preserve') return;
-    if (ref.current && !isGrid) renderer.scrollToItem?.(ref.current.id, selection);
-    if (isGrid) {
-      const row = Math.floor((selection % pageSize) / columns);
-      if (albumGridRef.current) renderer.scrollTo?.(albumGridRef.current.id, 0, -row * (albumTileSize + 78));
-    }
-  }, [selection, view, libraryView, artist?.name, record?.key, pageSize, columns, albumTileSize]);
+    if (scroll === 'preserve' || !ref.current) return;
+    const target = isGrid ? Math.floor(selection / columns) : selection;
+    const rowHeight = isGrid ? gridRowHeight : isArtists ? 88 : ROW;
+    const top = renderer.getListScrollTop?.(ref.current.id);
+    const measurable = renderer as typeof renderer & Partial<Pick<GpuixRenderer, 'getElementBounds'>>;
+    const bounds = measurable.getElementBounds?.(ref.current.id);
+    if (top && bounds?.[3]) {
+      const start = top[0] * rowHeight + top[1];
+      const end = start + bounds[3];
+      if (target * rowHeight >= start && (target + 1) * rowHeight <= end) return;
+      const destination = target * rowHeight < start ? target * rowHeight : Math.max(0, (target + 1) * rowHeight - bounds[3]);
+      renderer.scrollToItem?.(ref.current.id, Math.floor(destination / rowHeight), destination % rowHeight);
+    } else renderer.scrollToItem?.(ref.current.id, target);
+  }, [selection, view, libraryView, artist?.name, record?.key, columns, gridRowHeight, height, order]);
   useEffect(() => {
     history.checkpoint({ ...history.current, route: currentRoute(), selection, selected: placeKey(currentRoute(), buffer[selection]) });
   }, [selection, view, libraryView, artist?.name, record?.key, buffer.length]);
@@ -181,19 +205,19 @@ function App() {
     const route = currentRoute();
     const point: Place = { route, selection, selected: placeKey(route, buffer[selection]) };
     if (pendingViewport.current) point.viewport = pendingViewport.current;
-    else if (isGrid && albumGridRef.current) {
-      const offset = renderer.getScrollOffset?.(albumGridRef.current.id);
-      if (offset) point.viewport = { kind: 'grid', x: offset[0] || 0, y: offset[1] || 0, columns };
-    } else {
-      const ref = view === 'queue' ? queueRef : isArtists ? artistListRef : listRef;
+    else {
+      const ref = isGrid ? albumGridRef : view === 'queue' ? queueRef : isArtists ? artistListRef : listRef;
       const top = ref.current && renderer.getListScrollTop?.(ref.current.id);
-      if (top) point.viewport = { kind: 'list', index: top[0] || 0, offset: top[1] || 0, anchor: placeKey(route, buffer[top[0] || 0]) };
+      if (top) {
+        const index = (top[0] || 0) * (isGrid ? columns : 1);
+        point.viewport = { kind: 'list', index, offset: top[1] || 0, anchor: placeKey(route, buffer[index]) };
+      }
     }
     return point;
   }
   function resolvePlace(point: Place): Place { return resolveLocation(point, { albums, artists, queue: snapshot.queue }); }
   function applyPlace(point: Place) {
-    clearFocus(); updateDrag(undefined); setPrompt(null);
+    clearFocus(); updateDrag(undefined); setPrompt(null); setSortOpen(false);
     const route = point.route;
     const album = route.page === 'record' ? albums.find(a => a.key === route.key) : undefined;
     const person = route.page === 'artist' ? artists.find(a => a.name === route.name) : album ? artists.find(a => a.name === (route.page === 'record' && route.artist || album.artist)) : undefined;
@@ -202,9 +226,9 @@ function App() {
     pendingViewport.current = point.viewport;
     setSelection(point.selection);
   }
-  function visit(route: Route, index = 0) {
+  function visit(route: Route, index = 0, source = capturePlace()) {
     const next = resolvePlace({ route, selection: index });
-    history.visit(next, capturePlace());
+    history.visit(next, source);
     applyPlace(next);
   }
   function travel(direction: 'back' | 'forward') {
@@ -215,9 +239,9 @@ function App() {
     const route = next.route;
     setNotice(`${direction === 'back' ? 'Back' : 'Forward'} · ${route.page === 'queue' ? 'Now playing' : route.page === 'library' ? 'Library' : route.page === 'artist' ? route.name : albums.find(a => a.key === route.key)?.title || 'Album'}`);
   }
-  function openAlbum(album: Album, track?: Track) {
+  function openAlbum(album: Album, track?: Track, source?: Place) {
     const place = albumPlace(album, track, artist);
-    visit(place.route, place.selection);
+    visit(place.route, place.selection, source);
     setNotice(`${album.artist} · ${album.title}`);
   }
   function openTrack(track: Track) {
@@ -225,10 +249,14 @@ function App() {
     if (a) openAlbum(a, track);
   }
   function clearFocus() { focusSteps.cancel(); focusedButton = undefined; renderer.blur?.(); }
-  function openArtist(name: string) {
+  function openArtist(name: string, source?: Place) {
     const found = artists.find(a => a.name === name);
     if (!found) return;
-    visit({ page: 'artist', name }); setNotice(name);
+    visit({ page: 'artist', name }, 0, source); setNotice(name);
+  }
+  function sourceAt(index: number): Place {
+    const point = capturePlace();
+    return { ...point, selection: index, selected: placeKey(point.route, buffer[index]) };
   }
   function openPage(page: 'queue' | 'library', mode = libraryView) {
     visit(page === 'queue' ? { page } : { page, mode });
@@ -237,6 +265,30 @@ function App() {
     if (view === 'record' && record) openArtist(artist?.name || record.artist);
     else if (view === 'artist') openPage('library', 'artists');
     else if (view === 'library') openPage('queue');
+  }
+  // GPUIX 0.7.0 supplies ranges for programmatic jumps. Its wheel path needs
+  // the wrapper's scroll event plus the already updated logical scroll anchor.
+  function syncVisibleRows(event?: EventPayload) {
+    const ref = isGrid ? albumGridRef : artistListRef;
+    const top = ref.current && renderer.getListScrollTop?.(ref.current.id);
+    const count = isGrid ? gridRows : artists.length;
+    const rowHeight = isGrid ? gridRowHeight : 88;
+    const first = event?.startIndex ?? top?.[0] ?? 0;
+    const capacity = Math.ceil(((top?.[2] || height - 240) + (top?.[1] || 0)) / rowHeight) + 2;
+    const start = Math.max(0, Math.min(Math.max(0, count - 1), first - 1));
+    const end = Math.min(count, Math.max(event?.endIndex || 0, first + capacity) + 1);
+    if (isGrid) setGridWindow(previous => previous.key === gridKey && previous.start === start && previous.end === end ? previous : { key: gridKey, start, end });
+    else setArtistWindow(previous => previous.start === start && previous.end === end ? previous : { start, end });
+  }
+  function openSort() {
+    clearFocus();
+    setSortIndex(Math.max(0, sortOptions.findIndex(option => option.value === order[orderContext])));
+    setSortOpen(true);
+  }
+  function chooseSort(value: string) {
+    pendingSort.current = capturePlace();
+    setOrder(previous => ({ ...previous, [orderContext]: value }));
+    setSortOpen(false); clearFocus();
   }
   function openPrompt(kind: 'global' | 'local') {
     focusSteps.cancel();
@@ -305,6 +357,13 @@ function App() {
   useLayoutEffect(() => {
     dispatchKey = event => {
       const key = event.keyChar || event.key || '';
+      if (sortOpen) {
+        if (event.key === 'escape') { setSortOpen(false); clearFocus(); }
+        else if (event.key === 'down' || key === 'j') setSortIndex(i => (i + 1) % sortOptions.length);
+        else if (event.key === 'up' || key === 'k') setSortIndex(i => (i - 1 + sortOptions.length) % sortOptions.length);
+        else if (event.key === 'enter' && sortOptions[sortIndex]) chooseSort(sortOptions[sortIndex]!.value);
+        return;
+      }
       const page = pageShortcut(event);
       if (page) { openPage(page); return; }
       if (event.modifiers?.cmd || event.modifiers?.ctrl || event.modifiers?.alt) return;
@@ -385,7 +444,6 @@ function App() {
     </div>;
   }
 
-  const pageAlbums = shelf.slice(albumPage * pageSize, (albumPage + 1) * pageSize);
   const scrollAnchor = queueRef.current ? renderer.getListScrollTop?.(queueRef.current.id) : undefined;
   const sourceIndex = drag ? snapshot.queue.findIndex(t => t.queueId === drag.id) : 0;
   const previewIndex = drag?.startY !== undefined ? sourceIndex : drag?.target || 0;
@@ -397,8 +455,6 @@ function App() {
 
   return <div testId="music-root" style={{ width: '100%', height: '100%', ...surface('canvas'), selectionColor: C.textSelection, display: 'flex', flexDirection: 'column', position: 'relative' }}>
     <div style={{ height: 56, flexShrink: 0, paddingLeft: process.platform === 'darwin' ? 94 : 22, paddingRight: 18, ...surface('header'), borderBottomWidth: 1, borderColor: theme.borders.header, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, userSelect: 'none' }}>
-      <Text size={14}>music</Text>
-      {width >= 1000 && <Text size={11} color={C.muted}>{demo ? 'sample library' : 'MPD'}</Text>}
       <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'row', gap: 6 }}>
         <Button tab active={view === 'queue'} onClick={() => openPage('queue')} id="view-queue">Now playing</Button>
         <Button tab active={view === 'library'} onClick={() => openPage('library')} id="view-library">Library</Button>
@@ -409,32 +465,40 @@ function App() {
     </div>
 
     <div style={{ flexGrow: 1, minHeight: 0, padding: 22, ...surface('main'), display: 'flex', flexDirection: 'row', gap: 26 }}>
-      {isGrid || isArtists ? <div style={{ width: '100%', minHeight: 0, ...surface('library'), display: 'flex', flexDirection: 'column', gap: 18 }}>
+      {isGrid || isArtists ? <div onScroll={() => syncVisibleRows()} style={{ width: '100%', minHeight: 0, ...surface('library'), display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           {view === 'artist' ? <><Button onClick={() => openPage('library', 'artists')}>‹ Artists</Button><Text size={17} style={{ flexGrow: 1 }}>{artist?.name}</Text><Text color={C.muted}>{shelf.length} albums</Text></> : <>
             <Button active={libraryView === 'covers'} onClick={() => openPage('library', 'covers')}>Covers</Button>
             <Button active={libraryView === 'artists'} onClick={() => openPage('library', 'artists')}>Artists</Button>
             <div style={{ flexGrow: 1 }} /><Text color={C.muted}>{isArtists ? `${artists.length} artists` : `${albums.length} albums`}</Text>
           </>}
+          <Button id="library-sort" onClick={openSort}>{sortLabel} ▾</Button>
         </div>
-        {isArtists ? <virtual-list ref={artistListRef} estimatedItemHeight={88} style={{ width: '100%', flexGrow: 1, minHeight: 0, ...surface('artistList') }}>
-          {artists.map((a, index) => <div key={a.name} onClick={() => selectFromPointer(index)} style={{ width: '100%', height: 88, padding: 12, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, ...surface(selection === index ? 'artistRowSelected' : 'artistRow'), hover: selection === index ? undefined : surface('artistRowHover'), borderBottomWidth: 1, borderColor: theme.borders.artistRow }}>
-            <Cover track={a.albums[0]?.tracks[0]} size={60} onClick={() => openArtist(a.name)} />
+        {isArtists ? <virtual-list ref={artistListRef} itemCount={artists.length} windowStart={artistWindow.start} onVisibleRange={event => syncVisibleRows(event)} estimatedItemHeight={88} style={{ width: '100%', flexGrow: 1, minHeight: 0, ...surface('artistList') }}>
+          {artists.slice(artistWindow.start, artistWindow.end).map((a, localIndex) => { const index = artistWindow.start + localIndex; return <div key={a.name} onClick={() => selectFromPointer(index)} style={{ width: '100%', height: 88, padding: 12, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, ...surface(selection === index ? 'artistRowSelected' : 'artistRow'), hover: selection === index ? undefined : surface('artistRowHover'), borderBottomWidth: 1, borderColor: theme.borders.artistRow }}>
+            <Cover track={a.albums[0]?.tracks[0]} size={60} onClick={() => openArtist(a.name, sourceAt(index))} />
             <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
-              <Link size={16} onClick={() => openArtist(a.name)}>{a.name}</Link>
+              <Link size={16} onClick={() => openArtist(a.name, sourceAt(index))}>{a.name}</Link>
               <Text size={11} color={C.muted}>{a.albums.length} {a.albums.length === 1 ? 'album' : 'albums'} · {a.albums.reduce((n, album) => n + album.tracks.length, 0)} tracks</Text>
             </div>
-            <Button onClick={() => openArtist(a.name)}>›</Button>
-          </div>)}
-        </virtual-list> : <div ref={albumGridRef} style={{ flexGrow: 1, minHeight: 0, overflowY: 'scroll', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 20 }}>
-          {pageAlbums.map((a, index) => <div key={a.key} onClick={() => openAlbum(a)} style={{ width: albumTileSize, height: albumTileSize + 58, display: 'flex', flexDirection: 'column', gap: 9, cursor: 'pointer', ...surface(selection === albumPage * pageSize + index ? 'albumCardSelected' : 'albumCard'), hover: selection === albumPage * pageSize + index ? undefined : surface('albumCardHover') }}>
-            <Cover track={a.tracks[0]} size={albumTileSize} />
-            <Text style={{ height: 22, flexShrink: 0 }}>{a.title}</Text>
-            <div style={{ height: 18, flexShrink: 0, display: 'flex', flexDirection: 'row', gap: 6 }}><Link muted size={11} onClick={() => openArtist(a.artist)}>{a.artist}</Link><Text size={11} color={C.muted}>{a.year}</Text></div>
-          </div>)}
-        </div>}
+            <Button onClick={() => openArtist(a.name, sourceAt(index))}>›</Button>
+          </div>; })}
+        </virtual-list> : <virtual-list ref={albumGridRef} itemCount={gridRows} windowStart={gridRange.start} estimatedItemHeight={gridRowHeight} onVisibleRange={event => syncVisibleRows(event)} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>
+          {Array.from({ length: Math.max(0, Math.min(gridRows, gridRange.end) - gridRange.start) }, (_, localRow) => {
+            const row = gridRange.start + localRow;
+            return <div key={`${gridKey}:${row}`} style={{ width: '100%', height: gridRowHeight, paddingBottom: 20, display: 'flex', flexDirection: 'row', gap: 20 }}>
+              {shelf.slice(row * columns, (row + 1) * columns).map((a, column) => {
+                const index = row * columns + column;
+                return <div key={a.key} onClick={() => openAlbum(a, undefined, sourceAt(index))} style={{ width: albumTileSize, height: albumTileSize + 58, display: 'flex', flexDirection: 'column', gap: 9, cursor: 'pointer', ...surface(selection === index ? 'albumCardSelected' : 'albumCard'), hover: selection === index ? undefined : surface('albumCardHover') }}>
+                  <Cover track={a.tracks[0]} size={albumTileSize} />
+                  <Text style={{ height: 22, flexShrink: 0 }}>{a.title}</Text>
+                  <div style={{ height: 18, flexShrink: 0, display: 'flex', flexDirection: 'row', gap: 6 }}><Link muted size={11} onClick={() => openArtist(a.artist)}>{a.artist}</Link><Text size={11} color={C.muted}>{a.year}</Text></div>
+                </div>;
+              })}
+            </div>;
+          })}
+        </virtual-list>}
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          {isGrid && <><Button onClick={() => setSelection(Math.max(0, (albumPage - 1) * pageSize))}>←</Button><Text color={C.muted}>{albumPage + 1} / {Math.max(1, Math.ceil(shelf.length / pageSize))}</Text><Button onClick={() => setSelection(Math.min(Math.max(0, shelf.length - 1), (albumPage + 1) * pageSize))}>→</Button></>}
           <Text size={11} color={C.muted}>{isArtists ? 'j/k select · l open · h back' : 'hjkl / arrows select · enter open'} · / find · o/i history</Text>
         </div>
       </div> : <>
@@ -483,7 +547,7 @@ function App() {
       <Text size={11} color={C.muted}>{duration(current?.duration || 0)}</Text>
     </div>
     {prompt === 'local' && <div style={{ display: 'flex', flexDirection: 'row', gap: 12, alignItems: 'center', padding: 12, ...surface('localFind') }}><Text color={C.accent} style={{ width: 14, flexShrink: 0 }}>/</Text><input autoFocus value={query} placeholder={`Find in ${isArtists ? 'artists' : isGrid ? 'albums' : view}`} theme={inputTheme()} onFocus={() => { promptReady.current = true; }} onChange={e => { promptReady.current = true; setQuery(e.value || ''); }} onSubmit={() => closePrompt(false)} style={{ flexGrow: 1, flexBasis: 0, minWidth: 0, height: 28, ...surface('localFindInput'), selectionColor: C.textSelection, color: C.text, fontSize: 14, fontFamily: FONT }} /><Text color={C.muted} style={{ flexShrink: 0 }}>{matches.length} matches</Text><Button onClick={() => closePrompt(true)}>esc</Button></div>}
-    <div style={{ height: 32, paddingLeft: 18, paddingRight: 18, ...surface('status'), display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10 }}><Text size={11} color={error || navigationLog.error ? C.warning : C.muted} style={{ flexGrow: 1 }}>{navigationLog.error ? `Navigation log: ${navigationLog.error}` : error ? `${demo ? 'Demo' : 'MPD'}: ${error}` : notice}</Text><Text size={11} color={C.muted}>{demo ? 'DEMO · ' : ''}{library.length.toLocaleString()} songs</Text></div>
+    <div style={{ height: 32, paddingLeft: 18, paddingRight: 18, ...surface('status'), display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10 }}><Text size={11} color={error || navigationLog.error ? C.warning : C.muted} style={{ flexGrow: 1 }}>{navigationLog.error ? `Navigation log: ${navigationLog.error}` : error ? `${demo ? 'Demo' : 'MPD'}: ${error}` : notice}</Text><Text size={11} color={C.muted}>{demo ? 'Demo · simulated' : connection === 'connected' ? 'MPD connected' : connection === 'down' ? 'MPD down' : 'MPD connecting'} · {library.length.toLocaleString()} songs</Text></div>
 
     {drag && drag.startY !== undefined && <div
       onMouseMove={event => flushSync(() => { if (event.pressedButton === 0) positionDrag(event); else updateDrag(undefined); })}
@@ -492,6 +556,11 @@ function App() {
       style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'auto', cursor: 'grabbing', userSelect: 'none' }}
     />}
 
+    {sortOpen && <div onClick={() => { setSortOpen(false); clearFocus(); }} style={{ position: 'absolute', top: 56, bottom: 0, left: 0, right: 0, pointerEvents: 'auto' }}>
+      <div style={{ position: 'absolute', top: 72, right: 22, width: 260, padding: 6, display: 'flex', flexDirection: 'column', ...surface('sortMenu'), borderWidth: 1, borderColor: theme.borders.sortMenu, borderRadius: 3 }}>
+        {sortOptions.map((option, index) => <Button key={option.value} onClick={() => chooseSort(option.value)} active={index === sortIndex} style={{ ...surface(index === sortIndex ? 'sortItemSelected' : 'sortItem') }}>{option.label}{order[orderContext] === option.value ? ' ✓' : ''}</Button>)}
+      </div>
+    </div>}
     {prompt === 'global' && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, ...surface('promptScrim'), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div testId="prompt" onMouseDownOutside={() => closePrompt(true)} style={{ width: Math.min(680, width - 80), ...surface('prompt'), borderWidth: 1, borderColor: theme.borders.prompt, borderRadius: 6, padding: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12 }}><Text color={C.accent}>:</Text><input testId="prompt-input" autoFocus value={query} placeholder="Find an album, track, artist or action" theme={inputTheme()} onFocus={() => { promptReady.current = true; }} onChange={e => { promptReady.current = true; setQuery(e.value || ''); setResultIndex(0); }} onSubmit={() => activateResult(results[resultIndex])} style={{ height: 36, flexGrow: 1, ...surface('promptInput'), selectionColor: C.textSelection, color: C.text, fontSize: 16, fontFamily: FONT }} /><Button onClick={() => closePrompt(true)}>esc</Button></div>

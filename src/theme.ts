@@ -47,6 +47,9 @@ const surfaces = {
   promptResult: 'transparent',
   promptResultHover: 'transparent',
   promptResultSelected: '#3c515f',
+  sortMenu: '#1c2329',
+  sortItem: 'transparent',
+  sortItemSelected: '#3c515f',
 } satisfies Record<string, Paint>;
 
 const colors = {
@@ -59,7 +62,7 @@ const colors = {
 const borders = {
   header: '#43515d', queueRow: '#43515d', recordRow: '#43515d',
   artistRow: '#43515d', detail: '#43515d', transport: '#43515d',
-  prompt: '#43515d', promptDivider: '#43515d',
+  prompt: '#43515d', promptDivider: '#43515d', sortMenu: '#43515d',
   queueInsertion: '#b4d3e5', queueHeld: '#b4d3e5',
   focus: '#b4d3e5', control: 'transparent',
 };
