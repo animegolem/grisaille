@@ -468,7 +468,7 @@ function App() {
       {isGrid || isArtists ? <div onScroll={() => syncVisibleRows()} style={{ width: '100%', minHeight: 0, ...surface('library'), display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           {view === 'artist' ? <><Button onClick={() => openPage('library', 'artists')}>‹ Artists</Button><Text size={17} style={{ flexGrow: 1 }}>{artist?.name}</Text><Text color={C.muted}>{shelf.length} albums</Text></> : <>
-            <Button active={libraryView === 'covers'} onClick={() => openPage('library', 'covers')}>Covers</Button>
+            <Button active={libraryView === 'covers'} onClick={() => openPage('library', 'covers')}>Albums</Button>
             <Button active={libraryView === 'artists'} onClick={() => openPage('library', 'artists')}>Artists</Button>
             <div style={{ flexGrow: 1 }} /><Text color={C.muted}>{isArtists ? `${artists.length} artists` : `${albums.length} albums`}</Text>
           </>}

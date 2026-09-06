@@ -68,7 +68,7 @@ Ghostty access during this sitting; the screenshot supplied the visual evidence.
 - `Cmd+1` opens Now playing; `Cmd+2` opens Library. Bare numbers do not change pages.
   The eventual page order is Now playing, Lyrics, Library, Visualizer. Those
   later pages and their Command-number assignments have not been added yet.
-- Library has Covers and Artists views. Both the album shelf and artist lists
+- Library has Albums and Artists views. Both the album shelf and artist lists
   scroll continuously. The shelf retains spatial keyboard movement and mounts
   only album rows near the viewport; there are no page controls. The sort dropdown
   offers Artist A–Z, Album title A–Z, and year in either direction. Artist lists
@@ -309,7 +309,7 @@ python3 scripts/package-mac.py
 
 - MPD supplies playback; the UI does not decode audio. Server playback and elapsed
   time were verified after the service restart; owner listening remains distinct.
-- The GUI includes queue, library covers/artists, artist albums, album tracks
+- The GUI includes queue, library albums/artists, artist albums, album tracks
   and prompt. Playlists, lyrics, waveform, full ranger columns remain
   outside this prototype. No nonfunctional page buttons are shown for them.
 - Queue moves use a stable source ID and a freshly resolved destination. MPD has no
