@@ -74,8 +74,8 @@ Ghostty access during this sitting; the screenshot supplied the visual evidence.
   offers Artist A–Z, Album title A–Z, and year in either direction. Artist lists
   offer A–Z/Z–A. An artist's albums default to oldest first and have their own sort
   setting. Missing years sort last. Sorting retains the selected album/artist by
-  identity, including its viewport anchor. These sort choices last for the app
-  session; they are not persisted across launches.
+  identity, including its viewport anchor. Sort choices and browsing positions
+  are restored when the app reopens.
 - The top bar contains navigation and the prompt. MPD connected / down / connecting
   is shown in the status line; the sample mode is labelled there as simulated.
   Connection state follows snapshot reads, independently of artwork failures.
@@ -147,11 +147,38 @@ mode, renderer (`gui` or `tui`), action, source and destination. Locations inclu
 on page transitions, the viewport. Typed queries and playback commands are not
 recorded. The directory is created with mode 0700 and new files with mode 0600.
 
-The back/forward stack holds up to 200 places in the current app session. The
-journal persists across launches, including discarded forward branches; it is
-not replayed on launch. Missing albums fall back to Library, and removed queue
-items fall back to the nearest surviving selection. Journal write failures
-appear in the status bar without blocking navigation.
+The back/forward stack holds up to 200 places. The journal persists across
+launches, including discarded forward branches; it remains an audit trail.
+Journal write failures appear in the status bar without blocking navigation.
+
+## Saved browsing state and recovery
+
+A separate JSON snapshot in `~/Library/Application Support/Music Prototype/state/`
+restores the last page, selected item, scroll anchor and pixel offset, all three
+sort choices, the last Library view, and both directions of `o`/`i` history.
+The GUI and terminal keep separate snapshots, as do demo mode and each configured
+MPD endpoint. Endpoint names are hashed; passwords are not stored. Set
+`MUSIC_UI_STATE_DIR` to use a separate state directory for a development check.
+
+Snapshots use an atomic replacement with private file permissions. Changes are
+coalesced for 180 ms, with a synchronous flush on normal exit. A forced kill can
+lose the most recent unflushed movement. Prompts and typed queries are not saved.
+Restoration resolves identities against the current library and queue and waits
+for their first successful reads before applying a saved location. An offline
+launch does not replace the previous snapshot with an empty queue. A missing
+album falls back to Library; a removed item uses the nearest surviving position.
+Queue locations also keep the file URI and duplicate occurrence, because queue
+IDs may be reused after an MPD restart. Invalid state files produce a status
+message and start at Now playing. Playback commands are never replayed.
+
+Failed status and library reads retry independently, backing off from one second
+to a ten-second maximum. Loaded library and queue data remain available while
+MPD is down, and the elapsed-time estimate stops advancing. A successful reconnect
+refreshes the library as well as playback state, including changes whose database
+events were missed during the outage. Connection and library-read errors clear
+on successful recovery. Failed user commands remain reported until the next
+action; they are not retried automatically. Exit stops owned subscriptions and
+pending retries.
 
 ## Colour addresses
 
@@ -207,11 +234,33 @@ python3 scripts/package-mac.py
 
 ## Verification on 6 September 2026
 
-- Current TypeScript check, standalone build and 39 tests pass (134 assertions).
+- Current TypeScript check, standalone build and 47 tests pass (178 assertions).
   The terminal tests render at 100×28, 65×16 and 44×12 and cover rapid input,
   bracketed paste, search destinations, history without replaying commands,
   queue controls, sorting, viewport restoration, action serialization and cleanup.
   A short-terminal check keeps both the prompt input and chosen result visible.
+- New restart checks cover a fresh terminal renderer, an unavailable server at
+  launch, retained forward history, private/atomic state files, corrupted state,
+  recycled queue IDs and independent recovery without a new server event.
+  Rapid typing followed immediately by Enter now commits the latest input before
+  opening a search result. Terminal shutdown explicitly flushes saved navigation
+  before renderer teardown.
+- A native demo window closed and reopened with Loveless track nine selected at
+  the same list anchor and 15.5-pixel offset. Forward history returned to the
+  artist page with its newest-first sort. A separate wheel-only movement saved
+  and restored the album grid's 30.5-pixel offset while leaving its selection
+  unchanged.
+- Two launches of the compiled terminal app from `/tmp` retained identical saved
+  state, including Loveless track nine and its viewport. Both exited with status
+  zero and restored the terminal screen and cursor. The first run sent search,
+  Enter and eight navigation keys in one input burst; submission now commits
+  before subsequent navigation keys are handled.
+- The actual MPD adapter was checked through an isolated localhost proxy. Closing
+  that connection retained the loaded library and queue; reopening it restored
+  connected status and reloaded all 18,404 tracks without another server event.
+  Recovery took 390 ms with the check's shortened retry delay. The proxy observed
+  only search, status, playlistinfo and idle commands; the MPD service was not
+  restarted. The normal application uses the backoff described above.
 - The compiled terminal app ran from `/tmp` against live MPD in a PTY with emulated
   Kitty capability replies. The capture contained image transfers, three placements
   and three deletions across opening/closing the prompt. Exit restored the alternate
@@ -323,3 +372,7 @@ python3 scripts/package-mac.py
   does not yet change it from artwork.
 - The macOS accessibility tree exposed window chrome rather than the app's
   content during these checks. Screen-reader usability remains unverified.
+- Two live GUI close checks logged a GPUIX `window not found` error from a pending
+  render after the window had closed. Both exited with status zero and retained
+  their saved navigation; the separate demo close/reopen checks were quiet.
+  The close-time framework warning remains unresolved.

@@ -1,14 +1,18 @@
 /** @jsxImportSource @opentui/react */
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { flushSync, useKeyboard, useTerminalDimensions } from '@opentui/react';
 import type { ImageRenderProtocol, KeyEvent } from '@opentui/core';
 import { MusicSession, useMusic } from '../music-session';
 import { NavigationHistory, type NavigationEvent, type Place, type Route } from '../history';
-import { albumPlace, placeKey, resolvePlace, routeItems, routeTitle } from '../locations';
+import { albumPlace, identifyPlace, placeKey, resolvePlace, routeItems, routeTitle } from '../locations';
 import { albumKey, albumsOf, artistsOf, duration, fuzzyScore, searchLibrary, type Album, type Result, type Track } from '../model';
 import { directionOf } from '../navigation';
 import { theme } from '../theme';
 import { albumOrders, artistOrders, defaultOrder, orderAlbums, orderArtists, type LibraryOrder } from '../library-order';
+import type { NavigationState, NavigationStateStore } from '../navigation-state';
+
+const noStateSubscription = () => () => {};
+const noStateError = () => undefined;
 
 const C = theme.colors;
 // A terminal cell has one background; a future GUI gradient uses its first stop here.
@@ -38,21 +42,30 @@ function Cover({ session, track, width, height, protocol }: { session: MusicSess
     {source && !error ? <image source={source} width={width} height={height} fit="fit" protocol={protocol} onError={() => setError(true)} /> : <Line text={error ? 'Artwork unavailable' : 'No cover'} color={C.muted} />}
   </box>;
 }
-export function TerminalApp({ session, record = () => {}, quit = () => {}, protocol = 'auto', logError }: {
+export function TerminalApp({ session, record = () => {}, quit = () => {}, protocol = 'auto', logError, navigationState }: {
   session: MusicSession; record?: (event: NavigationEvent) => void; quit?: () => void;
-  protocol?: ImageRenderProtocol; logError?: () => string | undefined;
+  protocol?: ImageRenderProtocol; logError?: () => string | undefined; navigationState?: NavigationStateStore;
 }) {
-  const { library, snapshot, loading, connection, notice, problem, actionProblem, playClock, act, reloadLibrary, setNotice } = useMusic(session);
+  const { library, snapshot, loading, libraryReady, snapshotReady, libraryProblem, connection, notice, problem, actionProblem, playClock, act, reloadLibrary, setNotice } = useMusic(session);
+  const saved = useMemo(() => navigationState?.read(), [navigationState]);
+  const restoring = useRef(Boolean(saved));
+  const stateError = useSyncExternalStore(navigationState?.subscribe || noStateSubscription, navigationState?.getError || noStateError);
+  const stateProvider = useRef<() => NavigationState | undefined>(() => undefined);
   const backend = session.backend;
   const { width, height } = useTerminalDimensions();
-  const [order, setOrder] = useState<LibraryOrder>(defaultOrder);
+  const [order, setOrder] = useState<LibraryOrder>(saved?.order || defaultOrder);
+  const [libraryView, setLibraryView] = useState<'covers' | 'artists'>(saved?.libraryView || 'covers');
   const [sortOpen, setSortOpen] = useState(false);
   const [sortIndex, setSortIndex] = useState(0);
   const baseAlbums = useMemo(() => albumsOf(library), [library]);
   const albums = useMemo(() => orderAlbums(baseAlbums, order.albums), [baseAlbums, order.albums]);
   const artists = useMemo(() => orderArtists(artistsOf(baseAlbums), order), [baseAlbums, order]);
   const catalogue = useMemo(() => ({ albums, artists, queue: snapshot.queue }), [albums, artists, snapshot.queue]);
-  const history = useMemo(() => new NavigationHistory({ route: { page: 'queue' }, selection: 0 }, record), []);
+  const history = useMemo(() => {
+    const value = new NavigationHistory({ route: { page: 'queue' }, selection: 0 }, record);
+    if (saved) value.restore(saved.history);
+    return value;
+  }, []);
   const [place, setPlace] = useState<Place>(history.current);
   const [prompt, setPrompt] = useState<'global' | 'local'>();
   const [query, setQuery] = useState('');
@@ -85,13 +98,15 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     let index = next.viewport?.kind === 'list' ? next.viewport.index : 0;
     if (!keepViewport) index = reveal(next.selection, index, list.length, capacity);
     else index = Math.max(0, Math.min(Math.max(0, list.length - capacity), index));
-    return { ...next, viewport: { kind: 'list', index, offset: 0, anchor: placeKey(next.route, list[index]) } };
+    return identifyPlace({ ...next, viewport: { kind: 'list', index, offset: 0, anchor: placeKey(next.route, list[index]) } }, list);
   }
   function select(index: number) {
-    const next = position({ ...place, selection: Math.max(0, Math.min(items.length - 1, index)), selected: undefined });
+    const next = position({ ...place, selection: Math.max(0, Math.min(items.length - 1, index)), selected: undefined, queue: undefined });
     history.checkpoint(next); setPlace(next);
   }
   function visit(point: Place) {
+    restoring.current = false;
+    if (point.route.page === 'library') setLibraryView(point.route.mode);
     const next = position(point);
     history.visit(next, place); setPlace(next); setPrompt(undefined); setHeld(undefined); setSortOpen(false);
     setNotice(routeTitle(next.route, albums));
@@ -122,7 +137,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     else if (result.kind === 'track') openTrack(result.track);
     else {
       if (result.title === 'Open queue') visit({ route: { page: 'queue' }, selection: 0 });
-      if (result.title === 'Open library') visit({ route: { page: 'library', mode: 'covers' }, selection: 0 });
+      if (result.title === 'Open library') visit({ route: { page: 'library', mode: libraryView }, selection: 0 });
       if (result.title === 'Reload library') void act(reloadLibrary, 'Library refreshed');
       if (result.title === 'Play / pause') void act(() => backend.toggle());
       if (result.title === 'Next track') void act(() => backend.next());
@@ -172,7 +187,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     else if (char === 'q') quit();
     else if (char === 's' && (route.page === 'library' || route.page === 'artist')) { setSortIndex(Math.max(0, sortOptions.findIndex(option => option.value === order[orderContext]))); setSortOpen(true); }
     else if (key.name === 'f1') visit({ route: { page: 'queue' }, selection: 0 });
-    else if (key.name === 'f2') visit({ route: { page: 'library', mode: 'covers' }, selection: 0 });
+    else if (key.name === 'f2') visit({ route: { page: 'library', mode: libraryView }, selection: 0 });
     else if (direction === 'up' || direction === 'down') select(place.selection + (direction === 'down' ? 1 : -1));
     else if (direction === 'left' || key.name === 'escape') parentPage();
     else if (direction === 'right') openSelected();
@@ -194,20 +209,27 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   // Commit each key before the next terminal byte; fast ':' + text must keep its prefix.
   useKeyboard(key => flushSync(() => keypress(key)));
   useLayoutEffect(() => {
+    if (restoring.current && (!libraryReady || !snapshotReady)) return;
     const next = position(place);
+    restoring.current = false;
     if (JSON.stringify(next) !== JSON.stringify(place)) { setPlace(next); history.checkpoint(next, false); }
     setHeld(undefined);
-  }, [catalogue, width, height]);
+  }, [catalogue, width, height, libraryReady, snapshotReady]);
+  useLayoutEffect(() => {
+    stateProvider.current = () => libraryReady && snapshotReady && !restoring.current ? { version: 1, history: history.snapshot(), order, libraryView } : undefined;
+  });
+  useEffect(() => navigationState?.attach(() => stateProvider.current()), [navigationState]);
+  useEffect(() => { navigationState?.schedule(); }, [place, order, libraryView, libraryReady, snapshotReady, navigationState]);
   useEffect(() => { if (prompt === 'local' && query.trim() && matches.length) select(matches[0]!); }, [query]);
 
-  const error = logError?.() || actionProblem || problem;
+  const error = stateError || logError?.() || actionProblem || problem || libraryProblem;
   const status = backend.demo ? 'Demo · simulated' : connection === 'connected' ? 'MPD connected' : connection === 'down' ? 'MPD down' : 'MPD connecting';
   const heading = routeTitle(route, albums) + (route.page === 'library' ? route.mode === 'artists' ? ' / Artists' : ' / Albums' : route.page === 'record' ? ` / ${parent?.name || album?.artist || ''}` : '');
   const resultCount = Math.max(1, Math.floor((height - (compactPrompt ? tight ? 8 : 9 : 16)) / 2));
   const resultTop = Math.max(0, resultIndex - resultCount + 1);
   const input = <box height={1} flexDirection="row" gap={1}>
     <text fg={C.accent}>{prompt === 'global' ? ':' : '/'}</text>
-    <input id="music-prompt" focused value={query} flexGrow={1} backgroundColor={fill('prompt')} textColor={C.text} focusedBackgroundColor={fill('prompt')} focusedTextColor={C.text} placeholderColor={C.muted} cursorColor={C.caret} placeholder={prompt === 'global' ? 'Find an artist, album, track or action' : 'Find in this list'} onInput={value => { setQuery(value); setResultIndex(0); }} onSubmit={() => { if (prompt === 'global') activateResult(results[resultIndex]); else setPrompt(undefined); }} />
+    <input id="music-prompt" focused value={query} flexGrow={1} backgroundColor={fill('prompt')} textColor={C.text} focusedBackgroundColor={fill('prompt')} focusedTextColor={C.text} placeholderColor={C.muted} cursorColor={C.caret} placeholder={prompt === 'global' ? 'Find an artist, album, track or action' : 'Find in this list'} onInput={value => flushSync(() => { setQuery(value); setResultIndex(0); })} onSubmit={() => flushSync(() => { if (prompt === 'global') activateResult(results[resultIndex]); else setPrompt(undefined); })} />
   </box>;
   if (width < 40 || height < 12) return <box padding={1}><Line text="Music · enlarge to at least 40 × 12" /><Line text="q quit · Ctrl+C quit" color={C.muted} /></box>;
   return <box width="100%" height="100%" flexDirection="column" backgroundColor={fill('canvas')}>

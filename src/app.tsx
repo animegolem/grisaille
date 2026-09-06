@@ -1,4 +1,4 @@
-import { Children, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type SetStateAction } from 'react';
+import { Children, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type SetStateAction } from 'react';
 import { flushSync, motion, render, useGpuixRequired, useWindowSize, type EventPayload, type PublicInstance, type StyleDesc } from '@gpuix/react';
 import type { GpuixRenderer } from '@gpuix/native';
 import { DemoBackend } from './demo';
@@ -10,8 +10,9 @@ import { inputTheme, surface, theme } from './theme';
 import { NavigationHistory, type Place, type Route, type Viewport } from './history';
 import { NavigationLog } from './navigation-log';
 import { MusicSession, useMusic } from './music-session';
-import { albumPlace, placeKey, resolvePlace as resolveLocation } from './locations';
+import { albumPlace, identifyPlace, placeKey, resolvePlace as resolveLocation } from './locations';
 import { albumOrders, artistOrders, defaultOrder, orderAlbums, orderArtists, type LibraryOrder } from './library-order';
+import { NavigationStateStore, navigationStatePath, type NavigationState } from './navigation-state';
 
 const C = theme.colors;
 const FONT = 'Menlo';
@@ -24,6 +25,7 @@ const demo = process.argv.includes('--demo');
 const backend: MusicBackend = demo ? new DemoBackend() : new MpdBackend();
 const navigationLog = new NavigationLog(demo ? 'demo' : 'mpd');
 const session = new MusicSession(backend);
+const navigationState = new NavigationStateStore(navigationStatePath(demo ? 'demo' : 'mpd', 'gui'));
 // GPUIX exits on window close; signals must also release the owned MPD helper.
 process.once('SIGTERM', () => process.exit(0));
 process.once('SIGINT', () => process.exit(0));
@@ -75,15 +77,22 @@ function App() {
     return () => { didFocusControl = () => {}; focusSteps.cancel(); };
   }, [focusSteps]);
   const { width, height } = useWindowSize();
-  const { library, snapshot, loading, connection, notice, problem, actionProblem, playClock, act, reloadLibrary, setNotice } = useMusic(session);
+  const { library, snapshot, loading, libraryReady, snapshotReady, libraryProblem, connection, notice, problem, actionProblem, playClock, act, reloadLibrary, setNotice } = useMusic(session);
+  const saved = useMemo(() => navigationState.read(), []);
+  const stateError = useSyncExternalStore(navigationState.subscribe, navigationState.getError);
+  const restoring = useRef(Boolean(saved));
+  const saveReady = useRef(false);
+  const stateProvider = useRef<() => NavigationState | undefined>(() => undefined);
+  const [locationRevision, setLocationRevision] = useState(0);
+  const locationEpoch = useRef(0);
   const [view, setView] = useState<'queue' | 'library' | 'artist' | 'record'>('queue');
-  const [order, setOrder] = useState<LibraryOrder>(defaultOrder);
+  const [order, setOrder] = useState<LibraryOrder>(saved?.order || defaultOrder);
   const [sortOpen, setSortOpen] = useState(false);
   const [sortIndex, setSortIndex] = useState(0);
   const pendingSort = useRef<Place | undefined>(undefined);
   const [gridWindow, setGridWindow] = useState({ key: '', start: 0, end: 6 });
   const [artistWindow, setArtistWindow] = useState({ start: 0, end: 10 });
-  const [libraryView, setLibraryView] = useState<'covers' | 'artists'>('covers');
+  const [libraryView, setLibraryView] = useState<'covers' | 'artists'>(saved?.libraryView || 'covers');
   const [artist, setArtist] = useState<Artist>();
   const [record, setRecord] = useState<Album>();
   const [selection, updateSelection] = useState(0);
@@ -97,7 +106,11 @@ function App() {
   const [query, setQuery] = useState('');
   const [resultIndex, setResultIndex] = useState(0);
   const [drag, setDrag] = useState<QueueDrag>();
-  const history = useMemo(() => new NavigationHistory({ route: { page: 'queue' }, selection: 0 }, event => navigationLog.append(event)), []);
+  const history = useMemo(() => {
+    const value = new NavigationHistory({ route: { page: 'queue' }, selection: 0 }, event => navigationLog.append(event));
+    if (saved) value.restore(saved.history);
+    return value;
+  }, []);
   const pendingViewport = useRef<Viewport | undefined>(undefined);
   const queueRef = useRef<PublicInstance>(null);
   const listRef = useRef<PublicInstance>(null);
@@ -138,33 +151,31 @@ function App() {
   const sortOptions = isArtists ? artistOrders : albumOrders;
   const sortLabel = sortOptions.find(option => option.value === order[orderContext])?.label || '';
   const elapsed = Math.min(current?.duration || 0, snapshot.elapsed + playClock);
-  const error = actionProblem || problem;
+  const error = actionProblem || problem || libraryProblem;
 
   useLayoutEffect(() => {
+    if (restoring.current) {
+      if (!libraryReady || !snapshotReady) return;
+      restoring.current = false;
+      const point = resolvePlace(history.current);
+      history.checkpoint(point, false); applyPlace(point); return;
+    }
     if (pendingSort.current) {
       const point = resolvePlace(pendingSort.current); pendingSort.current = undefined;
       applyPlace(point); return;
     }
-    if (view === 'record' && record) {
-      const updated = albums.find(a => a.key === record.key);
-      if (updated) {
-        const uri = record.tracks[selection]?.uri;
-        setRecord(updated); setSelection(Math.max(0, updated.tracks.findIndex(t => t.uri === uri)));
-        setArtist(artists.find(a => a.name === artist?.name) || artists.find(a => a.name === updated.artist));
-      } else openPage('library');
-    } else if (view === 'artist' && artist) {
-      const updated = artists.find(a => a.name === artist.name);
-      if (updated) {
-        const key = artist.albums[selection]?.key;
-        setArtist(updated); setSelection(Math.max(0, updated.albums.findIndex(a => a.key === key)));
-      } else openPage('library', 'artists');
+    if (saveReady.current && (view === 'queue' ? snapshotReady : libraryReady)) {
+      const point = resolvePlace(history.current);
+      history.checkpoint(point, false); applyPlace(point, false);
     }
-  }, [albums, artists]);
-  useEffect(() => { setSelection(i => Math.min(i, Math.max(0, buffer.length - 1))); }, [buffer.length]);
+  }, [albums, artists, snapshot.queue, libraryReady, snapshotReady]);
+  useEffect(() => { if (!restoring.current && locationRevision === locationEpoch.current) setSelection(i => Math.min(i, Math.max(0, buffer.length - 1))); }, [buffer.length]);
   useEffect(() => {
+    if (restoring.current) return;
     if (prompt === 'local' && query.trim() && matches.length) setSelection(matches[0]!);
   }, [query, prompt]);
   useEffect(() => {
+    if (restoring.current || locationRevision !== locationEpoch.current) return;
     const scroll = selectionScroll.current;
     selectionScroll.current = 'reveal';
     if (activeDrag.current?.startY !== undefined) return;
@@ -187,10 +198,17 @@ function App() {
       const destination = target * rowHeight < start ? target * rowHeight : Math.max(0, (target + 1) * rowHeight - bounds[3]);
       renderer.scrollToItem?.(ref.current.id, Math.floor(destination / rowHeight), destination % rowHeight);
     } else renderer.scrollToItem?.(ref.current.id, target);
-  }, [selection, view, libraryView, artist?.name, record?.key, columns, gridRowHeight, height, order]);
+  }, [selection, view, libraryView, artist?.name, record?.key, columns, gridRowHeight, height, order, locationRevision]);
   useEffect(() => {
-    history.checkpoint({ ...history.current, route: currentRoute(), selection, selected: placeKey(currentRoute(), buffer[selection]) });
-  }, [selection, view, libraryView, artist?.name, record?.key, buffer.length]);
+    if (restoring.current || locationRevision !== locationEpoch.current) return;
+    saveReady.current = libraryReady && snapshotReady;
+    history.checkpoint(capturePlace());
+    navigationState.schedule();
+  }, [selection, view, libraryView, artist?.name, record?.key, buffer.length, libraryReady, snapshotReady, order, locationRevision]);
+  useLayoutEffect(() => {
+    stateProvider.current = () => saveReady.current && !restoring.current ? { version: 1, history: history.snapshot(), order, libraryView } : undefined;
+  });
+  useEffect(() => navigationState.attach(() => stateProvider.current()), []);
   useEffect(() => { updateDrag(undefined); }, [width, height, view, snapshot.queue]);
   useEffect(() => {
     if (prompt === 'global' && promptListRef.current) renderer.scrollToItem?.(promptListRef.current.id, resultIndex);
@@ -213,11 +231,11 @@ function App() {
         point.viewport = { kind: 'list', index, offset: top[1] || 0, anchor: placeKey(route, buffer[index]) };
       }
     }
-    return point;
+    return identifyPlace(point, buffer);
   }
   function resolvePlace(point: Place): Place { return resolveLocation(point, { albums, artists, queue: snapshot.queue }); }
-  function applyPlace(point: Place) {
-    clearFocus(); updateDrag(undefined); setPrompt(null); setSortOpen(false);
+  function applyPlace(point: Place, resetTransient = true) {
+    if (resetTransient) { clearFocus(); updateDrag(undefined); setPrompt(null); setSortOpen(false); }
     const route = point.route;
     const album = route.page === 'record' ? albums.find(a => a.key === route.key) : undefined;
     const person = route.page === 'artist' ? artists.find(a => a.name === route.name) : album ? artists.find(a => a.name === (route.page === 'record' && route.artist || album.artist)) : undefined;
@@ -225,8 +243,10 @@ function App() {
     if (route.page === 'library') setLibraryView(route.mode);
     pendingViewport.current = point.viewport;
     setSelection(point.selection);
+    setLocationRevision(++locationEpoch.current);
   }
   function visit(route: Route, index = 0, source = capturePlace()) {
+    restoring.current = false;
     const next = resolvePlace({ route, selection: index });
     history.visit(next, source);
     applyPlace(next);
@@ -256,7 +276,7 @@ function App() {
   }
   function sourceAt(index: number): Place {
     const point = capturePlace();
-    return { ...point, selection: index, selected: placeKey(point.route, buffer[index]) };
+    return identifyPlace({ ...point, selection: index }, buffer);
   }
   function openPage(page: 'queue' | 'library', mode = libraryView) {
     visit(page === 'queue' ? { page } : { page, mode });
@@ -265,6 +285,10 @@ function App() {
     if (view === 'record' && record) openArtist(artist?.name || record.artist);
     else if (view === 'artist') openPage('library', 'artists');
     else if (view === 'library') openPage('queue');
+  }
+  function rememberPosition() {
+    if (!saveReady.current || restoring.current || locationRevision !== locationEpoch.current) return;
+    history.checkpoint(capturePlace(), false); navigationState.schedule();
   }
   // GPUIX 0.7.0 supplies ranges for programmatic jumps. Its wheel path needs
   // the wrapper's scroll event plus the already updated logical scroll anchor.
@@ -279,6 +303,7 @@ function App() {
     const end = Math.min(count, Math.max(event?.endIndex || 0, first + capacity) + 1);
     if (isGrid) setGridWindow(previous => previous.key === gridKey && previous.start === start && previous.end === end ? previous : { key: gridKey, start, end });
     else setArtistWindow(previous => previous.start === start && previous.end === end ? previous : { start, end });
+    rememberPosition();
   }
   function openSort() {
     clearFocus();
@@ -464,7 +489,7 @@ function App() {
       <Button id="open-prompt" onClick={() => openPrompt('global')}>Prompt :</Button>
     </div>
 
-    <div style={{ flexGrow: 1, minHeight: 0, padding: 22, ...surface('main'), display: 'flex', flexDirection: 'row', gap: 26 }}>
+    <div onScroll={rememberPosition} style={{ flexGrow: 1, minHeight: 0, padding: 22, ...surface('main'), display: 'flex', flexDirection: 'row', gap: 26 }}>
       {isGrid || isArtists ? <div onScroll={() => syncVisibleRows()} style={{ width: '100%', minHeight: 0, ...surface('library'), display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           {view === 'artist' ? <><Button onClick={() => openPage('library', 'artists')}>‹ Artists</Button><Text size={17} style={{ flexGrow: 1 }}>{artist?.name}</Text><Text color={C.muted}>{shelf.length} albums</Text></> : <>
@@ -547,7 +572,7 @@ function App() {
       <Text size={11} color={C.muted}>{duration(current?.duration || 0)}</Text>
     </div>
     {prompt === 'local' && <div style={{ display: 'flex', flexDirection: 'row', gap: 12, alignItems: 'center', padding: 12, ...surface('localFind') }}><Text color={C.accent} style={{ width: 14, flexShrink: 0 }}>/</Text><input autoFocus value={query} placeholder={`Find in ${isArtists ? 'artists' : isGrid ? 'albums' : view}`} theme={inputTheme()} onFocus={() => { promptReady.current = true; }} onChange={e => { promptReady.current = true; setQuery(e.value || ''); }} onSubmit={() => closePrompt(false)} style={{ flexGrow: 1, flexBasis: 0, minWidth: 0, height: 28, ...surface('localFindInput'), selectionColor: C.textSelection, color: C.text, fontSize: 14, fontFamily: FONT }} /><Text color={C.muted} style={{ flexShrink: 0 }}>{matches.length} matches</Text><Button onClick={() => closePrompt(true)}>esc</Button></div>}
-    <div style={{ height: 32, paddingLeft: 18, paddingRight: 18, ...surface('status'), display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10 }}><Text size={11} color={error || navigationLog.error ? C.warning : C.muted} style={{ flexGrow: 1 }}>{navigationLog.error ? `Navigation log: ${navigationLog.error}` : error ? `${demo ? 'Demo' : 'MPD'}: ${error}` : notice}</Text><Text size={11} color={C.muted}>{demo ? 'Demo · simulated' : connection === 'connected' ? 'MPD connected' : connection === 'down' ? 'MPD down' : 'MPD connecting'} · {library.length.toLocaleString()} songs</Text></div>
+    <div style={{ height: 32, paddingLeft: 18, paddingRight: 18, ...surface('status'), display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10 }}><Text size={11} color={error || stateError || navigationLog.error ? C.warning : C.muted} style={{ flexGrow: 1 }}>{stateError || (navigationLog.error ? `Navigation log: ${navigationLog.error}` : error ? `${demo ? 'Demo' : 'MPD'}: ${error}` : restoring.current ? 'Restoring your place…' : notice)}</Text><Text size={11} color={C.muted}>{demo ? 'Demo · simulated' : connection === 'connected' ? 'MPD connected' : connection === 'down' ? 'MPD down' : 'MPD connecting'} · {library.length.toLocaleString()} songs</Text></div>
 
     {drag && drag.startY !== undefined && <div
       onMouseMove={event => flushSync(() => { if (event.pressedButton === 0) positionDrag(event); else updateDrag(undefined); })}
@@ -581,4 +606,4 @@ function App() {
   </div>;
 }
 
-render(<App />, { title: 'Music — MPD UI Prototype', appName: 'Music Prototype', width: 1120, height: 820, minWidth: 720, minHeight: 620, titlebarTransparent: true, trafficLightX: 16, trafficLightY: 20, focus: process.env.GPUIX_BACKGROUND !== '1', onKeyDown: event => flushSync(() => dispatchKey(event)) });
+render(<App />, { title: demo ? 'Music — Demo' : 'Music — MPD UI Prototype', appName: 'Music Prototype', width: 1120, height: 820, minWidth: 720, minHeight: 620, titlebarTransparent: true, trafficLightX: 16, trafficLightY: 20, focus: process.env.GPUIX_BACKGROUND !== '1', onKeyDown: event => flushSync(() => dispatchKey(event)) });

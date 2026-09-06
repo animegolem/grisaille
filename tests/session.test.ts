@@ -58,3 +58,52 @@ test('MPD connection state changes on failed snapshot reads and clears on recove
     expect(session.getState().problem).toBe('');
   } finally { session.stop(); }
 });
+
+async function until(check: () => boolean) {
+  const deadline = Date.now() + 1500;
+  while (!check()) { if (Date.now() > deadline) throw new Error('Recovery did not complete'); await Bun.sleep(5); }
+}
+test('an unavailable server recovers without another event and reloads changes missed while disconnected', async () => {
+  const backend = new DemoBackend();
+  const library = backend.library.bind(backend), snapshot = backend.snapshot.bind(backend);
+  let online = false, libraryReads = 0, trimmed = false;
+  backend.subscribe = () => () => {}; // No server event will rescue a missed reconnect.
+  backend.library = async () => { libraryReads++; if (!online) throw new Error('Offline'); return (await library()).filter((_, i) => !trimmed || i > 0); };
+  backend.snapshot = async () => { if (!online) throw new Error('Offline'); return snapshot(); };
+  const session = new MusicSession(backend, 10); session.start();
+  try {
+    await session.refresh(); await session.reloadLibrary();
+    expect(session.getState()).toMatchObject({ connection: 'down', libraryReady: false, snapshotReady: false });
+    online = true;
+    await until(() => session.getState().connection === 'connected' && session.getState().libraryReady);
+    const before = session.getState();
+    online = false; await session.refresh();
+    expect(session.getState().library).toBe(before.library);
+    expect(session.getState().snapshot).toBe(before.snapshot);
+    const priorReads = libraryReads;
+    trimmed = true; online = true;
+    await until(() => session.getState().connection === 'connected' && session.getState().library.length === before.library.length - 1);
+    expect(libraryReads).toBeGreaterThan(priorReads);
+    expect(session.getState()).toMatchObject({ problem: '', libraryProblem: '' });
+  } finally { session.stop(); }
+});
+
+test('library reads retry independently and stopping cancels pending recovery', async () => {
+  const backend = new DemoBackend(), read = backend.library.bind(backend);
+  backend.subscribe = () => () => {};
+  let available = false, reads = 0;
+  backend.library = async () => { reads++; if (!available) throw new Error('Library unavailable'); return read(); };
+  const session = new MusicSession(backend, 10); session.start();
+  try {
+    await session.refresh(); await session.reloadLibrary();
+    expect(session.getState().connection).toBe('connected');
+    expect(session.getState().libraryProblem).toBe('Library unavailable');
+    available = true;
+    await until(() => session.getState().libraryReady);
+    expect(session.getState().libraryProblem).toBe('');
+    available = false; await session.reloadLibrary(); session.stop();
+    const stoppedAt = reads;
+    await Bun.sleep(60);
+    expect(reads).toBe(stoppedAt);
+  } finally { session.stop(); }
+});

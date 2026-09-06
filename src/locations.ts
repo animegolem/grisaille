@@ -1,4 +1,4 @@
-import type { Place, Route } from './history';
+import type { Place, QueueIdentity, Route } from './history';
 import { albumKey, type Album, type Artist, type QueueTrack, type Track } from './model';
 
 export type Catalogue = { albums: Album[]; artists: Artist[]; queue: QueueTrack[] };
@@ -18,6 +18,26 @@ export function routeItems(route: Route, catalogue: Catalogue): Track[] {
   if (route.mode === 'artists') return artists.map(a => ({ ...a.albums[0]!.tracks[0]!, artist: a.name }));
   return albums.map(a => a.tracks[0]!);
 }
+function queueIdentity(items: Track[], index: number): QueueIdentity | undefined {
+  const track = items[index];
+  return track ? { uri: track.uri, occurrence: items.slice(0, index).filter(t => t.uri === track.uri).length } : undefined;
+}
+/** Queue IDs can be reused after a server restart. Keep URI/occurrence as a fallback. */
+export function identifyPlace(point: Place, items: Track[]): Place {
+  return { ...point, selected: placeKey(point.route, items[point.selection]),
+    queue: point.route.page === 'queue' ? queueIdentity(items, point.selection) : undefined,
+    viewport: point.viewport?.kind === 'list' ? { ...point.viewport,
+      anchor: placeKey(point.route, items[point.viewport.index]),
+      queue: point.route.page === 'queue' ? queueIdentity(items, point.viewport.index) : undefined,
+    } : point.viewport };
+}
+function identityIndex(route: Route, items: Track[], key?: string, queue?: QueueIdentity): number {
+  const found = key ? items.findIndex(t => placeKey(route, t) === key) : -1;
+  if (route.page !== 'queue' || !queue) return found;
+  if (found >= 0 && items[found]?.uri === queue.uri) return found;
+  const matches = items.flatMap((t, index) => t.uri === queue.uri ? [index] : []);
+  return matches[Math.min(queue.occurrence, matches.length - 1)] ?? -1;
+}
 /** Resolve stable selection and viewport anchors against today's library/queue. */
 export function resolvePlace(point: Place, catalogue: Catalogue): Place {
   const { albums, artists } = catalogue;
@@ -31,15 +51,14 @@ export function resolvePlace(point: Place, catalogue: Catalogue): Place {
     if (!artists.some(a => a.name === parent && a.albums.some(a => a.key === album.key))) route = { ...route, artist: album.artist };
   }
   const items = routeItems(route, catalogue);
-  const found = point.selected ? items.findIndex(t => placeKey(route, t) === point.selected) : -1;
+  const found = identityIndex(route, items, point.selected, point.queue);
   const selection = Math.max(0, Math.min(items.length - 1, found >= 0 ? found : point.selection));
   let viewport = point.viewport;
   if (viewport?.kind === 'list') {
-    const anchorKey = viewport.anchor;
-    const anchor = anchorKey ? items.findIndex(t => placeKey(route, t) === anchorKey) : -1;
+    const anchor = identityIndex(route, items, viewport.anchor, viewport.queue);
     viewport = { ...viewport, index: Math.max(0, Math.min(items.length - 1, anchor >= 0 ? anchor : viewport.index)) };
   }
-  return { route, selection, selected: placeKey(route, items[selection]), viewport };
+  return identifyPlace({ route, selection, viewport }, items);
 }
 export function albumPlace(album: Album, track?: Track, parent?: Artist): Place {
   return {

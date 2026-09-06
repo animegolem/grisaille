@@ -4,11 +4,13 @@ export type Route =
   | { page: 'artist'; name: string }
   | { page: 'record'; key: string; artist?: string };
 
+export type QueueIdentity = { uri: string; occurrence: number };
 export type Viewport =
-  | { kind: 'list'; index: number; offset: number; anchor?: string }
+  | { kind: 'list'; index: number; offset: number; anchor?: string; queue?: QueueIdentity }
   | { kind: 'grid'; x: number; y: number; columns: number };
 
-export type Place = { route: Route; selection: number; selected?: string; viewport?: Viewport };
+export type Place = { route: Route; selection: number; selected?: string; queue?: QueueIdentity; viewport?: Viewport };
+export type HistoryState = { entries: Place[]; cursor: number };
 export type NavigationEvent = {
   action: 'visit' | 'back' | 'forward' | 'position';
   from: Place;
@@ -29,6 +31,13 @@ export class NavigationHistory {
   get current() { return structuredClone(this.entries[this.cursor]!); }
   get canBack() { return this.cursor > 0; }
   get canForward() { return this.cursor < this.entries.length - 1; }
+  snapshot(): HistoryState { return structuredClone({ entries: this.entries, cursor: this.cursor }); }
+  restore(state: HistoryState) {
+    if (!state.entries.length || !Number.isInteger(state.cursor) || state.cursor < 0 || state.cursor >= state.entries.length) return;
+    const start = Math.max(0, state.cursor - this.limit + 1);
+    this.entries = structuredClone(state.entries.slice(start, start + this.limit));
+    this.cursor = state.cursor - start;
+  }
 
   checkpoint(place: Place, log = true) {
     const from = this.current;

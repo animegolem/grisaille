@@ -6,17 +6,21 @@ import { DemoBackend } from '../src/demo';
 import { MusicSession } from '../src/music-session';
 import { TerminalApp, plain, reveal } from '../src/terminal/app';
 import type { NavigationEvent } from '../src/history';
+import { NavigationStateStore } from '../src/navigation-state';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 class NoArtDemo extends DemoBackend { async artwork() { return undefined; } }
-async function setup(width = 100, height = 28) {
+async function setup(width = 100, height = 28, options: { state?: NavigationStateStore; backend?: NoArtDemo; ready?: (frame: string) => boolean; retryMs?: number } = {}) {
   const view = await createTestRenderer({ width, height, kittyKeyboard: true });
-  const backend = new NoArtDemo();
-  const session = new MusicSession(backend);
+  const backend = options.backend || new NoArtDemo();
+  const session = new MusicSession(backend, options.retryMs);
   const events: NavigationEvent[] = [];
   const root = createRoot(view.renderer);
-  flushSync(() => root.render(<TerminalApp session={session} record={event => events.push(event)} />));
-  await view.waitForFrame(frame => frame.includes('Only Shallow') && frame.includes('1/7'));
-  return { ...view, backend, session, events, cleanup() { root.unmount(); session.stop(); view.renderer.destroy(); } };
+  flushSync(() => root.render(<TerminalApp session={session} navigationState={options.state} record={event => events.push(event)} />));
+  await view.waitForFrame(options.ready || (frame => frame.includes('Only Shallow') && frame.includes('1/7')));
+  return { ...view, backend, session, events, cleanup() { options.state?.detach(); root.unmount(); session.stop(); view.renderer.destroy(); } };
 }
 
 test('terminal rapid prompt text retains its prefix; track navigation and o/i never replay playback', async () => {
@@ -117,4 +121,68 @@ test('a short terminal keeps the prompt input and selected result visible', asyn
     view.mockInput.pressArrow('down'); view.mockInput.pressEnter();
     await view.waitForFrame(frame => frame.includes('6/14') && frame.includes('Love Ire & Song'));
   } finally { view.cleanup(); }
+});
+
+test('reopening the terminal restores scroll, sorts and the forward branch without changing MPD playback', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'music-terminal-resume-'));
+  const path = join(directory, 'state.json');
+  try {
+    const first = await setup(65, 16, { state: new NavigationStateStore(path) });
+    const before = await first.backend.snapshot();
+    try {
+      first.mockInput.pressKey('F2');
+      await first.mockInput.typeText('s', 0); first.mockInput.pressArrow('down'); first.mockInput.pressEnter();
+      await first.mockInput.typeText(':loveless', 0); first.mockInput.pressEnter();
+      await first.waitForFrame(frame => frame.includes('Loveless') && frame.includes('1/11'));
+      await first.mockInput.typeText('jjjjjjjjh', 0);
+      await first.waitForFrame(frame => frame.includes('My Bloody Valentine') && frame.includes('1/3'));
+      await first.mockInput.typeText('s', 0); first.mockInput.pressArrow('down'); first.mockInput.pressEnter();
+      await first.waitForFrame(frame => frame.includes('Year · newest first'));
+      await first.mockInput.typeText('o', 0);
+      await first.waitForFrame(frame => frame.includes('Loveless') && frame.includes('9/11'));
+    } finally { first.cleanup(); }
+    const persisted = new NavigationStateStore(path).read()!;
+    expect(persisted.order).toMatchObject({ albums: 'title', artistAlbums: 'newest' });
+    expect(persisted.history.cursor).toBeLessThan(persisted.history.entries.length - 1);
+    const reopened = await setup(65, 16, { state: new NavigationStateStore(path), ready: frame => frame.includes('Loveless') && frame.includes('9/11') });
+    try {
+      expect(reopened.events).toHaveLength(0);
+      expect(await reopened.backend.snapshot()).toEqual(before);
+      expect(reopened.captureCharFrame()).toContain('Blown a Wish');
+      await reopened.mockInput.typeText('i', 0);
+      await reopened.waitForFrame(frame => frame.includes('My Bloody Valentine') && frame.includes('Year · newest first') && frame.includes('3/3'));
+      await reopened.mockInput.typeText('o', 0);
+      await reopened.waitForFrame(frame => frame.includes('Loveless') && frame.includes('9/11'));
+      expect(await reopened.backend.snapshot()).toEqual(before);
+    } finally { reopened.cleanup(); }
+    expect(new NavigationStateStore(path).read()?.history).toEqual(persisted.history);
+  } finally { rmSync(directory, { recursive: true }); }
+});
+
+test('an offline launch preserves saved navigation until the library returns, then restores it automatically', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'music-terminal-offline-'));
+  const path = join(directory, 'state.json');
+  try {
+    const first = await setup(65, 16, { state: new NavigationStateStore(path) });
+    await first.mockInput.typeText(':loveless', 0); first.mockInput.pressEnter();
+    await first.waitForFrame(frame => frame.includes('Loveless') && frame.includes('1/11'));
+    await first.mockInput.typeText('jjjjjjjj', 0);
+    await first.waitForFrame(frame => frame.includes('9/11'));
+    first.cleanup();
+    const original = readFileSync(path, 'utf8');
+    const backend = new NoArtDemo(), snapshot = backend.snapshot.bind(backend), library = backend.library.bind(backend);
+    let online = false;
+    backend.subscribe = () => () => {};
+    backend.snapshot = async () => { if (!online) throw new Error('Offline'); return snapshot(); };
+    backend.library = async () => { if (!online) throw new Error('Offline'); return library(); };
+    const store = new NavigationStateStore(path);
+    const view = await setup(65, 16, { state: store, backend, retryMs: 10, ready: frame => frame.includes('Offline') });
+    try {
+      store.flush(); expect(readFileSync(path, 'utf8')).toBe(original);
+      online = true;
+      await view.waitFor(() => view.session.getState().libraryReady && view.session.getState().snapshotReady);
+      await view.waitForFrame(frame => frame.includes('Loveless') && frame.includes('9/11') && !frame.includes('Offline'));
+      expect(view.events).toHaveLength(0);
+    } finally { view.cleanup(); }
+  } finally { rmSync(directory, { recursive: true }); }
 });
