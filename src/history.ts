@@ -2,7 +2,7 @@ export type Route =
   | { page: 'queue' }
   | { page: 'library'; mode: 'covers' | 'artists' }
   | { page: 'artist'; name: string }
-  | { page: 'record'; key: string };
+  | { page: 'record'; key: string; artist?: string };
 
 export type Viewport =
   | { kind: 'list'; index: number; offset: number; anchor?: string }

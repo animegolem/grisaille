@@ -55,11 +55,14 @@ describe('MPD boundaries', () => {
     expect(queue[1]?.duration).toBe(120.3);
   });
   test('library parsing preserves Unicode and duration without shell evaluation', () => {
-    const fields = ['a/$(touch nope).mp3', 'Björk', 'Début', 'Human Behaviour', '4:12', '1993', '1/11'];
-    const tracks = parseLibrary(fields.join('\u001f') + '\n');
-    expect(tracks[0]?.uri).toBe(fields[0]);
+    const tracks = parseLibrary('file: a/$(touch nope).mp3\nArtist: Björk\nArtist: Collaborator\nAlbum: Début\nAlbumArtist: Björk\nTitle: Human Behaviour\nduration: 252\nDate: 1993\nTrack: 1/11\nDisc: 2/2\nMUSICBRAINZ_ALBUMID: release-one\n');
+    expect(tracks[0]?.uri).toBe('a/$(touch nope).mp3');
     expect(tracks[0]?.duration).toBe(252);
     expect(tracks[0]?.number).toBe(1);
+    expect(tracks[0]?.disc).toBe(2);
+    expect(tracks[0]?.artists).toEqual(['Björk', 'Collaborator']);
+    expect(tracks[0]?.albumArtist).toBe('Björk');
+    expect(tracks[0]?.releaseId).toBe('release-one');
   });
   test('text transport handles fragmented greeting, Unicode and terminator', async () => {
     const oldHost = process.env.MPD_HOST, oldPort = process.env.MPD_PORT, oldPassword = process.env.MPD_PASSWORD;

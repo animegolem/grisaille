@@ -2,9 +2,13 @@ export type Track = {
   uri: string;
   title: string;
   artist: string;
+  artists?: string[];
+  albumArtist?: string;
   album: string;
+  releaseId?: string;
   year: string;
   number: number;
+  disc?: number;
   duration: number;
   art?: string;
 };
@@ -26,8 +30,13 @@ export type Result =
   | { kind: 'track'; key: string; track: Track; score: number }
   | { kind: 'action'; key: string; title: string; score: number };
 
-export function albumKey(t: Pick<Track, 'album' | 'artist'>): string {
-  return `${t.artist}\u0000${t.album}`;
+export function albumKey(t: Pick<Track, 'album' | 'artist'> & Partial<Track>): string {
+  if (t.releaseId) return JSON.stringify(['release', t.releaseId]);
+  const folder = t.uri?.split('/').slice(0, -1) || [];
+  // A conventional disc subfolder belongs to its containing album.
+  if (/^(?:cd|disc|disk)[ ._-]*\d+(?:\b|$)/i.test(folder.at(-1) || '')) folder.pop();
+  if (folder.length) return JSON.stringify(['folder', folder.join('/'), t.album]);
+  return JSON.stringify(['tags', t.albumArtist || t.artist, t.album]);
 }
 
 export function albumsOf(tracks: Track[]): Album[] {
@@ -36,12 +45,18 @@ export function albumsOf(tracks: Track[]): Album[] {
     const key = albumKey(t);
     let a = albums.get(key);
     if (!a) {
-      a = { key, title: t.album, artist: t.artist, year: t.year, tracks: [], art: t.art };
+      a = { key, title: t.album, artist: t.albumArtist || t.artist, year: t.year, tracks: [], art: t.art };
       albums.set(key, a);
     }
     a.tracks.push(t);
   }
-  return [...albums.values()].sort((a, b) => a.artist.localeCompare(b.artist) || a.title.localeCompare(b.title));
+  for (const album of albums.values()) {
+    album.tracks.sort((a, b) => (a.disc || 1) - (b.disc || 1) || a.number - b.number || a.uri.localeCompare(b.uri, undefined, { numeric: true }));
+    const albumArtist = album.tracks.find(t => t.albumArtist)?.albumArtist;
+    album.artist = albumArtist || (new Set(album.tracks.map(t => t.artist)).size === 1 ? album.tracks[0]!.artist : 'Various artists');
+    album.art ||= album.tracks.find(t => t.art)?.art;
+  }
+  return [...albums.values()].sort((a, b) => a.artist.localeCompare(b.artist) || a.title.localeCompare(b.title) || a.key.localeCompare(b.key));
 }
 
 export function duration(seconds: number): string {
@@ -52,9 +67,12 @@ export function duration(seconds: number): string {
 export function artistsOf(albums: Album[]): Artist[] {
   const artists = new Map<string, Artist>();
   for (const album of albums) {
-    const artist = artists.get(album.artist) || { name: album.artist, albums: [] };
-    artist.albums.push(album);
-    artists.set(artist.name, artist);
+    const names = new Set([album.artist, ...album.tracks.flatMap(t => t.artists?.length ? t.artists : [t.artist])]);
+    for (const name of names) {
+      const artist = artists.get(name) || { name, albums: [] };
+      artist.albums.push(album);
+      artists.set(name, artist);
+    }
   }
   for (const artist of artists.values()) artist.albums.sort((a, b) => a.year.localeCompare(b.year) || a.title.localeCompare(b.title));
   return [...artists.values()].sort((a, b) => a.name.localeCompare(b.name));
@@ -92,7 +110,7 @@ export function searchLibrary(query: string, albums: Album[], tracks: Track[], a
     const score = Math.max(fuzzyScore(query, track.title), fuzzyScore(query, `${track.artist} ${track.title} ${track.album}`) - 30);
     if (score >= 0) found.push({ kind: 'track', key: `track:${track.uri}`, track, score });
   }
-  for (const title of ['Play / pause', 'Next track', 'Previous track', 'Open queue', 'Open library']) {
+  for (const title of ['Play / pause', 'Next track', 'Previous track', 'Open queue', 'Open library', 'Reload library']) {
     const score = fuzzyScore(query, title);
     if (score >= 0) found.push({ kind: 'action', key: title, title, score });
   }
@@ -118,6 +136,9 @@ export interface MusicBackend {
   previous(): Promise<void>;
   play(id: number): Promise<void>;
   enqueue(track: Track, play?: boolean): Promise<void>;
+  enqueueAlbum(album: Album, play?: boolean): Promise<number[]>;
+  seek(id: number, seconds: number): Promise<void>;
+  remove(id: number): Promise<void>;
   move(id: number, beforeId: number | null): Promise<void>;
-  subscribe(changed: () => void): () => void;
+  subscribe(changed: (event?: 'database') => void): () => void;
 }

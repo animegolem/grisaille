@@ -31,9 +31,10 @@ GPUIX_BACKGROUND=1 './dist/Music Prototype.app/Contents/MacOS/music-ui' --demo
 
 macOS controls desktop placement. GUI automation can still activate the window.
 
-The prototype currently uses the installed `mpc` executable for library reads,
-artwork and MPD event subscriptions. It uses MPD's stable song IDs for playback
-and queue moves. `MPD_HOST` and `MPD_PORT` select the server; mpc's
+The prototype uses the installed `mpc` executable for artwork and MPD event
+subscriptions. Library metadata uses bounded MPD search pages. It uses MPD's
+stable song IDs for playback, seeking, removal and queue moves.
+`MPD_HOST` and `MPD_PORT` select the server; mpc's
 `password@host` convention is supported. Nothing changes the MPD configuration.
 
 This is a GUI launched from a shell or a macOS app bundle. It does not render a
@@ -43,7 +44,8 @@ renderer could use them later.
 ## Interaction
 
 - `Cmd+1` opens Now playing; `Cmd+2` opens Library. Bare numbers do not change pages.
-  `Cmd+3` is reserved for a future Lyrics view and currently has no app action.
+  The eventual page order is Now playing, Lyrics, Library, Visualizer. Those
+  later pages and their Command-number assignments have not been added yet.
 - Library has Covers and Artists views. Artist links open that artist's albums,
   in year order; album links open its track list. They are separate focus targets.
   The header keeps a temporary path: Library → artist → album. Opening an album
@@ -63,11 +65,42 @@ renderer could use them later.
   returns to the parent. Enter plays a track or opens an album/artist.
   In an input, letters remain text; Up/Down choose matches.
 - Space toggles playback. Album and artist text navigate into the library.
+- The album header offers Play album and Queue album. Both append the album in
+  disc/track order; Play album starts its first new queue occurrence. The existing
+  queue is retained. The detail pane's Play track and Queue track act on one track.
+- Click the progress bar to seek, or use `[` / `]` for ten seconds backward/forward.
+  Seeking addresses the current song ID and rejects an already changed/stopped song.
+- In the queue, Backspace/Delete or Remove removes the selected occurrence from
+  the queue. It does not delete the music file or another copy of the same track.
 - In the queue, `m` grabs the selection; arrows and `hjkl` move it, Enter drops
   and Escape cancels. Left/Up/`h`/`k` move earlier; Right/Down/`l`/`j` move later.
 - The small handle starts a pointer drag. Reordering preserves the current song ID.
   Pointer preview position follows unsnapped motion without easing; only the
   insertion target snaps. Keyboard moves retain the short held-row transition.
+
+## Library metadata
+
+The adapter reads up to 1,000 songs per MPD search request, retaining album artist,
+disc number, MusicBrainz release ID and repeated artist tags. The local fuzzy
+index currently holds the full library, with a prototype cap of 512,000 tracks.
+MPD database events reload metadata; `: Reload library` also refreshes it.
+
+Albums use a MusicBrainz release ID when supplied, otherwise their containing
+folder and album title, falling back to artist/title for paths without a folder.
+Conventional CD/Disc/Disk number subfolders share their containing album. This
+keeps ordinary compilations together and distinguishes same-title editions in
+different folders. Tracks sort by disc, track number, then natural path order.
+Artist pages include albums on which the artist appears as a contributor.
+
+These are practical grouping rules, not release disambiguation: partially tagged
+release IDs or unconventional disc folders can still split an album. Copies with
+the same release ID group together. Multiple album-artist tags currently use the
+first value for the album heading.
+
+Artwork tries embedded pictures, then folder artwork. CLI status text is suppressed
+and image signatures are checked before handing bytes to the renderer. Missing
+covers remain placeholders and can be retried on a later visit. The event helper
+is stopped when the native app exits, including a normal development SIGTERM.
 
 ## Local navigation journal
 
@@ -137,9 +170,10 @@ python3 scripts/package-mac.py
 
 ## Verification on 6 September 2026
 
-- TypeScript check, standalone build and nineteen tests pass (65 assertions), covering
+- TypeScript check, standalone build and twenty-eight tests pass (101 assertions), covering
   model/MPD behavior, artist grouping/search, keyboard/grid semantics, pointer
-  insertion, delayed native focus and history. The packaged window opens with artwork.
+  insertion, delayed native focus, history, album ordering, queue operations,
+  bounded metadata reads and artwork validation. The packaged window opens with artwork.
 - Native history checks opened Loveless from Now playing, returned directly
   to the previously selected queue row with `o`, and reopened the selected album
   track with `i`. Repeating after scrolling to the last track retained both the
@@ -156,14 +190,30 @@ python3 scripts/package-mac.py
 - Automated drag input did not complete reliably. The owner tried physical
   dragging in the native sample app and reported no obvious issues; it works.
   That is an owner interaction check, not an automated drag test pass.
-- Read-only MPD checks returned 18,404 library tracks and the existing 12-song
-  queue. All interactive checks used the sample backend; the real queue was
-  not modified by this work.
+- Live MPD checks returned 18,404 tracks, grouped into 1,508 albums and 1,118
+  artist pages with the current identity rules. One local read took 244 ms,
+  grouping took 17 ms and a mixed album/track search took 19 ms. These are bounded
+  observations, not a performance guarantee.
+- A live album append returned 12 new song IDs in order. Removing only those
+  returned IDs restored the exact prior queue; current song, stopped state and
+  volume were unchanged by that probe.
+- Native demo checks covered album queueing while paused, Play album, removal
+  of one selected occurrence, click seeking, ten-second keyboard seeking and
+  narrow layouts. Native live checks covered the library shelf, album/track
+  search with overlapping names, opening the album, and real queue artwork.
+- MPD initially failed to read its Google Drive music folder. System Settings
+  already showed its Google Drive permission enabled. Restarting the existing
+  launchd service restored file access without changing permissions or config;
+  the existing queue survived. Playback then advanced normally and loaded cover
+  art. Audible output still awaits the owner's listening confirmation.
 - Toolbar controls have a visible focus outline and retain their latest action
   while focused. Native screenshots checked the focus cue and Enter activation.
   A rapid Tab/Enter sequence now waits for native focus to reach its destination;
   tests cover several Tabs in flight and cancelling pending activation. A native
   check of three rapid Tabs followed by Enter opened the expected prompt.
+- A native rapid `:` followed immediately by `love ire` retained the full query
+  after buffering letters during the input's initial focus frame. Before that
+  fix, this sequence could drop the beginning of the query.
 - Native resizing checked narrow, short, and short/wide layouts. The prompt's
   input and footer remain visible while its results scroll; keyboard selection
   follows into the viewport. The album shelf also scrolls to its selected row.
@@ -191,16 +241,19 @@ python3 scripts/package-mac.py
 
 ## Current limits
 
-- The local MPD server can supply its database but currently reports an OS permission
-  error opening a music file. Actual audio output has not been verified.
+- MPD supplies playback; the UI does not decode audio. Server playback and elapsed
+  time were verified after the service restart; owner listening remains distinct.
 - The GUI includes queue, library covers/artists, artist albums, album tracks
   and prompt. Playlists, lyrics, waveform, full ranger columns and a TUI remain
   outside this prototype. No nonfunctional page buttons are shown for them.
 - Queue moves use a stable source ID and a freshly resolved destination. MPD has no
   compare-and-swap move command; simultaneous edits by another client can race.
+- MPD command lists stop at the first error and do not roll back earlier additions.
+  The UI refreshes the queue and reports possible partial additions, without an
+  automatic retry. Seeking checks the current ID first, but another client can
+  still change playback between that check and the seek command.
 - This local app bundle is neither signed for distribution nor notarized.
 - The dark study palette is centralized and gradient-capable; the running app
   does not yet change it from artwork.
 - The macOS accessibility tree exposed window chrome rather than the app's
   content during these checks. Screen-reader usability remains unverified.
-- Library metadata is loaded at startup. Restart after changing the MPD database.
