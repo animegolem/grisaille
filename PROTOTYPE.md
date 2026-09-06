@@ -1,6 +1,6 @@
 # Music UI prototype
 
-A separate frontend experiment using GPUIX 0.7.0, React and Bun 1.4.2.
+A separate frontend experiment using GPUIX 0.7.0, OpenTUI 0.5.10, React and Bun 1.4.2.
 MPD owns audio decoding, playback and output. nowplayd remains the independent
 macOS media integration. Neither existing repository was changed.
 
@@ -11,6 +11,8 @@ The compiled app does not need Bun installed. From this directory:
 ```sh
 ./dist/music-ui --demo
 ./dist/music-ui
+./dist/music-ui --tui
+./dist/music-ui --tui --demo
 ```
 
 `--demo` uses the eight-record sample from the earlier design sketches, with
@@ -37,9 +39,25 @@ stable song IDs for playback, seeking, removal and queue moves.
 `MPD_HOST` and `MPD_PORT` select the server; mpc's
 `password@host` convention is supported. Nothing changes the MPD configuration.
 
-This is a GUI launched from a shell or a macOS app bundle. It does not render a
-terminal interface. The model and MPD adapter are separate from GPUIX so another
-renderer could use them later.
+The same executable opens the native GUI by default or a terminal view with
+`--tui`. Terminal mode requires an interactive terminal. `--help` lists modes.
+The renderers share the MPD adapter, music session, serialized actions, library
+identity/search, location resolution, history and navigation journal.
+
+Terminal mode includes the queue, album/artist lists, record tracks, global
+prompt, local find, `o`/`i` history, playback, seeking, removal and keyboard queue
+moves. `F1` opens Now playing; `F2` opens Library; Tab switches album/artist lists.
+`q` or Ctrl+C exits and restores the terminal. The remaining main keys match the
+GUI. Command-number shortcuts remain GUI-specific because terminal applications
+commonly reserve them. Terminal mode is keyboard-only in this proof.
+
+One context cover uses OpenTUI's negotiated Kitty graphics, Sixel or coloured
+block fallback. `--no-images` forces the coloured block fallback. The detail pane
+hides below 78 columns or 19 rows, keeping the list and prompt usable; the minimum
+layout is 40 by 12. Images unmount while the global prompt is open. OpenTUI owns
+image placement, deletion and terminal restoration. Actual Ghostty artwork and
+visual layout still need a native window check: Computer Use refused Ghostty
+access during this sitting. Protocol/PTY evidence is not that visual acceptance.
 
 ## Interaction
 
@@ -110,7 +128,7 @@ is stopped when the native app exits, including a normal development SIGTERM.
 
 Navigation appends to `~/Library/Application Support/Music Prototype/navigation/`
 in daily JSONL files. Each entry has a timestamp, session ID, sequence, backend
-mode, action, source and destination. Locations include the selected item and,
+mode, renderer (`gui` or `tui`), action, source and destination. Locations include the selected item and,
 on page transitions, the viewport. Typed queries and playback commands are not
 recorded. The directory is created with mode 0700 and new files with mode 0600.
 
@@ -252,7 +270,7 @@ python3 scripts/package-mac.py
 - MPD supplies playback; the UI does not decode audio. Server playback and elapsed
   time were verified after the service restart; owner listening remains distinct.
 - The GUI includes queue, library covers/artists, artist albums, album tracks
-  and prompt. Playlists, lyrics, waveform, full ranger columns and a TUI remain
+  and prompt. Playlists, lyrics, waveform, full ranger columns remain
   outside this prototype. No nonfunctional page buttons are shown for them.
 - Queue moves use a stable source ID and a freshly resolved destination. MPD has no
   compare-and-swap move command; simultaneous edits by another client can race.

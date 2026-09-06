@@ -4,11 +4,13 @@ import type { GpuixRenderer } from '@gpuix/native';
 import { DemoBackend } from './demo';
 import { MpdBackend } from './mpd';
 import { FocusSteps } from './focus';
-import { albumsOf, artistsOf, albumKey, duration, fuzzyScore, searchLibrary, type Album, type Artist, type MusicBackend, type QueueTrack, type Result, type Snapshot, type Track } from './model';
+import { albumsOf, artistsOf, albumKey, duration, fuzzyScore, searchLibrary, type Album, type Artist, type MusicBackend, type QueueTrack, type Result, type Track } from './model';
 import { directionOf, gridSelection, pageShortcut, pointerDrag } from './navigation';
 import { inputTheme, surface, theme } from './theme';
 import { NavigationHistory, type Place, type Route, type Viewport } from './history';
 import { NavigationLog } from './navigation-log';
+import { MusicSession, useMusic } from './music-session';
+import { albumPlace, placeKey, resolvePlace as resolveLocation } from './locations';
 
 const C = theme.colors;
 const FONT = 'Menlo';
@@ -17,10 +19,13 @@ type QueueDrag = { id: number; target: number; startY?: number; dy: number };
 let dispatchKey: (event: EventPayload) => void = () => {};
 let focusedButton: { token: object; activate: () => void } | undefined;
 let didFocusControl: () => void = () => {};
-const empty: Snapshot = { queue: [], state: 'stop', elapsed: 0, volume: 0 };
 const demo = process.argv.includes('--demo');
 const backend: MusicBackend = demo ? new DemoBackend() : new MpdBackend();
 const navigationLog = new NavigationLog(demo ? 'demo' : 'mpd');
+const session = new MusicSession(backend);
+// GPUIX exits on window close; signals must also release the owned MPD helper.
+process.once('SIGTERM', () => process.exit(0));
+process.once('SIGINT', () => process.exit(0));
 
 function Text({ children, size = 13, color = C.text, style = {}, onClick }: { children: ReactNode; size?: number; color?: string; style?: StyleDesc; onClick?: () => void }) {
   // GPUIX lays out separate primitive children as separate native text nodes.
@@ -69,9 +74,7 @@ function App() {
     return () => { didFocusControl = () => {}; focusSteps.cancel(); };
   }, [focusSteps]);
   const { width, height } = useWindowSize();
-  const [library, setLibrary] = useState<Track[]>([]);
-  const [snapshot, setSnapshot] = useState<Snapshot>(empty);
-  const [loading, setLoading] = useState(true);
+  const { library, snapshot, loading, notice, problem, actionProblem, playClock, act, reloadLibrary, setNotice } = useMusic(session);
   const [view, setView] = useState<'queue' | 'library' | 'artist' | 'record'>('queue');
   const [libraryView, setLibraryView] = useState<'covers' | 'artists'>('covers');
   const [artist, setArtist] = useState<Artist>();
@@ -83,16 +86,12 @@ function App() {
     updateSelection(next);
   }
   function selectFromPointer(index: number) { clearFocus(); setSelection(index, 'preserve'); }
-  const [notice, setNotice] = useState('Connecting…');
-  const [problem, setProblem] = useState('');
-  const [actionProblem, setActionProblem] = useState('');
   const [prompt, setPrompt] = useState<'global' | 'local' | null>(null);
   const [query, setQuery] = useState('');
   const [resultIndex, setResultIndex] = useState(0);
   const [drag, setDrag] = useState<QueueDrag>();
   const history = useMemo(() => new NavigationHistory({ route: { page: 'queue' }, selection: 0 }, event => navigationLog.append(event)), []);
   const pendingViewport = useRef<Viewport | undefined>(undefined);
-  const [playClock, setPlayClock] = useState(0);
   const queueRef = useRef<PublicInstance>(null);
   const listRef = useRef<PublicInstance>(null);
   const artistListRef = useRef<PublicInstance>(null);
@@ -101,12 +100,6 @@ function App() {
   const progressRef = useRef<PublicInstance>(null);
   const priorSelection = useRef(0);
   const promptReady = useRef(false);
-  const busy = useRef(false);
-  const queuedRefresh = useRef(false);
-  const libraryBusy = useRef(false);
-  const queuedLibrary = useRef(false);
-  const actions = useRef(Promise.resolve());
-  const mounted = useRef(true);
   const activeDrag = useRef(drag);
   function updateDrag(next: QueueDrag | undefined) {
     activeDrag.current = next;
@@ -134,59 +127,6 @@ function App() {
   const elapsed = Math.min(current?.duration || 0, snapshot.elapsed + playClock);
   const error = actionProblem || problem;
 
-  async function refresh() {
-    if (busy.current) { queuedRefresh.current = true; return; }
-    busy.current = true;
-    try {
-      const next = await backend.snapshot();
-      if (mounted.current) { setSnapshot(next); setPlayClock(0); setProblem(next.error || ''); }
-    } catch (err) { if (mounted.current) setProblem(err instanceof Error ? err.message : String(err)); }
-    finally {
-      busy.current = false;
-      if (queuedRefresh.current && mounted.current) { queuedRefresh.current = false; void refresh(); }
-    }
-  }
-  function act(action: () => Promise<unknown>, message?: string) {
-    const task = actions.current.then(async () => {
-      setActionProblem('');
-      try { await action(); if (message) setNotice(message); }
-      catch (err) { setActionProblem(err instanceof Error ? err.message : String(err)); }
-      // A failed MPD command list can still have appended some tracks.
-      await refresh();
-    });
-    actions.current = task;
-    return task;
-  }
-  async function reloadLibrary() {
-    if (libraryBusy.current) { queuedLibrary.current = true; return; }
-    libraryBusy.current = true; setLoading(true);
-    try {
-      const tracks = await backend.library();
-      if (mounted.current) { setLibrary(tracks); setNotice(demo ? 'Sample library · playback is simulated' : 'Connected to MPD'); }
-    } catch (err) { if (mounted.current) setActionProblem(err instanceof Error ? err.message : String(err)); }
-    finally {
-      libraryBusy.current = false;
-      if (mounted.current) {
-        setLoading(false);
-        if (queuedLibrary.current) { queuedLibrary.current = false; void reloadLibrary(); }
-      }
-    }
-  }
-  useEffect(() => {
-    mounted.current = true;
-    void reloadLibrary();
-    void refresh();
-    const unsubscribe = backend.subscribe(event => { void refresh(); if (event === 'database') void reloadLibrary(); });
-    // Native window close exits Bun directly, without waiting for React unmount.
-    const terminate = () => process.exit(0);
-    process.once('exit', unsubscribe);
-    process.once('SIGTERM', terminate); process.once('SIGINT', terminate);
-    return () => {
-      mounted.current = false; unsubscribe();
-      process.off('exit', unsubscribe);
-      process.off('SIGTERM', terminate); process.off('SIGINT', terminate);
-    };
-  }, []);
   useLayoutEffect(() => {
     if (view === 'record' && record) {
       const updated = albums.find(a => a.key === record.key);
@@ -204,13 +144,6 @@ function App() {
     }
   }, [albums, artists]);
   useEffect(() => { setSelection(i => Math.min(i, Math.max(0, buffer.length - 1))); }, [buffer.length]);
-  useEffect(() => {
-    setPlayClock(0);
-    if (snapshot.state !== 'play' || demo) return;
-    const start = Date.now();
-    const timer = setInterval(() => setPlayClock((Date.now() - start) / 1000), 1000);
-    return () => clearInterval(timer);
-  }, [snapshot]);
   useEffect(() => {
     if (prompt === 'local' && query.trim() && matches.length) setSelection(matches[0]!);
   }, [query, prompt]);
@@ -244,13 +177,6 @@ function App() {
     if (view === 'artist' && artist) return { page: 'artist', name: artist.name };
     return view === 'library' ? { page: 'library', mode: libraryView } : { page: 'queue' };
   }
-  function placeKey(route: Route, track?: Track): string | undefined {
-    if (!track) return;
-    if (route.page === 'queue') return `queue:${(track as QueueTrack).queueId}`;
-    if (route.page === 'library' && route.mode === 'artists') return `artist:${track.artist}`;
-    if (route.page === 'artist' || route.page === 'library') return `album:${albumKey(track)}`;
-    return `track:${track.uri}`;
-  }
   function capturePlace(): Place {
     const route = currentRoute();
     const point: Place = { route, selection, selected: placeKey(route, buffer[selection]) };
@@ -265,27 +191,7 @@ function App() {
     }
     return point;
   }
-  function resolvePlace(point: Place): Place {
-    const requested = point.route;
-    let route = requested;
-    const album = requested.page === 'record' ? albums.find(a => a.key === requested.key) : undefined;
-    const person = requested.page === 'artist' ? artists.find(a => a.name === requested.name) : undefined;
-    if ((route.page === 'record' && !album) || (route.page === 'artist' && !person)) route = { page: 'library', mode: 'covers' };
-    if (route.page === 'record' && album) {
-      const parent = route.artist;
-      if (!artists.some(a => a.name === parent && a.albums.some(a => a.key === album.key))) route = { ...route, artist: album.artist };
-    }
-    const items = route.page === 'queue' ? snapshot.queue : route.page === 'record' ? album!.tracks : route.page === 'artist' ? person!.albums.map(a => a.tracks[0]!) : route.mode === 'artists' ? artistBuffer : albums.map(a => a.tracks[0]!);
-    const found = point.selected ? items.findIndex(t => placeKey(route, t) === point.selected) : -1;
-    const index = Math.max(0, Math.min(items.length - 1, found >= 0 ? found : point.selection));
-    let viewport = point.viewport;
-    if (viewport?.kind === 'list') {
-      const anchorKey = viewport.anchor;
-      const anchor = anchorKey ? items.findIndex(t => placeKey(route, t) === anchorKey) : -1;
-      viewport = { ...viewport, index: Math.max(0, Math.min(items.length - 1, anchor >= 0 ? anchor : viewport.index)) };
-    }
-    return { route, selection: index, selected: placeKey(route, items[index]), viewport };
-  }
+  function resolvePlace(point: Place): Place { return resolveLocation(point, { albums, artists, queue: snapshot.queue }); }
   function applyPlace(point: Place) {
     clearFocus(); updateDrag(undefined); setPrompt(null);
     const route = point.route;
@@ -310,8 +216,8 @@ function App() {
     setNotice(`${direction === 'back' ? 'Back' : 'Forward'} · ${route.page === 'queue' ? 'Now playing' : route.page === 'library' ? 'Library' : route.page === 'artist' ? route.name : albums.find(a => a.key === route.key)?.title || 'Album'}`);
   }
   function openAlbum(album: Album, track?: Track) {
-    const parent = artist?.albums.some(a => a.key === album.key) ? artist.name : album.artist;
-    visit({ page: 'record', key: album.key, artist: parent }, track ? Math.max(0, album.tracks.findIndex(t => t.uri === track.uri)) : 0);
+    const place = albumPlace(album, track, artist);
+    visit(place.route, place.selection);
     setNotice(`${album.artist} · ${album.title}`);
   }
   function openTrack(track: Track) {

@@ -10,7 +10,7 @@ export class NavigationLog {
   readonly directory: string;
   error?: string;
   private sequence = 0;
-  constructor(private mode: 'demo' | 'mpd', directory?: string) {
+  constructor(private mode: 'demo' | 'mpd', directory?: string, private renderer: 'gui' | 'tui' = 'gui') {
     this.directory = directory || join(homedir(), 'Library', 'Application Support', 'Music Prototype', 'navigation');
   }
   append(event: NavigationEvent) {
@@ -20,7 +20,7 @@ export class NavigationLog {
       const at = new Date().toISOString();
       const path = join(this.directory, `${at.slice(0, 10)}.jsonl`);
       // Small, synchronous appends keep the final event when the native window exits.
-      appendFileSync(path, JSON.stringify({ version: 1, session: this.session, sequence: ++this.sequence, at, mode: this.mode, ...event }) + '\n', { mode: 0o600 });
+      appendFileSync(path, JSON.stringify({ version: 1, session: this.session, sequence: ++this.sequence, at, mode: this.mode, renderer: this.renderer, ...event }) + '\n', { mode: 0o600 });
     } catch (error) {
       this.error = error instanceof Error ? error.message : String(error);
       console.warn('Navigation journal unavailable:', this.error);
