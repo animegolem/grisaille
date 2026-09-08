@@ -58,7 +58,7 @@ export function resolvePlace(point: Place, catalogue: Catalogue): Place {
     const anchor = identityIndex(route, items, viewport.anchor, viewport.queue);
     viewport = { ...viewport, index: Math.max(0, Math.min(items.length - 1, anchor >= 0 ? anchor : viewport.index)) };
   }
-  return identifyPlace({ route, selection, viewport }, items);
+  return identifyPlace({ route, selection, viewport, browser: point.browser }, items);
 }
 export function albumPlace(album: Album, track?: Track, parent?: Artist): Place {
   return {

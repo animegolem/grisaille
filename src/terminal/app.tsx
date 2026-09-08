@@ -3,7 +3,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalS
 import { flushSync, useKeyboard, useTerminalDimensions } from '@opentui/react';
 import type { ImageRenderProtocol, KeyEvent } from '@opentui/core';
 import { MusicSession, useMusic } from '../music-session';
-import { NavigationHistory, type NavigationEvent, type Place, type Route } from '../history';
+import { NavigationHistory, type BrowserColumn, type NavigationEvent, type Place, type Route } from '../history';
+import { browserColumns, browserTarget, browserTrail } from '../browser';
 import { albumPlace, identifyPlace, placeKey, resolvePlace, routeItems, routeTitle } from '../locations';
 import { albumKey, albumsOf, artistsOf, duration, fuzzyScore, searchLibrary, type Album, type Result, type Track } from '../model';
 import { directionOf } from '../navigation';
@@ -82,9 +83,13 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   const shown = route.page === 'queue' ? current || selected : selected;
   const album = route.page === 'record' ? albums.find(a => a.key === route.key) : undefined;
   const parent = route.page === 'artist' ? artists.find(a => a.name === route.name) : route.page === 'record' ? artists.find(a => a.name === route.artist) : undefined;
+  const browse = browserColumns(place, catalogue);
+  const visibleColumns: BrowserColumn[] = !browse ? [] : width >= 100 && height >= 19 ? ['artists', 'albums', 'tracks'] : width >= 70 && height >= 19 ? browse.active === 'artists' ? ['artists', 'albums'] : ['albums', 'tracks'] : [browse.active];
+  const browserArt = width >= 100 && height >= 24;
   const tight = height < 16;
   const compactPrompt = height < 20;
-  const capacity = Math.max(1, Math.floor((height - (tight ? 8 : 10) - (prompt === 'local' ? tight ? 1 : 2 : 0)) / 2));
+  const capacityFor = (column?: BrowserColumn) => Math.max(1, Math.floor((height - (tight ? 8 : 10) - (prompt === 'local' ? tight ? 1 : 2 : 0) - (column && width >= 70 && height >= 19 ? 1 : 0) - (column === 'tracks' && browserArt ? 5 : 0)) / 2));
+  const capacity = capacityFor(browse?.active);
   const top = place.viewport?.kind === 'list' ? place.viewport.index : 0;
   const showDetail = width >= 78 && height >= 19 && prompt !== 'global';
   const detailWidth = Math.min(36, Math.floor(width * .35));
@@ -94,6 +99,16 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
 
   function position(point: Place, keepViewport = false): Place {
     const next = resolvePlace(point, catalogue);
+    const columns = browserColumns(next, catalogue);
+    if (columns) {
+      for (const name of ['artists', 'albums', 'tracks'] as const) {
+        const entry = columns[name], list = routeItems(entry.route, catalogue), size = capacityFor(name);
+        let index = entry.viewport?.kind === 'list' ? entry.viewport.index : 0;
+        index = keepViewport ? Math.max(0, Math.min(Math.max(0, list.length - size), index)) : reveal(entry.selection, index, list.length, size);
+        columns[name] = identifyPlace({ ...entry, viewport: { kind: 'list', index, offset: 0 } }, list);
+      }
+      return { ...next, viewport: columns[columns.active].viewport, browser: browserTrail(columns) };
+    }
     const list = routeItems(next.route, catalogue);
     let index = next.viewport?.kind === 'list' ? next.viewport.index : 0;
     if (!keepViewport) index = reveal(next.selection, index, list.length, capacity);
@@ -107,11 +122,14 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   function visit(point: Place) {
     restoring.current = false;
     if (point.route.page === 'library') setLibraryView(point.route.mode);
-    const next = position(point);
+    const next = position({ ...point, browser: point.browser || place.browser });
     history.visit(next, place); setPlace(next); setPrompt(undefined); setHeld(undefined); setSortOpen(false);
     setNotice(routeTitle(next.route, albums));
   }
-  function openAlbum(target: Album, track?: Track) { visit(albumPlace(target, track, parent)); }
+  function openAlbum(target: Album, track?: Track) {
+    const point = browse?.album?.key === target.key ? browserTarget(place, 'tracks', catalogue, track ? target.tracks.findIndex(t => t.uri === track.uri) : undefined) : undefined;
+    visit(point || albumPlace(target, track, browse?.person || parent));
+  }
   function openTrack(track: Track) { const target = albums.find(a => a.key === albumKey(track)); if (target) openAlbum(target, track); }
   function travel(direction: 'back' | 'forward') {
     const target = history.step(direction, place);
@@ -121,13 +139,28 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     setNotice(`${direction === 'back' ? 'Back' : 'Forward'} · ${routeTitle(next.route, albums)}`);
   }
   function openSelected() {
+    if (browse) {
+      const column = browse.active === 'artists' ? 'albums' : browse.active === 'albums' ? 'tracks' : undefined;
+      const point = column && browserTarget(place, column, catalogue);
+      if (point) visit(point);
+      return;
+    }
     if (!selected) return;
     if (route.page === 'library' && route.mode === 'artists') visit({ route: { page: 'artist', name: selected.artist }, selection: 0 });
     else openTrack(selected);
   }
   function parentPage() {
+    if (browse && browse.active !== 'artists') {
+      const target = browserTarget(place, browse.active === 'tracks' ? 'albums' : 'artists', catalogue);
+      if (target) visit(target);
+      return;
+    }
     const next: Route = route.page === 'record' ? { page: 'artist', name: parent?.name || album?.artist || '' } : route.page === 'artist' ? { page: 'library', mode: 'artists' } : { page: 'queue' };
     if (route.page !== 'queue') visit({ route: next, selection: 0 });
+  }
+  function openPage(page: 'queue' | 'library') {
+    const target = page === 'library' && libraryView === 'artists' && browse ? browserTarget(place, 'artists', catalogue) : undefined;
+    visit(target || { route: page === 'library' ? { page, mode: libraryView } : { page }, selection: 0 });
   }
   function activateResult(result?: Result) {
     if (!result) return;
@@ -136,8 +169,8 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     else if (result.kind === 'album') openAlbum(result.album);
     else if (result.kind === 'track') openTrack(result.track);
     else {
-      if (result.title === 'Open queue') visit({ route: { page: 'queue' }, selection: 0 });
-      if (result.title === 'Open library') visit({ route: { page: 'library', mode: libraryView }, selection: 0 });
+      if (result.title === 'Open queue') openPage('queue');
+      if (result.title === 'Open library') openPage('library');
       if (result.title === 'Reload library') void act(reloadLibrary, 'Library refreshed');
       if (result.title === 'Play / pause') void act(() => backend.toggle());
       if (result.title === 'Next track') void act(() => backend.next());
@@ -186,8 +219,8 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     else if (char === 'i') travel('forward');
     else if (char === 'q') quit();
     else if (char === 's' && (route.page === 'library' || route.page === 'artist')) { setSortIndex(Math.max(0, sortOptions.findIndex(option => option.value === order[orderContext]))); setSortOpen(true); }
-    else if (key.name === 'f1') visit({ route: { page: 'queue' }, selection: 0 });
-    else if (key.name === 'f2') visit({ route: { page: 'library', mode: libraryView }, selection: 0 });
+    else if (key.name === 'f1') openPage('queue');
+    else if (key.name === 'f2') openPage('library');
     else if (direction === 'up' || direction === 'down') select(place.selection + (direction === 'down' ? 1 : -1));
     else if (direction === 'left' || key.name === 'escape') parentPage();
     else if (direction === 'right') openSelected();
@@ -214,7 +247,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     restoring.current = false;
     if (JSON.stringify(next) !== JSON.stringify(place)) { setPlace(next); history.checkpoint(next, false); }
     setHeld(undefined);
-  }, [catalogue, width, height, libraryReady, snapshotReady]);
+  }, [catalogue, width, height, libraryReady, snapshotReady, prompt === 'local']);
   useLayoutEffect(() => {
     stateProvider.current = () => libraryReady && snapshotReady && !restoring.current ? { version: 1, history: history.snapshot(), order, libraryView } : undefined;
   });
@@ -254,8 +287,28 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
       </box> : <>
         <Line text={`${heading}   ${items.length ? place.selection + 1 : 0}/${items.length}${route.page === 'library' || route.page === 'artist' ? `   s ${sortLabel} ▾` : ''}`} color={C.accent} />
         {prompt === 'local' && <box height={tight ? 1 : 2} paddingTop={tight ? 0 : 1}>{input}</box>}
-        <box flexDirection="row" gap={3} flexGrow={1} minHeight={0} paddingTop={tight ? 0 : 1}>
-          <box flexDirection="column" flexGrow={1} minWidth={0}>
+        <box flexDirection="row" gap={browse ? 2 : 3} flexGrow={1} minHeight={0} paddingTop={tight ? 0 : 1}>
+          {browse ? visibleColumns.map(column => {
+            const point = browse[column], columnItems = column === 'artists' ? routeItems(point.route, catalogue) : column === 'albums' ? browse.person?.albums.map(a => a.tracks[0]!) || [] : browse.album?.tracks || [];
+            const columnTop = point.viewport?.kind === 'list' ? point.viewport.index : 0;
+            const active = browse.active === column;
+            return <box key={column} flexDirection="column" flexGrow={column === 'tracks' ? 1.4 : 1} flexBasis={0} minWidth={0}>
+              {visibleColumns.length > 1 && <Line text={`${active ? '›' : ' '} ${column.toUpperCase()} ${columnItems.length}`} color={active ? C.accent : C.muted} />}
+              {column === 'tracks' && browserArt && <box height={5} flexShrink={0} flexDirection="row" gap={1}>
+                <Cover session={session} track={browse.track} width={8} height={4} protocol={protocol} />
+                <box flexDirection="column" flexGrow={1} minWidth={0}><Line text={active ? browse.track?.title || '' : browse.album?.title || ''} /><Line text={browse.track?.artist || ''} color={C.muted} /><Line text={active ? browse.album?.title || '' : browse.album?.year || ''} color={C.muted} /></box>
+              </box>}
+              {columnItems.slice(columnTop, columnTop + capacityFor(column)).map((track, offset) => {
+                const index = columnTop + offset, chosen = point.selection === index;
+                const title = column === 'artists' ? track.artist : column === 'albums' ? track.album : track.title;
+                const subtitle = column === 'artists' ? `${artists[index]?.albums.length || 0} albums` : column === 'albums' ? `${track.year} · ${browse.person?.albums[index]?.tracks.length || 0} tracks` : `${track.disc && track.disc > 1 ? `${track.disc}.` : ''}${String(track.number).padStart(2, '0')} · ${duration(track.duration)}`;
+                return <box key={placeKey(point.route, track)} height={2} flexShrink={0} backgroundColor={chosen ? fill(active ? 'browserRowSelected' : 'browserRowContext') : fill('canvas')}>
+                  <Line text={`${chosen ? active ? '›' : '·' : ' '} ${title}`} /><Line text={`  ${subtitle}`} color={C.muted} />
+                </box>;
+              })}
+              {!columnItems.length && <Line text={loading ? 'Reading…' : 'Nothing here'} color={C.muted} />}
+            </box>;
+          }) : <><box flexDirection="column" flexGrow={1} minWidth={0}>
             {items.slice(top, top + capacity).map((track, i) => {
               const index = top + i;
               const isSelected = index === place.selection;
@@ -272,7 +325,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
           {showDetail && <box width={detailWidth} flexShrink={0} flexDirection="column" gap={1}>
             <Cover session={session} track={shown} width={detailWidth} height={Math.max(4, Math.min(Math.floor(detailWidth / 2), height - 17))} protocol={protocol} />
             <box><Line text={shown?.title || 'Nothing playing'} /><Line text={shown?.artist || ''} color={C.muted} /><Line text={shown?.album || ''} color={C.muted} /></box>
-          </box>}
+          </box>}</>}
         </box>
       </>}
     </box>

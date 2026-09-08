@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writ
 import { createHash, randomUUID } from 'node:crypto';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import type { HistoryState, Place, QueueIdentity, Route, Viewport } from './history';
+import type { BrowserPosition, BrowserTrail, HistoryState, Place, QueueIdentity, Route, Viewport } from './history';
 import { albumOrders, artistOrders, type LibraryOrder } from './library-order';
 
 export type NavigationState = { version: 1; history: HistoryState; order: LibraryOrder; libraryView: 'covers' | 'artists' };
@@ -22,6 +22,16 @@ function queue(value: unknown): QueueIdentity | undefined {
   if (value === undefined) return;
   const data = object(value); return { uri: text(data.uri), occurrence: number(data.occurrence) };
 }
+function position(value: unknown): BrowserPosition {
+  const data = object(value);
+  let viewport: Viewport | undefined;
+  if (data.viewport !== undefined) {
+    const view = object(data.viewport);
+    if (view.kind !== 'list') throw new Error('Unknown saved viewport');
+    viewport = { kind: 'list', index: number(view.index), offset: number(view.offset, false), anchor: view.anchor === undefined ? undefined : text(view.anchor), queue: queue(view.queue) };
+  }
+  return { selection: number(data.selection), selected: data.selected === undefined ? undefined : text(data.selected), viewport };
+}
 function place(value: unknown): Place {
   const data = object(value), page = object(data.route);
   let route: Route;
@@ -30,13 +40,16 @@ function place(value: unknown): Place {
   else if (page.page === 'artist') route = { page: 'artist', name: text(page.name) };
   else if (page.page === 'record') route = { page: 'record', key: text(page.key), artist: page.artist === undefined ? undefined : text(page.artist) };
   else throw new Error('Unknown saved page');
-  let viewport: Viewport | undefined;
-  if (data.viewport !== undefined) {
-    const view = object(data.viewport);
-    if (view.kind !== 'list') throw new Error('Unknown saved viewport');
-    viewport = { kind: 'list', index: number(view.index), offset: number(view.offset, false), anchor: view.anchor === undefined ? undefined : text(view.anchor), queue: queue(view.queue) };
+  let browser: BrowserTrail | undefined;
+  if (data.browser !== undefined) {
+    const trail = object(data.browser);
+    browser = {
+      artists: trail.artists === undefined ? undefined : position(trail.artists),
+      albums: trail.albums === undefined ? undefined : { ...position(trail.albums), artist: text(object(trail.albums).artist) },
+      tracks: trail.tracks === undefined ? undefined : { ...position(trail.tracks), album: text(object(trail.tracks).album) },
+    };
   }
-  return { route, selection: number(data.selection), selected: data.selected === undefined ? undefined : text(data.selected), queue: queue(data.queue), viewport };
+  return { route, ...position(data), queue: queue(data.queue), browser };
 }
 export function parseNavigationState(value: unknown): NavigationState {
   const data = object(value), history = object(data.history), order = object(data.order);

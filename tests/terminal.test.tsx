@@ -135,7 +135,7 @@ test('reopening the terminal restores scroll, sorts and the forward branch witho
       await first.mockInput.typeText(':loveless', 0); first.mockInput.pressEnter();
       await first.waitForFrame(frame => frame.includes('Loveless') && frame.includes('1/11'));
       await first.mockInput.typeText('jjjjjjjjh', 0);
-      await first.waitForFrame(frame => frame.includes('My Bloody Valentine') && frame.includes('1/3'));
+      await first.waitForFrame(frame => frame.includes('My Bloody Valentine') && frame.includes('2/3'));
       await first.mockInput.typeText('s', 0); first.mockInput.pressArrow('down'); first.mockInput.pressEnter();
       await first.waitForFrame(frame => frame.includes('Year · newest first'));
       await first.mockInput.typeText('o', 0);
@@ -150,7 +150,7 @@ test('reopening the terminal restores scroll, sorts and the forward branch witho
       expect(await reopened.backend.snapshot()).toEqual(before);
       expect(reopened.captureCharFrame()).toContain('Blown a Wish');
       await reopened.mockInput.typeText('i', 0);
-      await reopened.waitForFrame(frame => frame.includes('My Bloody Valentine') && frame.includes('Year · newest first') && frame.includes('3/3'));
+      await reopened.waitForFrame(frame => frame.includes('My Bloody Valentine') && frame.includes('Year · newest first') && frame.includes('2/3'));
       await reopened.mockInput.typeText('o', 0);
       await reopened.waitForFrame(frame => frame.includes('Loveless') && frame.includes('9/11'));
       expect(await reopened.backend.snapshot()).toEqual(before);
@@ -185,4 +185,31 @@ test('an offline launch preserves saved navigation until the library returns, th
       expect(view.events).toHaveLength(0);
     } finally { view.cleanup(); }
   } finally { rmSync(directory, { recursive: true }); }
+});
+
+test('terminal columns preview without playback, retain child selection, and adapt to narrow windows', async () => {
+  const view = await setup(110, 30);
+  try {
+    const before = await view.backend.snapshot();
+    await view.mockInput.typeText(':loveless', 0); view.mockInput.pressEnter();
+    await view.waitForFrame(frame => frame.includes('ARTISTS 6') && frame.includes('ALBUMS 3') && frame.includes('› TRACKS 11'));
+    await view.mockInput.typeText('jjjjjjjjhh', 0);
+    await view.waitForFrame(frame => frame.includes('Library / Artists') && frame.includes('6/6') && frame.includes('Blown a Wish'));
+    await view.mockInput.typeText('ll', 0);
+    await view.waitForFrame(frame => frame.includes('Loveless') && frame.includes('9/11') && frame.includes('› TRACKS 11'));
+    expect(await view.backend.snapshot()).toEqual(before);
+    view.resize(80, 24);
+    await view.waitForFrame(frame => frame.includes('ALBUMS 3') && frame.includes('› TRACKS 11') && !frame.includes('ARTISTS 6'));
+    view.resize(44, 12);
+    await view.waitForFrame(frame => frame.includes('9/11') && frame.includes('Blown a Wish'));
+    view.resize(110, 30);
+    await view.waitForFrame(frame => frame.includes('ARTISTS 6') && frame.includes('Blown a Wish'));
+    await view.mockInput.typeText('hhk', 0);
+    await view.waitForFrame(frame => frame.includes('Library / Artists') && frame.includes('5/6') && frame.includes('ALBUMS 1') && !frame.includes('Loveless'));
+    const visits = view.events.filter(event => event.action === 'visit').length;
+    view.mockInput.pressKey('F2');
+    await view.waitForFrame(frame => frame.includes('Library / Artists') && frame.includes('5/6'));
+    expect(view.events.filter(event => event.action === 'visit')).toHaveLength(visits);
+    expect(await view.backend.snapshot()).toEqual(before);
+  } finally { view.cleanup(); }
 });

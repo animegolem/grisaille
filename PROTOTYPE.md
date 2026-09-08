@@ -53,8 +53,14 @@ applies it.
 GUI. Command-number shortcuts remain GUI-specific because terminal applications
 commonly reserve them. Terminal mode is keyboard-only in this proof.
 
-One context cover uses OpenTUI's negotiated Kitty graphics, Sixel or coloured
-block fallback. `--no-images` forces the coloured block fallback. The detail pane
+Artist browsing uses connected Artists → Albums → Tracks columns. At 100 columns
+and 19 rows it shows all three; at 70–99 columns it shows two, keeping the active
+column visible. Smaller windows show the active list. The track column includes
+one context cover at 100 columns and 24 rows. Selection and navigation behave the
+same at each size.
+
+Context covers use OpenTUI's negotiated Kitty graphics, Sixel or coloured
+block fallback. `--no-images` forces the coloured block fallback. The queue detail pane
 hides below 78 columns or 19 rows, keeping the list and prompt usable; the minimum
 layout is 40 by 12. Images unmount while the global prompt is open. OpenTUI owns
 image placement, deletion and terminal restoration. An owner-provided Ghostty
@@ -76,6 +82,20 @@ Ghostty access during this sitting; the screenshot supplied the visual evidence.
   setting. Missing years sort last. Sorting retains the selected album/artist by
   identity, including its viewport anchor. Sort choices and browsing positions
   are restored when the app reopens.
+- Artists opens a connected three-column browser in the GUI. Artist selection
+  previews that artist's albums; album selection previews its tracks. Small covers
+  accompany album rows, and the track column's cover and details follow selection.
+  The active column has a brighter selection and heading; subdued selections keep
+  its artist and album visible. `j`/`k` moves within a column, `h`/`l` changes column,
+  and Enter opens the next column or plays a track. Right on a track has no playback
+  action. Clicking a row selects and focuses its column without starting playback.
+  Sorting and `/` find apply to the active column; `s` also opens sorting in the GUI.
+  The Albums grid retains spatial navigation.
+- Stepping to a parent retains the album or artist you came from. Stepping into
+  the child again retains its selected track and viewport. All three positions
+  travel with `o`/`i` history and saved state. The trail holds the current artist,
+  album and track path; changing a parent resets a child that belongs to another
+  parent. It does not keep an independent saved position for every album visited.
 - The top bar contains navigation and the prompt. MPD connected / down / connecting
   is shown in the status line; the sample mode is labelled there as simulated.
   Connection state follows snapshot reads, independently of artwork failures.
@@ -102,9 +122,10 @@ Ghostty access during this sitting; the screenshot supplied the visual evidence.
   reaches an edge. Pointer queue drops also avoid an extra
   automatic jump to the moved row.
 - Space toggles playback. Album and artist text navigate into the library.
-- The album header offers Play album and Queue album. Both append the album in
+- The Albums column offers Play album and Queue album. Both append the album in
   disc/track order; Play album starts its first new queue occurrence. The existing
-  queue is retained. The detail pane's Play track and Queue track act on one track.
+  queue is retained. The Tracks column's Play track and Queue track act on its
+  selected track, including when another column currently has keyboard focus.
 - Click the progress bar to seek, or use `[` / `]` for ten seconds backward/forward.
   Seeking addresses the current song ID and rejects an already changed/stopped song.
 - In the queue, Backspace/Delete or Remove removes the selected occurrence from
@@ -156,6 +177,9 @@ Journal write failures appear in the status bar without blocking navigation.
 A separate JSON snapshot in `~/Library/Application Support/Music Prototype/state/`
 restores the last page, selected item, scroll anchor and pixel offset, all three
 sort choices, the last Library view, and both directions of `o`/`i` history.
+Browser entries also retain the other columns' selections and viewport anchors.
+Existing snapshots without those fields remain readable. A different window size
+can clamp the restored scroll offset to the available content height.
 The GUI and terminal keep separate snapshots, as do demo mode and each configured
 MPD endpoint. Endpoint names are hashed; passwords are not stored. Set
 `MUSIC_UI_STATE_DIR` to use a separate state directory for a development check.
@@ -232,9 +256,41 @@ npm run typecheck
 python3 scripts/package-mac.py
 ```
 
-## Verification on 6 September 2026
+## Browser verification on 7 September 2026
 
-- Current TypeScript check, standalone build and 47 tests pass (178 assertions).
+- TypeScript checking and all 52 tests pass (201 assertions); the standalone binary
+  and macOS app bundle build successfully.
+- The native demo was checked at the initial size and the 720×620 minimum. Album
+  covers, column headings, context and playback controls remained usable. Moving
+  from a later Loveless track to Albums and back retained the track and scroll;
+  clicking another visible track preserved the viewport. Closing and reopening
+  retained the artist, album, child track and active column. Enter played the
+  retained track in the simulated backend, and previewing another album left that
+  simulated playback running.
+- Shared navigation checks cover parent/child restoration, changed parents,
+  contributor context on compilations, sorting, missing albums and validation of
+  saved column positions. Terminal renderer checks cover three, two and one-column
+  layouts, history, search and resizing with the selected track still visible.
+  These terminal checks do not constitute a new Ghostty visual check.
+- The compiled terminal app also ran twice from `/tmp` in a 110×30 PTY. Search,
+  eight track moves, both parent columns and returning to Tracks were sent in one
+  input burst. Both runs exited successfully, restored the terminal, displayed all
+  three columns, and retained identical saved state with Loveless track nine selected.
+- Native live checks used the 18,404-track library and 1,118 artists. Jumping to
+  NOFX and sending fifteen immediate navigation keys reached its sixteenth album.
+  Artists and Albums remained populated, including after reopening at the end of
+  the discography. Wheel scrolling in Artists and clicking Pat the Bunny retained
+  the viewport while updating the album covers and track preview. These live
+  checks used browsing controls only.
+- A first live pass exposed a blank parent column on a distant jump, followed by
+  missing rows when native scrolling clamped a jump near the end of a list.
+  Browser lists now mount the possible destination viewport before scrolling,
+  and wheel updates read the current native anchor. Search submission also commits
+  before subsequent navigation keys arrive.
+
+## Earlier verification on 6 September 2026
+
+- At that stage, TypeScript checking, standalone build and 47 tests passed (178 assertions).
   The terminal tests render at 100×28, 65×16 and 44×12 and cover rapid input,
   bracketed paste, search destinations, history without replaying commands,
   queue controls, sorting, viewport restoration, action serialization and cleanup.

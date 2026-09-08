@@ -9,7 +9,14 @@ export type Viewport =
   | { kind: 'list'; index: number; offset: number; anchor?: string; queue?: QueueIdentity }
   | { kind: 'grid'; x: number; y: number; columns: number };
 
-export type Place = { route: Route; selection: number; selected?: string; queue?: QueueIdentity; viewport?: Viewport };
+export type BrowserColumn = 'artists' | 'albums' | 'tracks';
+export type BrowserPosition = { selection: number; selected?: string; viewport?: Viewport };
+export type BrowserTrail = {
+  artists?: BrowserPosition;
+  albums?: BrowserPosition & { artist: string };
+  tracks?: BrowserPosition & { album: string };
+};
+export type Place = BrowserPosition & { route: Route; queue?: QueueIdentity; browser?: BrowserTrail };
 export type HistoryState = { entries: Place[]; cursor: number };
 export type NavigationEvent = {
   action: 'visit' | 'back' | 'forward' | 'position';

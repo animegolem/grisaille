@@ -26,6 +26,10 @@ const surfaces = {
   recordRow: 'transparent',
   recordRowHover: 'transparent',
   recordRowSelected: '#3c515f',
+  browserRow: 'transparent',
+  browserRowHover: '#282f36',
+  browserRowContext: '#2e3b45',
+  browserRowSelected: '#3c515f',
   detail: 'transparent',
   coverPlaceholder: '#1c2329',
   transport: '#282f36',
@@ -62,6 +66,7 @@ const colors = {
 const borders = {
   header: '#43515d', queueRow: '#43515d', recordRow: '#43515d',
   artistRow: '#43515d', detail: '#43515d', transport: '#43515d',
+  browserColumn: '#43515d', browserActive: '#b4d3e5',
   prompt: '#43515d', promptDivider: '#43515d', sortMenu: '#43515d',
   queueInsertion: '#b4d3e5', queueHeld: '#b4d3e5',
   focus: '#b4d3e5', control: 'transparent',
