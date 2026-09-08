@@ -118,8 +118,10 @@ Ghostty access during this sitting; the screenshot supplied the visual evidence.
   In an input, letters remain text; Up/Down choose matches.
 - Clicking a queue, album-track or artist-list row selects it without scrolling
   the viewport. Keyboard navigation and search still reveal the selected item;
-  history restores its saved viewport. Keyboard selection only scrolls when it
-  reaches an edge. Pointer queue drops also avoid an extra
+  history restores its saved viewport. Keyboard selection moves through the fully
+  visible rows before scrolling just enough to reveal a row beyond an edge. This
+  uses the native virtual list's viewport height for columns, queue and album rows.
+  Pointer queue drops also avoid an extra
   automatic jump to the moved row.
 - Space toggles playback. Album and artist text navigate into the library.
 - The Albums column offers Play album and Queue album. Both append the album in
@@ -255,6 +257,21 @@ npm run typecheck
 ./node_modules/.bin/bun run build
 python3 scripts/package-mac.py
 ```
+
+## Keyboard scrolling correction on 7 September 2026
+
+- The native bounds lookup returns no measurement for virtual lists. Its old
+  fallback treated a column as one row tall and anchored every new keyboard
+  selection at the top. Columns, queue and album grid now use the viewport height
+  returned by `getListScrollTop` and share the same edge-reveal calculation.
+- TypeScript checking and all 54 tests pass (218 assertions). The regression
+  cases use the measured native row geometry, including partial rows and movement
+  back up through an already scrolled viewport.
+- An isolated native demo confirmed that six 52-pixel tracks fit in a 332.5-pixel
+  viewport without scrolling. Selecting the seventh moved it only 31.5 pixels;
+  moving up within the viewport did not scroll. The queue retained its viewport
+  through visible selections, and the second album row required only a 16.5-pixel
+  reveal. These checks used native input and recorded the actual scroll anchors.
 
 ## Browser verification on 7 September 2026
 

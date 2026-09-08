@@ -5,7 +5,7 @@ import { DemoBackend } from './demo';
 import { MpdBackend } from './mpd';
 import { FocusSteps } from './focus';
 import { albumsOf, artistsOf, albumKey, duration, fuzzyScore, searchLibrary, type Album, type Artist, type MusicBackend, type QueueTrack, type Result, type Track } from './model';
-import { directionOf, gridSelection, pageShortcut, pointerDrag } from './navigation';
+import { directionOf, gridSelection, listReveal, pageShortcut, pointerDrag } from './navigation';
 import { inputTheme, surface, theme } from './theme';
 import { NavigationHistory, type BrowserColumn, type BrowserTrail, type Place, type Route, type Viewport } from './history';
 import { browserColumns, browserTarget, browserTrail, rememberBrowser } from './browser';
@@ -102,12 +102,8 @@ function BrowserList({ listRef, point, count, rowHeight, revision, preserve, wid
       if (point.viewport?.kind === 'list') { jump(point.viewport.index, point.viewport.offset); return; }
     } else if (preserve) return;
     const top = renderer.getListScrollTop?.(ref.id);
-    const bounds = (renderer as typeof renderer & Partial<Pick<GpuixRenderer, 'getElementBounds'>>).getElementBounds?.(ref.id);
-    const start = (top?.[0] || 0) * rowHeight + (top?.[1] || 0), viewportHeight = bounds?.[3] || rowHeight;
-    const target = point.selection * rowHeight;
-    if (target >= start && target + rowHeight <= start + viewportHeight) return;
-    const destination = target < start ? target : Math.max(0, target + rowHeight - viewportHeight);
-    jump(Math.floor(destination / rowHeight), destination % rowHeight);
+    const destination = listReveal(point.selection, rowHeight, top);
+    if (destination) jump(destination.index, destination.offset);
   }, [point.selection, revision, width, height, count]);
   return <div onScroll={() => sync()} style={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
     <virtual-list ref={listRef} itemCount={count} windowStart={range.start} estimatedItemHeight={rowHeight} onVisibleRange={sync} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>
@@ -245,15 +241,8 @@ function App() {
     const target = isGrid ? Math.floor(selection / columns) : selection;
     const rowHeight = isGrid ? gridRowHeight : ROW;
     const top = renderer.getListScrollTop?.(ref.current.id);
-    const measurable = renderer as typeof renderer & Partial<Pick<GpuixRenderer, 'getElementBounds'>>;
-    const bounds = measurable.getElementBounds?.(ref.current.id);
-    if (top && bounds?.[3]) {
-      const start = top[0] * rowHeight + top[1];
-      const end = start + bounds[3];
-      if (target * rowHeight >= start && (target + 1) * rowHeight <= end) return;
-      const destination = target * rowHeight < start ? target * rowHeight : Math.max(0, (target + 1) * rowHeight - bounds[3]);
-      renderer.scrollToItem?.(ref.current.id, Math.floor(destination / rowHeight), destination % rowHeight);
-    } else renderer.scrollToItem?.(ref.current.id, target);
+    const destination = listReveal(target, rowHeight, top);
+    if (destination) renderer.scrollToItem?.(ref.current.id, destination.index, destination.offset);
   }, [selection, view, libraryView, artist?.name, record?.key, columns, gridRowHeight, height, order, locationRevision]);
   useEffect(() => {
     if (restoring.current || locationRevision !== locationEpoch.current) return;

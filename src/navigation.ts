@@ -27,6 +27,16 @@ export function gridSelection(index: number, direction: Direction, columns: numb
   return Math.min(count - 1, index + columns);
 }
 
+/** Reveal only beyond an edge, using the virtual list's measured viewport. */
+export function listReveal(index: number, rowHeight: number, top: readonly number[] | null | undefined) {
+  if (!top || !(top[2]! > 0)) return;
+  const start = top[0]! * rowHeight + top[1]!;
+  const target = index * rowHeight, viewportHeight = top[2]!;
+  if (target >= start && target + rowHeight <= start + viewportHeight) return;
+  const destination = target < start ? target : Math.max(0, target + rowHeight - viewportHeight);
+  return { index: Math.floor(destination / rowHeight), offset: destination % rowHeight };
+}
+
 /** The preview follows every pointer pixel; only the insertion target snaps. */
 export function pointerDrag(source: number, dy: number, rowHeight: number, count: number) {
   return { offset: dy, target: Math.max(0, Math.min(count - 1, source + Math.round(dy / rowHeight))) };
