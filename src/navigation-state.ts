@@ -36,6 +36,7 @@ function place(value: unknown): Place {
   const data = object(value), page = object(data.route);
   let route: Route;
   if (page.page === 'queue') route = { page: 'queue' };
+  else if (page.page === 'lyrics') route = { page: 'lyrics' };
   else if (page.page === 'library' && (page.mode === 'covers' || page.mode === 'artists')) route = { page: 'library', mode: page.mode };
   else if (page.page === 'artist') route = { page: 'artist', name: text(page.name) };
   else if (page.page === 'record') route = { page: 'record', key: text(page.key), artist: page.artist === undefined ? undefined : text(page.artist) };

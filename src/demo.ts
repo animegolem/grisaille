@@ -1,5 +1,6 @@
 import records from './sample-library.json';
 import { albumKey, moveQueue, type Album, type MusicBackend, type Track, type QueueTrack, type Snapshot } from './model';
+import type { Lyrics } from './lyrics';
 
 export class DemoBackend implements MusicBackend {
   readonly demo = true;
@@ -24,6 +25,7 @@ export class DemoBackend implements MusicBackend {
   async library() { return this.tracks; }
   async snapshot(): Promise<Snapshot> { this.updateClock(); return { queue: [...this.queue], currentId: this.currentId, state: this.playState, elapsed: this.elapsed, volume: 75 }; }
   async artwork(t: Track) { return t.art || this.tracks.find(x => albumKey(x) === albumKey(t))?.art; }
+  async lyrics(_track: Track): Promise<Lyrics | undefined> { return undefined; }
   private changed() { for (const listener of this.listeners) listener(); }
   private updateClock() {
     const now = Date.now();

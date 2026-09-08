@@ -11,6 +11,8 @@ import { directionOf } from '../navigation';
 import { theme } from '../theme';
 import { albumOrders, artistOrders, defaultOrder, orderAlbums, orderArtists, type LibraryOrder } from '../library-order';
 import type { NavigationState, NavigationStateStore } from '../navigation-state';
+import { lyricRows } from '../lyrics';
+import { useLyrics } from '../use-lyrics';
 
 const noStateSubscription = () => () => {};
 const noStateError = () => undefined;
@@ -72,6 +74,8 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   const [query, setQuery] = useState('');
   const [resultIndex, setResultIndex] = useState(0);
   const [priorPlace, setPriorPlace] = useState(place);
+  const priorLyrics = useRef({ line: 0, row: 0, following: false });
+  const [lyricTop, setLyricTop] = useState(0);
   const [held, setHeld] = useState<{ id: number; target: number }>();
   const route = place.route;
   const orderContext = route.page === 'library' && route.mode === 'artists' ? 'artists' : route.page === 'artist' ? 'artistAlbums' : 'albums';
@@ -80,6 +84,11 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   const items = useMemo(() => routeItems(route, catalogue), [route, catalogue]);
   const selected = items[place.selection];
   const current = snapshot.queue.find(t => t.queueId === snapshot.currentId);
+  const lyrics = useLyrics(backend, current, snapshot, connection === 'connected', route.page === 'lyrics');
+  const lyricLines = useMemo(() => lyricRows(lyrics.lyrics, width - 6), [lyrics.lyrics, width]);
+  const lyricCursor = useRef<{ rows: typeof lyricLines; row: number } | undefined>(undefined);
+  const lyricSelection = !lyrics.following && lyricCursor.current?.rows === lyricLines && lyricLines[lyricCursor.current.row]?.line === lyrics.selectedLine
+    ? lyricCursor.current.row : Math.max(0, lyricLines.findIndex(row => row.line === lyrics.selectedLine));
   const shown = route.page === 'queue' ? current || selected : selected;
   const album = route.page === 'record' ? albums.find(a => a.key === route.key) : undefined;
   const parent = route.page === 'artist' ? artists.find(a => a.name === route.name) : route.page === 'record' ? artists.find(a => a.name === route.artist) : undefined;
@@ -87,6 +96,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   const visibleColumns: BrowserColumn[] = !browse ? [] : width >= 100 && height >= 19 ? ['artists', 'albums', 'tracks'] : width >= 70 && height >= 19 ? browse.active === 'artists' ? ['artists', 'albums'] : ['albums', 'tracks'] : [browse.active];
   const browserArt = width >= 100 && height >= 24;
   const tight = height < 16;
+  const lyricCapacity = Math.max(1, height - (tight ? 11 : 12) - (prompt === 'local' && !tight ? 2 : 0));
   const compactPrompt = height < 20;
   const capacityFor = (column?: BrowserColumn) => Math.max(1, Math.floor((height - (tight ? 8 : 10) - (prompt === 'local' ? tight ? 1 : 2 : 0) - (column && width >= 70 && height >= 19 ? 1 : 0) - (column === 'tracks' && browserArt ? 5 : 0)) / 2));
   const capacity = capacityFor(browse?.active);
@@ -94,11 +104,12 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   const showDetail = width >= 78 && height >= 19 && prompt !== 'global';
   const detailWidth = Math.min(36, Math.floor(width * .35));
   const results = useMemo(() => prompt === 'global' ? searchLibrary(query, albums, library, artists) : [], [prompt, query, albums, library, artists]);
-  const matches = useMemo(() => prompt === 'local' ? items.map((t, i) => fuzzyScore(query, `${t.title} ${t.artist} ${t.album}`) >= 0 ? i : -1).filter(i => i >= 0) : [], [prompt, query, items]);
+  const matches = useMemo(() => prompt === 'local' ? (route.page === 'lyrics' ? lyrics.lyrics?.lines.map(line => line.text) || [] : items.map(t => `${t.title} ${t.artist} ${t.album}`)).map((text, i) => fuzzyScore(query, text) >= 0 ? i : -1).filter(i => i >= 0) : [], [prompt, query, items, route.page, lyrics.lyrics]);
   const elapsed = Math.min(current?.duration || 0, snapshot.elapsed + playClock);
 
   function position(point: Place, keepViewport = false): Place {
     const next = resolvePlace(point, catalogue);
+    if (next.route.page === 'lyrics') return next;
     const columns = browserColumns(next, catalogue);
     if (columns) {
       for (const name of ['artists', 'albums', 'tracks'] as const) {
@@ -116,8 +127,14 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     return identifyPlace({ ...next, viewport: { kind: 'list', index, offset: 0, anchor: placeKey(next.route, list[index]) } }, list);
   }
   function select(index: number) {
+    if (route.page === 'lyrics') { lyricCursor.current = undefined; lyrics.select(index); return; }
     const next = position({ ...place, selection: Math.max(0, Math.min(items.length - 1, index)), selected: undefined, queue: undefined });
     history.checkpoint(next); setPlace(next);
+  }
+  function selectLyricRow(index: number) {
+    const row = Math.max(0, Math.min(lyricLines.length - 1, index));
+    lyricCursor.current = { rows: lyricLines, row };
+    lyrics.select(lyricLines[row]?.line || 0);
   }
   function visit(point: Place) {
     restoring.current = false;
@@ -158,7 +175,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     const next: Route = route.page === 'record' ? { page: 'artist', name: parent?.name || album?.artist || '' } : route.page === 'artist' ? { page: 'library', mode: 'artists' } : { page: 'queue' };
     if (route.page !== 'queue') visit({ route: next, selection: 0 });
   }
-  function openPage(page: 'queue' | 'library') {
+  function openPage(page: 'queue' | 'lyrics' | 'library') {
     const target = page === 'library' && libraryView === 'artists' && browse ? browserTarget(place, 'artists', catalogue) : undefined;
     visit(target || { route: page === 'library' ? { page, mode: libraryView } : { page }, selection: 0 });
   }
@@ -170,6 +187,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     else if (result.kind === 'track') openTrack(result.track);
     else {
       if (result.title === 'Open queue') openPage('queue');
+      if (result.title === 'Open lyrics') openPage('lyrics');
       if (result.title === 'Open library') openPage('library');
       if (result.title === 'Reload library') void act(reloadLibrary, 'Library refreshed');
       if (result.title === 'Play / pause') void act(() => backend.toggle());
@@ -191,11 +209,23 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
       return;
     }
     if (prompt) {
-      if (key.name === 'escape') { key.preventDefault(); if (prompt === 'local') { setPlace(priorPlace); history.checkpoint(priorPlace); } setPrompt(undefined); }
+      if (key.name === 'escape') {
+        key.preventDefault();
+        if (prompt === 'local') {
+          if (route.page === 'lyrics') {
+            const prior = priorLyrics.current;
+            if (prior.following) lyrics.follow();
+            else if (lyricLines[prior.row]?.line === prior.line) selectLyricRow(prior.row);
+            else select(prior.line);
+          }
+          else { setPlace(priorPlace); history.checkpoint(priorPlace); }
+        }
+        setPrompt(undefined);
+      }
       if (key.name === 'up' || key.name === 'down') {
         key.preventDefault(); const delta = key.name === 'down' ? 1 : -1;
         if (prompt === 'global') setResultIndex(i => Math.max(0, Math.min(results.length - 1, i + delta)));
-        else if (matches.length) select(matches[(matches.indexOf(place.selection) + delta + matches.length) % matches.length]!);
+        else if (matches.length) select(matches[(matches.indexOf(route.page === 'lyrics' ? lyrics.selectedLine : place.selection) + delta + matches.length) % matches.length]!);
       }
       return; // The focused input owns text, cursor movement, and submit.
     }
@@ -214,20 +244,35 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
       }
       return;
     }
-    if (char === ':' || char === '/') { setPriorPlace(place); setQuery(''); setResultIndex(0); setPrompt(char === ':' ? 'global' : 'local'); }
+    if (char === ':' || char === '/') { setPriorPlace(place); priorLyrics.current = { line: lyrics.selectedLine, row: lyricSelection, following: lyrics.following }; setQuery(''); setResultIndex(0); setPrompt(char === ':' ? 'global' : 'local'); }
     else if (char === 'o') travel('back');
     else if (char === 'i') travel('forward');
     else if (char === 'q') quit();
+    else if (char === 'f' && route.page === 'lyrics') lyrics.follow();
+    else if (char === 'r' && route.page === 'lyrics') lyrics.reload();
     else if (char === 's' && (route.page === 'library' || route.page === 'artist')) { setSortIndex(Math.max(0, sortOptions.findIndex(option => option.value === order[orderContext]))); setSortOpen(true); }
     else if (key.name === 'f1') openPage('queue');
-    else if (key.name === 'f2') openPage('library');
-    else if (direction === 'up' || direction === 'down') select(place.selection + (direction === 'down' ? 1 : -1));
+    else if (key.name === 'f2') openPage('lyrics');
+    else if (key.name === 'f3') openPage('library');
+    else if (direction === 'up' || direction === 'down') {
+      const delta = direction === 'down' ? 1 : -1;
+      if (route.page === 'lyrics') selectLyricRow(lyricSelection + delta); else select(place.selection + delta);
+    }
     else if (direction === 'left' || key.name === 'escape') parentPage();
     else if (direction === 'right') openSelected();
-    else if (key.name === 'pagedown' || key.name === 'pageup') select(place.selection + (key.name === 'pagedown' ? capacity : -capacity));
-    else if (key.name === 'home' || key.name === 'end') select(key.name === 'home' ? 0 : items.length - 1);
+    else if (key.name === 'pagedown' || key.name === 'pageup') {
+      const delta = key.name === 'pagedown' ? 1 : -1;
+      if (route.page === 'lyrics') selectLyricRow(lyricSelection + delta * lyricCapacity); else select(place.selection + delta * capacity);
+    }
+    else if (key.name === 'home' || key.name === 'end') {
+      if (route.page === 'lyrics') selectLyricRow(key.name === 'home' ? 0 : lyricLines.length - 1); else select(key.name === 'home' ? 0 : items.length - 1);
+    }
     else if (key.name === 'return') {
-      if (route.page === 'library' || route.page === 'artist') openSelected();
+      if (route.page === 'lyrics') {
+        const time = lyrics.lyrics?.lines[lyrics.selectedLine]?.time;
+        if (time !== undefined && current && snapshot.state !== 'stop') void act(() => backend.seek(current.queueId, time));
+      }
+      else if (route.page === 'library' || route.page === 'artist') openSelected();
       else if (route.page === 'queue' && snapshot.queue[place.selection]) void act(() => backend.play(snapshot.queue[place.selection]!.queueId));
       else if (selected) void act(() => backend.enqueue(selected, true), `Playing ${selected.title}`);
     }
@@ -241,6 +286,10 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   }
   // Commit each key before the next terminal byte; fast ':' + text must keep its prefix.
   useKeyboard(key => flushSync(() => keypress(key)));
+  useLayoutEffect(() => {
+    if (route.page !== 'lyrics') return;
+    setLyricTop(top => lyrics.following ? Math.max(0, Math.min(Math.max(0, lyricLines.length - lyricCapacity), lyricSelection - Math.floor(lyricCapacity / 2))) : reveal(lyricSelection, top, lyricLines.length, lyricCapacity));
+  }, [route.page, lyricSelection, lyricLines, lyricCapacity, lyrics.following]);
   useLayoutEffect(() => {
     if (restoring.current && (!libraryReady || !snapshotReady)) return;
     const next = position(place);
@@ -267,7 +316,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   if (width < 40 || height < 12) return <box padding={1}><Line text="Music · enlarge to at least 40 × 12" /><Line text="q quit · Ctrl+C quit" color={C.muted} /></box>;
   return <box width="100%" height="100%" flexDirection="column" backgroundColor={fill('canvas')}>
     <box height={3} paddingLeft={2} paddingRight={2} paddingTop={1} flexDirection="row" gap={3} backgroundColor={fill('header')}>
-      <text fg={route.page === 'queue' ? C.text : C.muted}>F1 Now playing</text><text fg={route.page === 'library' ? C.text : C.muted}>F2 Library</text>
+      <text fg={route.page === 'queue' ? C.text : C.muted}>{width < 60 ? 'F1 Play' : 'F1 Now playing'}</text><text fg={route.page === 'lyrics' ? C.text : C.muted}>F2 Lyrics</text><text fg={route.page === 'library' ? C.text : C.muted}>F3 Library</text>
     </box>
     <box flexGrow={1} minHeight={0} paddingLeft={2} paddingRight={2} paddingTop={tight ? 0 : 1} flexDirection="column">
       {prompt === 'global' ? <box flexDirection="column" height="100%" gap={compactPrompt ? 0 : 1} backgroundColor={fill('prompt')} padding={compactPrompt ? 0 : 1}>
@@ -284,6 +333,17 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
           {!results.length && <Line text={loading ? 'Reading the library…' : 'No matches'} color={C.muted} />}
         </box>
         {!compactPrompt && <Line text="↑↓ choose · Enter open / run · Esc return" color={C.muted} />}
+      </box> : route.page === 'lyrics' ? <box flexGrow={1} minHeight={0} flexDirection="column">
+        <Line text={current?.title || 'Nothing playing'} color={C.accent} />
+        <Line text={current ? `${current.artist} · ${current.album}` : 'Choose a track to see its lyrics'} color={C.muted} />
+        <Line text={lyrics.loading ? 'Reading local lyrics…' : lyrics.error || (!lyrics.lyrics ? 'No local lyrics found · r reload' : lyrics.lyrics.synced ? `${lyrics.following ? 'Following playback' : 'Reading'} · ${snapshot.state === 'pause' ? 'paused' : connection === 'down' ? 'disconnected' : 'synced lyrics'}` : 'Untimed lyrics')} color={lyrics.error ? C.warning : C.muted} />
+        {prompt === 'local' && <box height={tight ? 1 : 2} paddingTop={tight ? 0 : 1}>{input}</box>}
+        <box flexGrow={1} minHeight={0} flexDirection="column">
+          {lyricLines.slice(lyricTop, lyricTop + lyricCapacity).map((row, index) => <box key={lyricTop + index} height={1} flexShrink={0} backgroundColor={row.line === lyrics.selectedLine && !lyrics.following ? fill('lyricRowSelected') : fill('canvas')}>
+            <Line text={`${row.line === lyrics.selectedLine ? '›' : row.line === lyrics.activeLine ? '•' : ' '} ${row.text || '· · ·'}`} color={row.line === lyrics.activeLine ? C.accent : C.text} />
+          </box>)}
+        </box>
+        {!(tight && prompt === 'local') && <Line text={lyrics.lyrics?.synced ? 'j/k read · Enter seek · f follow · / find · r reload' : 'j/k read · / find · r reload'} color={C.muted} />}
       </box> : <>
         <Line text={`${heading}   ${items.length ? place.selection + 1 : 0}/${items.length}${route.page === 'library' || route.page === 'artist' ? `   s ${sortLabel} ▾` : ''}`} color={C.accent} />
         {prompt === 'local' && <box height={tight ? 1 : 2} paddingTop={tight ? 0 : 1}>{input}</box>}
@@ -331,7 +391,7 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
     </box>
     <box height={4} flexShrink={0} paddingLeft={2} paddingRight={2} paddingTop={1} backgroundColor={fill('transport')}>
       <Line text={`${snapshot.state === 'play' ? '▶' : snapshot.state === 'pause' ? 'Ⅱ' : '■'} ${current?.title || 'Nothing playing'}   ${duration(elapsed)} / ${duration(current?.duration || 0)}   ${snapshot.volume}%`} />
-      <Line text={held ? 'Moving · arrows / hjkl position · Enter drop · Esc cancel' : 'hjkl / arrows · Enter play/open · Space pause · : prompt · o/i history · q quit'} color={C.muted} />
+      <Line text={held ? 'Moving · arrows / hjkl position · Enter drop · Esc cancel' : route.page === 'lyrics' ? 'Space pause · [/] seek · : prompt · o/i history · q quit' : 'hjkl / arrows · Enter play/open · Space pause · : prompt · o/i history · q quit'} color={C.muted} />
       <Line text={`${status} · ${error || notice}`} color={error ? C.warning : C.muted} />
     </box>
     {sortOpen && <box position="absolute" top={5} right={2} width={Math.min(29, width - 4)} height={sortOptions.length + 2} padding={1} backgroundColor={fill('sortMenu')}>

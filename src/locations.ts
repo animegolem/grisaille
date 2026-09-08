@@ -12,6 +12,7 @@ export function placeKey(route: Route, track?: Track): string | undefined {
 }
 export function routeItems(route: Route, catalogue: Catalogue): Track[] {
   const { albums, artists, queue } = catalogue;
+  if (route.page === 'lyrics') return [];
   if (route.page === 'queue') return queue;
   if (route.page === 'record') return albums.find(a => a.key === route.key)?.tracks || [];
   if (route.page === 'artist') return artists.find(a => a.name === route.name)?.albums.map(a => a.tracks[0]!) || [];
@@ -42,6 +43,8 @@ function identityIndex(route: Route, items: Track[], key?: string, queue?: Queue
 export function resolvePlace(point: Place, catalogue: Catalogue): Place {
   const { albums, artists } = catalogue;
   const requested = point.route;
+  // Lyrics follows today's playback; returning to it resumes the current cue.
+  if (requested.page === 'lyrics') return { route: requested, selection: 0, browser: point.browser };
   let route = requested;
   const album = requested.page === 'record' ? albums.find(a => a.key === requested.key) : undefined;
   const person = requested.page === 'artist' ? artists.find(a => a.name === requested.name) : undefined;
@@ -67,5 +70,5 @@ export function albumPlace(album: Album, track?: Track, parent?: Artist): Place 
   };
 }
 export function routeTitle(route: Route, albums: Album[]): string {
-  return route.page === 'queue' ? 'Now playing' : route.page === 'library' ? 'Library' : route.page === 'artist' ? route.name : albums.find(a => a.key === route.key)?.title || 'Album';
+  return route.page === 'queue' ? 'Now playing' : route.page === 'lyrics' ? 'Lyrics' : route.page === 'library' ? 'Library' : route.page === 'artist' ? route.name : albums.find(a => a.key === route.key)?.title || 'Album';
 }

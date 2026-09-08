@@ -14,6 +14,8 @@ import { MusicSession, useMusic } from './music-session';
 import { albumPlace, identifyPlace, placeKey, resolvePlace as resolveLocation } from './locations';
 import { albumOrders, artistOrders, defaultOrder, orderAlbums, orderArtists, type LibraryOrder } from './library-order';
 import { NavigationStateStore, navigationStatePath, type NavigationState } from './navigation-state';
+import { lyricRows } from './lyrics';
+import { useLyrics } from './use-lyrics';
 
 const C = theme.colors;
 const FONT = 'Menlo';
@@ -67,9 +69,10 @@ function Cover({ track, size, onClick }: { track?: Track; size: number; onClick?
   </div>;
 }
 
-function BrowserList({ listRef, point, count, rowHeight, revision, preserve, width, height, onScroll, row }: {
+function BrowserList({ listRef, point, count, rowHeight, revision, preserve, width, height, onScroll, onWheel, align = 'edge', row }: {
   listRef: RefObject<PublicInstance | null>; point: Place; count: number; rowHeight: number;
   revision: number; preserve: boolean; width: number; height: number; onScroll: () => void; row: (index: number) => ReactNode;
+  onWheel?: () => void; align?: 'edge' | 'middle';
 }) {
   const renderer = useGpuixRequired();
   function rangeAt(index: number) {
@@ -94,7 +97,7 @@ function BrowserList({ listRef, point, count, rowHeight, revision, preserve, wid
     function jump(index: number, offset = 0) {
       // Mount the destination before asking native scrolling to reveal it. The
       // first visible-range event can precede a newly mounted list's jump.
-      setRange(rangeAt(index));
+      setRange(rangeAt(Math.max(0, index + Math.floor(offset / rowHeight))));
       renderer.scrollToItem?.(ref!.id, index, offset);
     }
     if (restored.current !== revision) {
@@ -102,10 +105,11 @@ function BrowserList({ listRef, point, count, rowHeight, revision, preserve, wid
       if (point.viewport?.kind === 'list') { jump(point.viewport.index, point.viewport.offset); return; }
     } else if (preserve) return;
     const top = renderer.getListScrollTop?.(ref.id);
+    if (align === 'middle' && top?.[2]) { jump(point.selection, -Math.max(0, (top[2] - rowHeight) / 2)); return; }
     const destination = listReveal(point.selection, rowHeight, top);
     if (destination) jump(destination.index, destination.offset);
-  }, [point.selection, revision, width, height, count]);
-  return <div onScroll={() => sync()} style={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+  }, [point.selection, revision, width, height, count, align]);
+  return <div onScroll={() => { onWheel?.(); sync(); }} style={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
     <virtual-list ref={listRef} itemCount={count} windowStart={range.start} estimatedItemHeight={rowHeight} onVisibleRange={sync} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>
       {Array.from({ length: Math.max(0, Math.min(count, range.end) - range.start) }, (_, index) => row(range.start + index))}
     </virtual-list>
@@ -132,7 +136,7 @@ function App() {
   const stateProvider = useRef<() => NavigationState | undefined>(() => undefined);
   const [locationRevision, setLocationRevision] = useState(0);
   const locationEpoch = useRef(0);
-  const [view, setView] = useState<'queue' | 'library' | 'artist' | 'record'>('queue');
+  const [view, setView] = useState<'queue' | 'lyrics' | 'library' | 'artist' | 'record'>('queue');
   const [order, setOrder] = useState<LibraryOrder>(saved?.order || defaultOrder);
   const [sortOpen, setSortOpen] = useState(false);
   const [sortIndex, setSortIndex] = useState(0);
@@ -168,6 +172,9 @@ function App() {
   const promptListRef = useRef<PublicInstance>(null);
   const progressRef = useRef<PublicInstance>(null);
   const priorSelection = useRef(0);
+  const priorLyricsFollow = useRef(false);
+  const lyricRef = useRef<PublicInstance>(null);
+  const lyricPointer = useRef(false);
   const promptReady = useRef(false);
   const activeDrag = useRef(drag);
   function updateDrag(next: QueueDrag | undefined) {
@@ -181,11 +188,15 @@ function App() {
   const isGrid = view === 'library' && libraryView === 'covers';
   const isArtists = view === 'library' && libraryView === 'artists';
   const current = snapshot.queue.find(t => t.queueId === snapshot.currentId);
+  const lyrics = useLyrics(backend, current, snapshot, connection === 'connected', view === 'lyrics');
+  const lyricWidth = Math.min(850, width - 44);
+  const lyricLines = useMemo(() => lyricRows(lyrics.lyrics, Math.floor((lyricWidth - 40) / 11)), [lyrics.lyrics, lyricWidth]);
+  const lyricSelection = Math.max(0, lyricLines.findIndex(row => row.line === lyrics.selectedLine));
   const artistBuffer = useMemo(() => artists.map(a => ({ ...a.albums[0]!.tracks[0]!, artist: a.name })), [artists]);
-  const buffer = view === 'queue' ? snapshot.queue : view === 'record' ? record?.tracks || [] : isArtists ? artistBuffer : shelf.map(a => a.tracks[0]!);
+  const buffer = view === 'lyrics' ? [] : view === 'queue' ? snapshot.queue : view === 'record' ? record?.tracks || [] : isArtists ? artistBuffer : shelf.map(a => a.tracks[0]!);
   const catalogue = { albums, artists, queue: snapshot.queue };
   const browse = browserColumns({ route: currentRoute(), selection, viewport: pendingViewport.current, browser }, catalogue);
-  const matches = useMemo(() => buffer.map((t, i) => fuzzyScore(query, `${t.title} ${t.artist} ${t.album}`) >= 0 ? i : -1).filter(i => i >= 0), [buffer, query]);
+  const matches = useMemo(() => (view === 'lyrics' ? lyrics.lyrics?.lines.map(line => line.text) || [] : buffer.map(t => `${t.title} ${t.artist} ${t.album}`)).map((text, i) => fuzzyScore(query, text) >= 0 ? i : -1).filter(i => i >= 0), [view, lyrics.lyrics, buffer, query]);
   const results = useMemo(() => searchLibrary(query, albums, library, artists), [query, albums, library, artists]);
   const selected = buffer[selection] || current;
   const shown = view === 'queue' ? current || selected : selected;
@@ -223,13 +234,15 @@ function App() {
   useEffect(() => { if (!restoring.current && locationRevision === locationEpoch.current) setSelection(i => Math.min(i, Math.max(0, buffer.length - 1))); }, [buffer.length]);
   useEffect(() => {
     if (restoring.current) return;
-    if (prompt === 'local' && query.trim() && matches.length) setSelection(matches[0]!);
+    if (prompt === 'local' && query.trim() && matches.length) {
+      if (view === 'lyrics') selectLyric(matches[0]!); else setSelection(matches[0]!);
+    }
   }, [query, prompt]);
   useEffect(() => {
     if (restoring.current || locationRevision !== locationEpoch.current) return;
     const scroll = selectionScroll.current;
     selectionScroll.current = 'reveal';
-    if (browse) { pendingViewport.current = undefined; return; }
+    if (browse || view === 'lyrics') { pendingViewport.current = undefined; return; }
     if (activeDrag.current?.startY !== undefined) return;
     const ref = isGrid ? albumGridRef : queueRef;
     const saved = pendingViewport.current;
@@ -262,12 +275,14 @@ function App() {
   }, [prompt, resultIndex, results.length, height]);
 
   function currentRoute(): Route {
+    if (view === 'lyrics') return { page: 'lyrics' };
     if (view === 'record' && record) return { page: 'record', key: record.key, artist: artist?.name };
     if (view === 'artist' && artist) return { page: 'artist', name: artist.name };
     return view === 'library' ? { page: 'library', mode: libraryView } : { page: 'queue' };
   }
   function capturePlace(): Place {
     const route = currentRoute();
+    if (route.page === 'lyrics') return { route, selection: 0, browser };
     const point: Place = { route, selection, selected: placeKey(route, buffer[selection]), browser };
     if (browse) {
       const columns = browserColumns(point, catalogue)!;
@@ -316,7 +331,7 @@ function App() {
     const next = resolvePlace(point);
     applyPlace(next);
     const route = next.route;
-    setNotice(`${direction === 'back' ? 'Back' : 'Forward'} · ${route.page === 'queue' ? 'Now playing' : route.page === 'library' ? 'Library' : route.page === 'artist' ? route.name : albums.find(a => a.key === route.key)?.title || 'Album'}`);
+    setNotice(`${direction === 'back' ? 'Back' : 'Forward'} · ${route.page === 'queue' ? 'Now playing' : route.page === 'lyrics' ? 'Lyrics' : route.page === 'library' ? 'Library' : route.page === 'artist' ? route.name : albums.find(a => a.key === route.key)?.title || 'Album'}`);
   }
   function openAlbum(album: Album, track?: Track, source?: Place) {
     const origin = source || capturePlace();
@@ -340,15 +355,15 @@ function App() {
     const point = capturePlace();
     return identifyPlace({ ...point, selection: index }, buffer);
   }
-  function openPage(page: 'queue' | 'library', mode = libraryView) {
+  function openPage(page: 'queue' | 'lyrics' | 'library', mode = libraryView) {
     const source = capturePlace();
     const target = page === 'library' && mode === 'artists' && browse ? browserTarget(source, 'artists', catalogue) : undefined;
-    visit(page === 'queue' ? { page } : { page, mode }, target?.selection || 0, source, target);
+    visit(page === 'library' ? { page, mode } : { page }, target?.selection || 0, source, target);
   }
   function goBack() {
     if (view === 'record' && record) openArtist(artist?.name || record.artist);
     else if (view === 'artist') openPage('library', 'artists');
-    else if (view === 'library') openPage('queue');
+    else if (view === 'library' || view === 'lyrics') openPage('queue');
   }
   function rememberPosition() {
     if (!saveReady.current || restoring.current || locationRevision !== locationEpoch.current) return;
@@ -382,10 +397,15 @@ function App() {
     focusSteps.cancel();
     focusedButton = undefined;
     promptReady.current = false;
-    priorSelection.current = selection; setQuery(''); setResultIndex(0); setPrompt(kind); updateDrag(undefined);
+    priorSelection.current = view === 'lyrics' ? lyrics.selectedLine : selection;
+    priorLyricsFollow.current = lyrics.following;
+    setQuery(''); setResultIndex(0); setPrompt(kind); updateDrag(undefined);
   }
   function closePrompt(cancel: boolean) {
-    if (prompt === 'local' && cancel) setSelection(priorSelection.current);
+    if (prompt === 'local' && cancel) {
+      if (view === 'lyrics') { if (priorLyricsFollow.current) lyrics.follow(); else selectLyric(priorSelection.current); }
+      else setSelection(priorSelection.current);
+    }
     setPrompt(null);
     setNotice('hjkl / arrows navigate · / find here · : prompt');
   }
@@ -400,6 +420,7 @@ function App() {
       if (result.title === 'Next track') void act(() => backend.next());
       if (result.title === 'Previous track') void act(() => backend.previous());
       if (result.title === 'Open queue') openPage('queue');
+      if (result.title === 'Open lyrics') openPage('lyrics');
       if (result.title === 'Open library') openPage('library');
       if (result.title === 'Reload library') void act(reloadLibrary, 'Library refreshed');
     }
@@ -408,7 +429,13 @@ function App() {
     clearFocus();
     setSelection(i => Math.max(0, Math.min(buffer.length - 1, i + delta)));
   }
+  function selectLyric(index: number, preserve = false) { clearFocus(); lyricPointer.current = preserve; lyrics.select(index); }
+  function seekLyric() {
+    const time = lyrics.lyrics?.lines[lyrics.selectedLine]?.time;
+    if (time !== undefined && current && snapshot.state !== 'stop') void act(() => backend.seek(current.queueId, time));
+  }
   function openSelection() {
+    if (view === 'lyrics') return;
     if (browse) {
       const target = browse.active === 'artists' ? 'albums' : browse.active === 'albums' ? 'tracks' : undefined;
       if (target) focusColumn(target);
@@ -478,8 +505,9 @@ function App() {
           const delta = event.key === 'down' ? 1 : -1;
           if (prompt === 'global') setResultIndex(i => Math.max(0, Math.min(results.length - 1, i + delta)));
           else if (matches.length) {
-            const at = matches.indexOf(selection);
-            setSelection(matches[(at + delta + matches.length) % matches.length]!);
+            const at = matches.indexOf(view === 'lyrics' ? lyrics.selectedLine : selection);
+            const next = matches[(at + delta + matches.length) % matches.length]!;
+            if (view === 'lyrics') selectLyric(next); else setSelection(next);
           }
         }
         return;
@@ -497,13 +525,16 @@ function App() {
       else if (key === '/') openPrompt('local');
       else if (key === 'o' || key === 'O') travel('back');
       else if (key === 'i' || key === 'I') travel('forward');
+      else if (key === 'f' && view === 'lyrics') lyrics.follow();
+      else if (key === 'r' && view === 'lyrics') lyrics.reload();
       else if (direction) {
         if (isGrid) { clearFocus(); setSelection(gridSelection(selection, direction, columns, buffer.length)); }
+        else if (view === 'lyrics' && (direction === 'up' || direction === 'down')) selectLyric(lyrics.selectedLine + (direction === 'down' ? 1 : -1));
         else if (direction === 'up' || direction === 'down') moveSelection(direction === 'down' ? 1 : -1);
         else if (direction === 'left') goBack();
         else openSelection();
       }
-      else if (event.key === 'enter') { if (focusSteps.pending) focusSteps.enqueue('activate'); else if (focusedButton) focusedButton.activate(); else if (isGrid || isArtists || view === 'artist') openSelection(); else playSelected(); }
+      else if (event.key === 'enter') { if (focusSteps.pending) focusSteps.enqueue('activate'); else if (focusedButton) focusedButton.activate(); else if (view === 'lyrics') seekLyric(); else if (isGrid || isArtists || view === 'artist') openSelection(); else playSelected(); }
       else if (event.key === 'space') void act(() => backend.toggle());
       else if (key === '[' || key === ']') seekTo(elapsed + (key === '[' ? -10 : 10));
       else if ((event.key === 'backspace' || event.key === 'delete') && view === 'queue') removeSelected();
@@ -565,6 +596,37 @@ function App() {
       <Text size={11} color={browse?.active === column ? C.accent : C.muted} style={{ flexGrow: 1 }}>{title}</Text><Text size={11} color={C.muted}>{count}</Text>
     </div>;
   }
+  const lyricsView = view === 'lyrics' && <div style={{ width: '100%', minHeight: 0, ...surface('lyrics'), display: 'flex', flexDirection: 'column', gap: 18 }}>
+    <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'row', gap: 18, alignItems: 'center' }}>
+      <Cover track={current} size={narrow ? 72 : 96} onClick={current ? () => openTrack(current) : undefined} />
+      <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <Text size={18}>{current?.title || 'Nothing playing'}</Text>
+        {current && <><Link onClick={() => openArtist(current.artist)}>{current.artist}</Link><Link muted onClick={() => openTrack(current)}>{current.album}</Link></>}
+      </div>
+      {lyrics.lyrics?.synced && <Button active={lyrics.following} onClick={() => lyrics.follow()}>{lyrics.following ? 'Following' : 'Follow playback'}</Button>}
+      <Button onClick={() => lyrics.reload()}>Reload</Button>
+    </div>
+    {lyrics.loading ? <Text color={C.muted}>Reading local lyrics…</Text> : lyrics.error ? <Text color={C.warning}>{lyrics.error}</Text> : lyrics.lyrics ? <>
+      <div style={{ flexGrow: 1, minHeight: 0, width: lyricWidth, alignSelf: 'center', display: 'flex', flexDirection: 'column' }}>
+        <BrowserList key={current?.uri} listRef={lyricRef} point={{ route: { page: 'lyrics' }, selection: lyricSelection }} count={lyricLines.length} rowHeight={42}
+          revision={locationRevision} preserve={!lyrics.following && lyricPointer.current} align={lyrics.following ? 'middle' : 'edge'} width={width} height={height - (prompt === 'local' ? 56 : 0)}
+          onScroll={() => {}} onWheel={() => { lyricPointer.current = true; lyrics.read(); }} row={index => {
+            const row = lyricLines[index]!, active = row.line === lyrics.activeLine, chosen = row.line === lyrics.selectedLine;
+            return <div key={index} onClick={() => selectLyric(row.line, true)} style={{ height: 42, width: '100%', paddingLeft: 18, paddingRight: 18, display: 'flex', alignItems: 'center',
+              ...surface(chosen && !lyrics.following ? 'lyricRowSelected' : 'lyricRow'), borderLeftWidth: 2, borderColor: active ? theme.borders.focus : theme.borders.control, cursor: 'pointer' }}>
+              <Text size={18} color={active ? C.accent : C.text} style={{ flexGrow: 1 }}>{row.text || '· · ·'}</Text>
+            </div>;
+          }} />
+      </div>
+      <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'row', gap: 12 }}>
+        <Text size={11} color={C.muted} style={{ flexGrow: 1 }}>{lyrics.lyrics.synced ? `${lyrics.following ? 'Following playback' : 'Reading'} · ${snapshot.state === 'pause' ? 'paused' : connection === 'down' ? 'disconnected' : 'synced lyrics'}` : 'Untimed lyrics'}</Text>
+        <Text size={11} color={C.muted}>{lyrics.lyrics.synced ? 'j/k read · enter seek · f follow · / find · r reload' : 'j/k read · / find · r reload'}</Text>
+      </div>
+    </> : <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12 }}>
+      <Text size={17}>{current ? 'No local lyrics found' : 'Choose a track to see its lyrics'}</Text>
+      {current && <Text color={C.muted}>Reload after adding or updating this track’s lyric file.</Text>}
+    </div>}
+  </div>;
   const browserView = browse && <div style={{ width: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
       <Button onClick={() => openPage('library', 'covers')}>Albums</Button>
@@ -628,6 +690,7 @@ function App() {
     <div style={{ height: 56, flexShrink: 0, paddingLeft: process.platform === 'darwin' ? 94 : 22, paddingRight: 18, ...surface('header'), borderBottomWidth: 1, borderColor: theme.borders.header, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, userSelect: 'none' }}>
       <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'row', gap: 6 }}>
         <Button tab active={view === 'queue'} onClick={() => openPage('queue')} id="view-queue">Now playing</Button>
+        <Button tab active={view === 'lyrics'} onClick={() => openPage('lyrics')} id="view-lyrics">Lyrics</Button>
         <Button tab active={view === 'library'} onClick={() => openPage('library')} id="view-library">Library</Button>
         {(view === 'artist' || view === 'record') && artist && <Button tab active={view === 'artist'} id="view-artist" style={{ minWidth: 0, maxWidth: narrow ? 110 : 220 }} onClick={() => openArtist(artist.name)}>{artist.name}</Button>}
         {view === 'record' && record && <Button tab active id="view-record" style={{ minWidth: 0, maxWidth: narrow ? 110 : 220 }} onClick={() => openAlbum(record)}>{record.title}</Button>}
@@ -636,7 +699,7 @@ function App() {
     </div>
 
     <div onScroll={rememberPosition} style={{ flexGrow: 1, minHeight: 0, padding: 22, ...surface('main'), display: 'flex', flexDirection: 'row', gap: 26 }}>
-      {browserView || (isGrid ? <div onScroll={() => syncVisibleRows()} style={{ width: '100%', minHeight: 0, ...surface('library'), display: 'flex', flexDirection: 'column', gap: 18 }}>
+      {lyricsView || browserView || (isGrid ? <div onScroll={() => syncVisibleRows()} style={{ width: '100%', minHeight: 0, ...surface('library'), display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Button active onClick={() => openPage('library', 'covers')}>Albums</Button>
           <Button onClick={() => openPage('library', 'artists')}>Artists</Button>

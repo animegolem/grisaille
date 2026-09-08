@@ -8,9 +8,10 @@ test('Vim and arrow keys agree without stealing modified shortcuts', () => {
   const modifiers = { cmd: true, ctrl: false, alt: false, shift: false };
   expect(directionOf({ key: 'h', modifiers })).toBeUndefined();
   expect(pageShortcut({ key: '2' })).toBeUndefined();
-  expect(pageShortcut({ key: '2', modifiers })).toBe('library');
+  expect(pageShortcut({ key: '2', modifiers })).toBe('lyrics');
   expect(pageShortcut({ key: '1', modifiers })).toBe('queue');
-  expect(pageShortcut({ key: '3', modifiers })).toBeUndefined();
+  expect(pageShortcut({ key: '3', modifiers })).toBe('library');
+  expect(pageShortcut({ key: '4', modifiers })).toBeUndefined();
 });
 
 test('cover navigation preserves row boundaries and handles a short final row', () => {

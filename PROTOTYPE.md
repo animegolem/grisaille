@@ -46,7 +46,8 @@ identity/search, location resolution, history and navigation journal.
 
 Terminal mode includes the queue, album/artist lists, record tracks, global
 prompt, local find, `o`/`i` history, playback, seeking, removal and keyboard queue
-moves. `F1` opens Now playing; `F2` opens Library; Tab switches album/artist lists.
+moves, and the shared local lyrics reader. `F1` opens Now playing; `F2` opens
+Lyrics; `F3` opens Library. Tab switches album/artist lists.
 On a library or artist page, `s` opens the sort dropdown; arrows choose and Enter
 applies it.
 `q` or Ctrl+C exits and restores the terminal. The remaining main keys match the
@@ -71,9 +72,8 @@ Ghostty access during this sitting; the screenshot supplied the visual evidence.
 
 ## Interaction
 
-- `Cmd+1` opens Now playing; `Cmd+2` opens Library. Bare numbers do not change pages.
-  The eventual page order is Now playing, Lyrics, Library, Visualizer. Those
-  later pages and their Command-number assignments have not been added yet.
+- `Cmd+1` opens Now playing; `Cmd+2` opens Lyrics; `Cmd+3` opens Library.
+  Bare numbers do not change pages. Visualizer remains the next planned page.
 - Library has Albums and Artists views. Both the album shelf and artist lists
   scroll continuously. The shelf retains spatial keyboard movement and mounts
   only album rows near the viewport; there are no page controls. The sort dropdown
@@ -102,7 +102,7 @@ Ghostty access during this sitting; the screenshot supplied the visual evidence.
 - Artist links open that artist's albums; album links open its track list. They are separate focus targets.
   The header keeps a temporary path: Library → artist → album. Opening an album
   from any entry point retains its artist tab; clicking that tab steps back to
-  the artist. Returning to Now playing or Library clears both context tabs and
+  the artist. Returning to Now playing, Lyrics or Library clears both context tabs and
   their active path. It does not erase history or evict the library/artwork cache.
 - `o` goes back through visited screens; `i` goes forward. For example, opening
   an album from Now playing and pressing `o` returns directly to the queue,
@@ -162,6 +162,39 @@ and image signatures are checked before handing bytes to the renderer. Missing
 covers remain placeholders and can be retried on a later visit. The event helper
 is stopped when the native app exits, including a normal development SIGTERM.
 
+## Local lyrics
+
+Lyrics follows the currently playing track. Synced LRC highlights its current
+cue and keeps nearby lines visible. Playback time advances between MPD snapshots,
+stops while paused or disconnected, and updates after seeking or reconnecting.
+Empty timed cues preserve instrumental gaps. Untimed lyrics remain readable.
+
+- `j`/`k` or Up/Down reads without seeking. The terminal moves through wrapped
+  rows, so every part remains reachable even in its smallest viewport. PageUp,
+  PageDown, Home and End are also available in the terminal.
+- Enter seeks to the selected timed cue; it has no playback action for untimed
+  lyrics. `f` or the GUI's Follow playback button resumes following.
+- `/` finds within the lyrics. Escape restores the prior reading/following state.
+  In the GUI, wheel scrolling pauses following and clicking a line selects it.
+- `r` or Reload rereads the local file. Space, `[`/`]`, and `o`/`i` keep their
+  playback and history meanings. Returning to Lyrics or reopening the app follows
+  current playback; it does not restore an old lyric seek.
+
+For an MPD URI such as `Artist/Album/01 Song.flac`, lookup tries
+`Artist/Album/01 Song.lrc`, `.LRC`, then `.txt` under each local root. Existing
+RMPC `lyrics_dir` and MPD `music_directory` settings supply the roots, in that
+order. Config discovery checks `$XDG_CONFIG_HOME` (or `~/.config`) and the MPD
+configs at `/opt/homebrew/etc/mpd.conf` and `/etc/mpd.conf`. Set
+`MUSIC_UI_LYRICS_DIR` to use one explicit root instead; restart after changing it.
+The directory must mirror MPD's file paths. A remote server needs a corresponding
+local lyrics directory.
+
+This version reads UTF-8 sidecars up to 1 MB and 10,000 lines. It supports LRC
+offsets, multiple timestamps, same-time cues and enhanced LRC word tags as
+line-level text. It does not fetch lyrics, index unrelated filenames, read
+embedded lyric tags, or edit source files. Missing lyrics and read failures
+remain inside the reader. Demo mode contains no fabricated song lyrics.
+
 ## Local navigation journal
 
 Navigation appends to `~/Library/Application Support/Music Prototype/navigation/`
@@ -211,10 +244,11 @@ pending retries.
 `src/theme.ts` is the sole definition of app-owned colour values. The current
 palette is unchanged. It is a typed palette boundary, not a theme settings system.
 
-- `theme.surfaces` separately addresses canvas, header, queue, library, artist
+- `theme.surfaces` separately addresses canvas, header, queue, library, lyrics, artist
   list, album cards, record list, detail pane, cover placeholders, playback bar,
   progress track/fill, status, local find, prompt, scrim, inputs and controls.
   Hover, selected, active and held-row fills have their own addresses.
+  Lyrics uses dedicated reader/row surfaces and the shared accent and focus colours.
 - Every surface accepts a solid CSS colour or a GPUIX `linear-gradient` object
   with an angle, two colour stops, and optional `srgb`/`oklab` colour space.
   Transparent panels reveal the canvas, so a canvas gradient can span the app.
@@ -257,6 +291,33 @@ npm run typecheck
 ./node_modules/.bin/bun run build
 python3 scripts/package-mac.py
 ```
+
+## Lyrics verification on 7 September 2026
+
+- TypeScript checking, all 63 tests (257 assertions), the standalone build and
+  macOS packaging pass. The lyric tests cover parsing, file reloads, delayed
+  results from a prior track, timing between MPD snapshots, disconnection,
+  search, reading without seeking, and reopening against current playback.
+- Terminal renderer checks include a 44×12 window with a single visible lyric
+  row. Every wrapped continuation is reachable, Enter seeks its original cue,
+  and local search/cancel retains readable content and the prior position.
+- The packaged terminal app ran from `/tmp` in an 80×24 PTY. F2 displayed the
+  empty Lyrics page in demo mode, F3 opened Library, and `o` returned to Lyrics.
+  Exit saved that route and restored the terminal screen and cursor. This is
+  protocol/renderer evidence; no new Ghostty visual check was possible.
+- A native preview read a real 29-cue local LRC and artwork through the MPD
+  adapter, with playback and seeking kept in a simulated backend. The reader
+  displayed the active cue and nearby context; manual reading, Enter seek,
+  follow, wheel scrolling, search, reload and history were checked down to
+  720×620. The original lyric file was not modified.
+- One earlier native preview stopped updating during the check. It exited
+  normally after SIGTERM; a fresh launch passed the read/seek/follow sequence
+  and compact-layout checks. Its cause remains unresolved, so this is not a
+  long-session stability result.
+- The normal app was rebuilt and reopened against MPD. Its saved artist-browser
+  position returned, Lyrics displayed the missing-file state for the current
+  track, and `o` returned to that browsing position. These live checks used
+  navigation controls only.
 
 ## Keyboard scrolling correction on 7 September 2026
 

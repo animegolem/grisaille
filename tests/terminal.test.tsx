@@ -10,8 +10,13 @@ import { NavigationStateStore } from '../src/navigation-state';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { parseLyrics, type Lyrics } from '../src/lyrics';
+import type { Track } from '../src/model';
 
 class NoArtDemo extends DemoBackend { async artwork() { return undefined; } }
+class LyricsDemo extends NoArtDemo {
+  async lyrics(): Promise<Lyrics | undefined> { return parseLyrics('[00:00]Opening line\n[01:00]Middle refrain\n[01:30]Next verse\n[02:00]Ending line', 'test.lrc'); }
+}
 async function setup(width = 100, height = 28, options: { state?: NavigationStateStore; backend?: NoArtDemo; ready?: (frame: string) => boolean; retryMs?: number } = {}) {
   const view = await createTestRenderer({ width, height, kittyKeyboard: true });
   const backend = options.backend || new NoArtDemo();
@@ -54,6 +59,137 @@ test('terminal input owns o/i/space and bracketed paste; Escape restores the lis
     view.mockInput.pressEscape();
     await view.waitForFrame(frame => frame.includes('Now playing   1/7'));
   } finally { view.cleanup(); }
+});
+
+test('lyrics follows playback, reads and finds without seeking, and returns through navigation history', async () => {
+  const view = await setup(100, 28, { backend: new LyricsDemo() });
+  try {
+    await view.mockInput.typeText('jj', 0);
+    const before = await view.backend.snapshot();
+    view.mockInput.pressKey('F2');
+    await view.waitForFrame(frame => frame.includes('Following playback') && frame.includes('› Middle refrain'));
+    await view.mockInput.typeText('j', 0);
+    await view.waitForFrame(frame => frame.includes('Reading · paused') && frame.includes('› Next verse'));
+    expect(await view.backend.snapshot()).toEqual(before);
+    view.mockInput.pressEnter();
+    await view.waitFor(() => view.session.getState().snapshot.elapsed === 90);
+    expect(view.session.getState().snapshot.state).toBe('pause');
+    expect(view.session.getState().snapshot.currentId).toBe(before.currentId);
+    await view.mockInput.typeText('f/ending', 0);
+    await view.waitForFrame(frame => frame.includes('› Ending line'));
+    expect(view.session.getState().snapshot.elapsed).toBe(90);
+    view.mockInput.pressEscape();
+    await view.waitForFrame(frame => frame.includes('Following playback') && frame.includes('› Next verse'));
+    await view.mockInput.typeText('o', 0);
+    await view.waitForFrame(frame => frame.includes('Now playing   3/7'));
+    await view.mockInput.typeText('i', 0);
+    await view.waitForFrame(frame => frame.includes('Following playback') && frame.includes('› Next verse'));
+    view.resize(44, 12);
+    await view.waitForFrame(frame => frame.includes('F2 Lyrics') && frame.includes('Next verse'));
+    view.mockInput.pressKey('F3');
+    await view.waitForFrame(frame => frame.includes('Library / Albums'));
+    expect(view.session.getState().snapshot.queue).toEqual(before.queue);
+  } finally { view.cleanup(); }
+});
+
+test('a delayed lyric result cannot replace the current song and reload errors stay in the reader', async () => {
+  class PendingLyrics extends NoArtDemo {
+    pending: { uri: string; resolve: (lyrics?: Lyrics) => void; reject: (error: Error) => void }[] = [];
+    async lyrics(track: Track): Promise<Lyrics | undefined> { return new Promise((resolve, reject) => this.pending.push({ uri: track.uri, resolve, reject })); }
+  }
+  const backend = new PendingLyrics();
+  const view = await setup(100, 28, { backend });
+  try {
+    view.mockInput.pressKey('F2');
+    await view.waitFor(() => backend.pending.length === 1);
+    await backend.next();
+    await view.waitFor(() => backend.pending.length === 2);
+    backend.pending[0]!.resolve(parseLyrics('[00:00]Old song words'));
+    await view.waitForFrame(frame => frame.includes('Loomer') && frame.includes('Reading local lyrics'));
+    expect(view.captureCharFrame()).not.toContain('Old song words');
+    backend.pending[1]!.resolve(parseLyrics('Current untimed verse\nSecond line'));
+    await view.waitForFrame(frame => frame.includes('Untimed lyrics') && frame.includes('Current untimed verse'));
+    view.mockInput.pressEnter();
+    expect(view.session.getState().snapshot.state).toBe('pause');
+    await view.mockInput.typeText('r', 0);
+    await view.waitFor(() => backend.pending.length === 3);
+    backend.pending[2]!.reject(new Error('The lyric file is unavailable.'));
+    await view.waitForFrame(frame => frame.includes('The lyric file is unavailable.'));
+    expect(view.session.getState().actionProblem).toBe('');
+  } finally { view.cleanup(); }
+});
+
+test('a one-row lyric viewport can read every wrapped row and still seek its original cue', async () => {
+  class WrappedLyrics extends NoArtDemo {
+    async lyrics(): Promise<Lyrics | undefined> { return parseLyrics('[00:00]Opening words fill the beginning of this deliberately long cue until its hidden continuation becomes readable\n[01:30]Next cue'); }
+  }
+  const view = await setup(44, 12, { backend: new WrappedLyrics() });
+  try {
+    view.mockInput.pressKey('F2');
+    await view.waitForFrame(frame => frame.includes('› Opening words'));
+    await view.mockInput.typeText('j', 0);
+    await view.waitForFrame(frame => frame.includes('› this deliberately long cue'));
+    await view.mockInput.typeText('j', 0);
+    await view.waitForFrame(frame => frame.includes('› hidden continuation becomes readable'));
+    expect(view.session.getState().snapshot.elapsed).toBe(83);
+    view.mockInput.pressEnter();
+    await view.waitFor(() => view.session.getState().snapshot.elapsed === 0);
+    await view.mockInput.typeText('/next', 0);
+    await view.waitForFrame(frame => frame.includes('› Next cue'));
+    view.mockInput.pressEscape();
+    await view.waitForFrame(frame => frame.includes('› hidden continuation becomes readable'));
+    expect(view.session.getState().snapshot.state).toBe('pause');
+  } finally { view.cleanup(); }
+});
+
+test('lyric timing advances between MPD snapshots and freezes across a disconnected interval', async () => {
+  class FastLyrics extends NoArtDemo {
+    fail = false;
+    async snapshot() { if (this.fail) throw new Error('Offline'); return super.snapshot(); }
+    async lyrics(): Promise<Lyrics | undefined> { return parseLyrics('[00:00]Opening cue\n[00:00.20]Second cue\n[00:00.80]Later cue'); }
+  }
+  const backend = new FastLyrics();
+  const view = await setup(100, 28, { backend });
+  try {
+    await backend.seek(1, 0);
+    await backend.toggle();
+    view.mockInput.pressKey('F2');
+    await view.waitForFrame(frame => frame.includes('› Opening cue'));
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await view.waitForFrame(frame => frame.includes('› Second cue'));
+    backend.fail = true;
+    await view.session.refresh();
+    await view.waitForFrame(frame => frame.includes('disconnected') && frame.includes('› Second cue'));
+    await new Promise(resolve => setTimeout(resolve, 850));
+    expect(view.captureCharFrame()).toContain('› Second cue');
+    backend.fail = false;
+    await backend.seek(1, 1);
+    await view.waitFor(() => view.session.getState().connection === 'connected');
+    await view.waitForFrame(frame => frame.includes('› Later cue'));
+    await backend.toggle();
+    await view.waitForFrame(frame => frame.includes('paused') && frame.includes('› Later cue'));
+  } finally { view.cleanup(); }
+});
+
+test('reopening a saved Lyrics page follows current playback without replaying a seek', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'music-lyric-state-'));
+  const path = join(directory, 'state.json');
+  try {
+    const first = await setup(100, 28, { backend: new LyricsDemo(), state: new NavigationStateStore(path) });
+    try {
+      first.mockInput.pressKey('F2');
+      await first.waitForFrame(frame => frame.includes('› Middle refrain'));
+      await first.mockInput.typeText('jj', 0);
+      first.mockInput.pressEnter();
+      await first.waitFor(() => first.session.getState().snapshot.elapsed === 120);
+    } finally { first.cleanup(); }
+    const backend = new LyricsDemo();
+    const reopened = await setup(100, 28, { backend, state: new NavigationStateStore(path), ready: frame => frame.includes('Following playback') && frame.includes('› Middle refrain') });
+    try {
+      expect(reopened.session.getState().snapshot.elapsed).toBe(83);
+      expect(reopened.session.getState().snapshot.state).toBe('pause');
+    } finally { reopened.cleanup(); }
+  } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
 test('terminal navigation reveals only the viewport edge and restores it across resize and history', async () => {
@@ -101,7 +237,7 @@ test('terminal viewport and metadata keep control characters out of display cont
 test('terminal sort dropdown reorders the shelf while retaining its selected album', async () => {
   const view = await setup();
   try {
-    view.mockInput.pressKey('F2');
+    view.mockInput.pressKey('F3');
     await view.waitForFrame(frame => frame.includes('Library / Albums') && frame.includes('1/8'));
     await view.mockInput.typeText('s', 0);
     await view.waitForFrame(frame => frame.includes('Year · newest first'));
@@ -130,7 +266,7 @@ test('reopening the terminal restores scroll, sorts and the forward branch witho
     const first = await setup(65, 16, { state: new NavigationStateStore(path) });
     const before = await first.backend.snapshot();
     try {
-      first.mockInput.pressKey('F2');
+      first.mockInput.pressKey('F3');
       await first.mockInput.typeText('s', 0); first.mockInput.pressArrow('down'); first.mockInput.pressEnter();
       await first.mockInput.typeText(':loveless', 0); first.mockInput.pressEnter();
       await first.waitForFrame(frame => frame.includes('Loveless') && frame.includes('1/11'));
@@ -207,7 +343,7 @@ test('terminal columns preview without playback, retain child selection, and ada
     await view.mockInput.typeText('hhk', 0);
     await view.waitForFrame(frame => frame.includes('Library / Artists') && frame.includes('5/6') && frame.includes('ALBUMS 1') && !frame.includes('Loveless'));
     const visits = view.events.filter(event => event.action === 'visit').length;
-    view.mockInput.pressKey('F2');
+    view.mockInput.pressKey('F3');
     await view.waitForFrame(frame => frame.includes('Library / Artists') && frame.includes('5/6'));
     expect(view.events.filter(event => event.action === 'visit')).toHaveLength(visits);
     expect(await view.backend.snapshot()).toEqual(before);

@@ -12,10 +12,11 @@ export function directionOf(event: NavigationKey): Direction | undefined {
   if (event.key === 'right' || key === 'l') return 'right';
 }
 
-export function pageShortcut(event: NavigationKey): 'queue' | 'library' | undefined {
+export function pageShortcut(event: NavigationKey): 'queue' | 'lyrics' | 'library' | undefined {
   if (!event.modifiers?.cmd || event.modifiers.ctrl || event.modifiers.alt || event.modifiers.shift) return;
   if (event.key === '1') return 'queue';
-  if (event.key === '2') return 'library';
+  if (event.key === '2') return 'lyrics';
+  if (event.key === '3') return 'library';
 }
 
 /** Horizontal movement stays on its row; a short last row retains a valid item. */

@@ -3,6 +3,7 @@ import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
 import { existsSync } from 'node:fs';
 import { type Album, type MusicBackend, type Track, type QueueTrack, type Snapshot } from './model';
+import { LocalLyrics } from './lyrics';
 
 const run = promisify(execFile);
 const mpc = existsSync('/opt/homebrew/bin/mpc') ? '/opt/homebrew/bin/mpc' : 'mpc';
@@ -118,6 +119,7 @@ async function send(command: string): Promise<string> {
 
 export class MpdBackend implements MusicBackend {
   readonly demo = false;
+  private localLyrics = new LocalLyrics();
   private artworkCache = new Map<string, Promise<string | undefined>>();
   private artJobs: (() => void)[] = [];
   private artActive = 0;
@@ -163,6 +165,7 @@ export class MpdBackend implements MusicBackend {
     }
     return job;
   }
+  async lyrics(track: Track) { return this.localLyrics.load(track); }
   private drainArtwork() { while (this.artActive < 3 && this.artJobs.length) this.artJobs.shift()!(); }
   private async loadArtwork(uri: string): Promise<string | undefined> {
     for (const command of ['readpicture', 'albumart']) {

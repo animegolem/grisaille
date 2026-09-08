@@ -1,3 +1,5 @@
+import type { Lyrics } from './lyrics';
+
 export type Track = {
   uri: string;
   title: string;
@@ -110,7 +112,7 @@ export function searchLibrary(query: string, albums: Album[], tracks: Track[], a
     const score = Math.max(fuzzyScore(query, track.title), fuzzyScore(query, `${track.artist} ${track.title} ${track.album}`) - 30);
     if (score >= 0) found.push({ kind: 'track', key: `track:${track.uri}`, track, score });
   }
-  for (const title of ['Play / pause', 'Next track', 'Previous track', 'Open queue', 'Open library', 'Reload library']) {
+  for (const title of ['Play / pause', 'Next track', 'Previous track', 'Open queue', 'Open lyrics', 'Open library', 'Reload library']) {
     const score = fuzzyScore(query, title);
     if (score >= 0) found.push({ kind: 'action', key: title, title, score });
   }
@@ -131,6 +133,7 @@ export interface MusicBackend {
   library(): Promise<Track[]>;
   snapshot(): Promise<Snapshot>;
   artwork(track: Track): Promise<string | undefined>;
+  lyrics(track: Track): Promise<Lyrics | undefined>;
   toggle(): Promise<void>;
   next(): Promise<void>;
   previous(): Promise<void>;

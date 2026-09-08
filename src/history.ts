@@ -1,5 +1,6 @@
 export type Route =
   | { page: 'queue' }
+  | { page: 'lyrics' }
   | { page: 'library'; mode: 'covers' | 'artists' }
   | { page: 'artist'; name: string }
   | { page: 'record'; key: string; artist?: string };
