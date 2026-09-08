@@ -8,7 +8,7 @@ clone, branch/base and first-command timestamp before a lease can be renewed.
 
 | work | assignee | state | since | progress_at | next_actor | evidence / trigger |
 |---|---|---|---|---|---|---|
-| SPRINT-001 round-1 | review-lead | parked | 2026-09-08T13:55:48.132126+00:00 | | review-lead | Round-1 report verified/ACKed; owner approved first two epic outcomes; Fable r4 consultation published at .inbox/tofable/theme-engine-consumption-r4.md; trigger: producer correlation/schema reply for numbered fold; no implementation |
+| SPRINT-001 round-1 | review-lead | parked | 2026-09-08T13:55:48.132126+00:00 | | review-lead | Round-1 report verified/ACKed; owner approved first two epic outcomes; Fable r5 read; r6 reply at .inbox/tofable/theme-engine-consumption-r6.md; trigger: same-art/different-file publication fix, startup reconciliation and executable schema for numbered fold; no implementation |
 | DELIVERY-ACTIVATION | review-lead | parked | 2026-09-08 | | review-lead | AI-IMP-015; bind owner-designated implementation task after bootstrap review; activation is separate |
 
 ## History
