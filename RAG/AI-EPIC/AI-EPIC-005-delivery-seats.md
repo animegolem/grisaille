@@ -51,5 +51,5 @@ No silent closure of inherited risks or owner-only checks.
 
 ## Implementation Breakdown
 
-- [ ] [[AI-IMP-014-owner-remote]]
+- [x] [[AI-IMP-014-owner-remote]]
 - [ ] [[AI-IMP-015-implementation-seat-and-delivery]]

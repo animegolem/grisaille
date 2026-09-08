@@ -7,10 +7,10 @@
 | Status | EPICs | IMPs |
 |--------|-------|------|
 | In Progress | 0 | 0 |
-| Planned | 5 | 14 |
+| Planned | 5 | 13 |
 | Deferred | 1 | 3 |
 | Cancelled | 0 | 0 |
-| Completed | 0 | 0 |
+| Completed | 0 | 1 |
 | **Total** | **6** | **17** |
 
 ## Planned
@@ -50,7 +50,7 @@
 > The local workflow needs a verified remote and bound implementation seat before a real PR lifecycle and unattended delivery can be claimed.
 
 **IMPs:**
-- [[AI-IMP-014-owner-remote|IMP-014]] Owner remote — planned
+- [[AI-IMP-014-owner-remote|IMP-014]] Owner remote — completed
 - [[AI-IMP-015-implementation-seat-and-delivery|IMP-015]] Implementation seat and delivery — planned
 
 ---
@@ -82,13 +82,24 @@ Git edit date so a second review can be judged.
 
 ### > 600 LOC
 
+- RAG/scripts/carrier.py (1060 LOC)
 - src/app.tsx (803 LOC)
+- RAG/scripts/generate-index.sh (662 LOC)
+- RAG/scripts/codex-relay-wake.py (646 LOC)
+- RAG/scripts/test-codex-runtime.py (604 LOC)
 
 ### > 300 LOC
 
+- RAG/scripts/carrier-receiver.py (589 LOC)
 - PROTOTYPE.md (523 LOC)
+- RAG/scripts/computer_history_projector.py (443 LOC)
+- RAG/PROTOCOL.md (421 LOC)
 - src/terminal/app.tsx (401 LOC)
+- SPEC.md (387 LOC)
 - tests/terminal.test.tsx (351 LOC)
+- RAG/scripts/codex-app-server-bell.mjs (339 LOC)
+- RAG/scripts/codex-memory.py (338 LOC)
+- RAG/templates/PROTOCOL-TEMPLATE.md (327 LOC)
 
 ---
 
