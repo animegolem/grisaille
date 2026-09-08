@@ -275,8 +275,9 @@ tokens instead of introducing component-local colour literals.
 
 ## Local repository
 
-Git is initialized in this prototype directory on `codex/prototype`. The app's
-name and remote are pending the owner's choice. Source, lockfile, tests and
+The repository lives at `/Users/golem/git/mpd-ui-prototype` on `codex/prototype`.
+Review correspondence can be placed in `.inbox/toastra/` and `.inbox/tofable/`.
+The app's name and remote are pending the owner's choice. Source, lockfile, tests and
 packaging script are tracked; `node_modules`, build output and local logs are
 ignored. No remote is configured.
 

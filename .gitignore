@@ -3,3 +3,4 @@ dist/
 .cache/
 review/
 *.log
+.DS_Store
