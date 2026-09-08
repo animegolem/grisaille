@@ -31,8 +31,8 @@ The ACK ritual avoids a mutable-path read/ack race without modifying the carrier
   temporary `uv --with pyyaml` because the available Python lacked PyYAML.
 - Product: typecheck passed; 63 tests, 257 assertions, 11 files; standalone Bun
   build passed (181 modules); macOS bundle packaging passed at the new root.
-- Ticket validator: 23 epic/implementation files passed before adding the log.
-  Run the full gate again on the reviewed commit. Index is generated.
+- Ticket validator: all 24 epic/implementation/log files passed whole-tree and
+  changed-range validation on the submitted bootstrap commit. Index is generated.
 - Existing runtime fixtures: 20 passed. Index generator smoke fixture exited 0;
   it printed a non-repository diagnostic in its temporary fixture.
 - Carrier adoption: four isolated tests passed (overwrite/exact ACK, atomic
@@ -56,3 +56,15 @@ round-1 review can proceed before publication is configured.
 The final reviewed base, created clone, assignment delivery and actual start
 receipt belong in the ready letter and WORK-LEDGER.md. Do not infer them from
 this adoption document or from a generated ticket status.
+
+
+## Review and operational evidence
+
+Independent review of `51bd3d9d6239df8e76073939461e55dd835e7add` identified the
+canonical-mailbox ACK binding and a leftover validation-template fragment.
+Both are corrected in protocol rev 0.2; the report is under RAG/reviews/.
+The full whitespace check reports preserved upstream template whitespace and
+the generator's final blank line in INDEX.md. Review Lead accepts those bounded
+source/generated-format exceptions; the check excluding those paths passes.
+The normal `dist/Music Prototype.app` was reopened from the new root, with its
+native window visible and process path verified. This is launch evidence only.

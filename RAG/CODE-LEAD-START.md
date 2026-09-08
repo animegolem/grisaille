@@ -22,3 +22,15 @@ Full product gate and ticket commands are in AGENTS.md. Build/package before
 compiled probes. Use demo/isolated state; report actual-host evidence separately.
 Never clean up refs, clones or another seat's material. Pending verdicts permit
 bounded waiting and read-only preparation, never an implied implementation start.
+
+
+Before channel commands in each shell, bind the canonical mailbox:
+
+```sh
+export OWNER_REPO=/Users/golem/git/grisaille
+```
+
+Separate tool invocations may use new shells, so include that binding explicitly
+on every scan/ACK command unless the shell is known to retain it. Follow the
+exact-event ACK command in RAG/PROTOCOL.md; a scan's one-command environment
+prefix does not persist. Implementation Git still runs only inside your clone.

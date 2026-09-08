@@ -1,6 +1,6 @@
 # Grisaille delivery protocol — Review Lead and Code Lead
 
-Revision 0.1 · 2026-09-08 · canonical process and destructive-operation fence.
+Revision 0.2 · 2026-09-08 · canonical process and destructive-operation fence.
 
 This protocol is tracked at `RAG/PROTOCOL.md`. Live handoff files, carrier
 receipts and local delivery state live in gitignored `.relay/`. Durable final
@@ -8,8 +8,9 @@ briefs, review findings and verdicts are also recorded under `RAG/` with their
 reviewed commit identity. `.relay/PROTOCOL.md` is only a pointer here.
 
 **Current delivery state:** manual active-task scans and the local carrier are
-available. No Grisaille idle-wake service is installed. A separate implementation
-task, remote URL and recipient bindings are pending AI-IMP-014/015. Do not claim
+available. No Grisaille idle-wake service is installed. The owner has designated the implementation
+task; its ready handoff, the remote URL and live wake bindings remain pending
+AI-IMP-014/015. Do not claim
 an event was delivered merely because a file or daemon exists. During an active
 assignment use bounded waits plus read-only preparation; no unrequested perpetual
 polling. An idle wake requires explicit activation and its real-target drill.
@@ -275,7 +276,7 @@ immediately before editing, preserve the other lead's rows, and
 replace the file atomically; disagreement stays visible until
 resolved, never averaged into vague prose.
 
-## Before reporting test failures: BUILD FIRST
+## Validation: source tests and compiled probes
 
 Source tests import TypeScript directly. Build the standalone binary before
 compiled/native/PTY checks and package the app before inspecting its bundle.
@@ -285,8 +286,7 @@ gate: `npm run typecheck && ./node_modules/.bin/bun test &&
 Run `RAG/scripts/validate-tickets.sh --changed main` in the canonical review
 branch, or `--changed origin/main` in an independent clone with that ref fetched.
 The whole-tree ticket gate remains required because --changed is a committed
-range check, not a complete unstaged-diff check. before any test run;
-only report failures that survive a clean build.}}
+range check, not a complete unstaged-diff check.
 
 ## Triage report
 
@@ -401,7 +401,16 @@ implied by installing the templates.
 
 Run the canonical channel scan, select the event, read its immutable artifact
 under `.relay/carrier/`, and verify its SHA-256 against the event digest.
-Process that content, then run `channel-carrier.sh ack --event-id <read-event-id>`.
+Process that content, then run:
+
+```sh
+OWNER_REPO=/Users/golem/git/grisaille RAG/scripts/channel-carrier.sh ack --event-id <read-event-id>
+```
+
+The explicit canonical binding is required from an independent clone. A
+variable prefix on an earlier scan applies only to that process; it does not
+configure later commands. The wrapper defaults to its own checkout when no
+binding is provided, which remains useful for isolated fixtures.
 Do not use `ack-file` on a mutable live pathname after reading it: a concurrent
 rewrite can change its digest and acknowledge a newer payload you never read.
 Transport acceptance, task delivery and wake notices do not substitute for this
