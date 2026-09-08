@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Backstop: every 30 min, surface unacked carrier events older than the
+       threshold. Distinguishes "unread with age" from silence. -->
+  <key>Label</key><string>com.{{OWNER}}.{{PROJECT}}.channel-watchdog</string>
+  <key>ProgramArguments</key>
+  <array><string>/usr/bin/python3</string><string>{{TICKET_ROOT}}/scripts/channel-watchdog.py</string>
+         <string>--receipts</string><string>{{CHANNEL_DIR}}/carrier/receipts</string>
+         <string>--threshold-minutes</string><string>30</string></array>
+  <key>StartInterval</key><integer>1800</integer>
+  <key>StandardErrorPath</key><string>{{STATE_DIR}}/watchdog.err</string>
+</dict></plist>

@@ -1,6 +1,9 @@
-# Music UI prototype
+# Grisaille — prototype operation and evidence
 
-A separate frontend experiment using GPUIX 0.7.0, OpenTUI 0.5.10, React and Bun 1.4.2.
+Product direction and amendment authority now live in `SPEC.md`; delivery is
+governed by `RAG/PROTOCOL.md`. This guide preserves dated prototype evidence.
+
+A music frontend using GPUIX 0.7.0, OpenTUI 0.5.10, React and Bun 1.4.2.
 MPD owns audio decoding, playback and output. nowplayd remains the independent
 macOS media integration. Neither existing repository was changed.
 
@@ -249,9 +252,10 @@ palette is unchanged. It is a typed palette boundary, not a theme settings syste
   progress track/fill, status, local find, prompt, scrim, inputs and controls.
   Hover, selected, active and held-row fills have their own addresses.
   Lyrics uses dedicated reader/row surfaces and the shared accent and focus colours.
-- Every surface accepts a solid CSS colour or a GPUIX `linear-gradient` object
+- Native surfaces accept a solid CSS colour or a GPUIX `linear-gradient` object
   with an angle, two colour stops, and optional `srgb`/`oklab` colour space.
-  Transparent panels reveal the canvas, so a canvas gradient can span the app.
+  Transparent native panels reveal the canvas, so a canvas gradient can span the app.
+  The terminal currently uses the first gradient stop; full gradient rendering is not implemented there.
   Opaque header/transport fills can be made transparent through their tokens too.
 - `theme.colors` addresses foregrounds, link states, placeholders, caret, text
   selection and errors. `theme.borders` addresses dividers, focus and insertion
@@ -275,11 +279,16 @@ tokens instead of introducing component-local colour literals.
 
 ## Local repository
 
-The repository lives at `/Users/golem/git/mpd-ui-prototype` on `codex/prototype`.
-Review correspondence can be placed in `.inbox/toastra/` and `.inbox/tofable/`.
-The app's name and remote are pending the owner's choice. Source, lockfile, tests and
-packaging script are tracked; `node_modules`, build output and local logs are
-ignored. No remote is configured.
+The repository lives at `/Users/golem/git/grisaille`; `main` is the integration
+branch. This Astra is Review Lead; independent implementation Astra clones live
+under `.workspaces/code-lead/`. `RAG/SPRINTS.md` lists the roadmap and
+`RAG/WORK-LEDGER.md` names the current next actor. The owner is creating the remote.
+Existing Fable correspondence remains in `.inbox/toastra/` and `.inbox/tofable/`;
+internal execution uses the local `.relay/` carrier described in RAG/PROTOCOL.md.
+Grisaille is tentative. The executable, bundle and state identifiers still use
+the prototype naming pending AI-IMP-013's explicit preservation/migration work.
+Source, lockfile, tests and packaging are tracked; build output and local state
+are ignored.
 
 ## Build
 
@@ -494,8 +503,9 @@ python3 scripts/package-mac.py
 - MPD supplies playback; the UI does not decode audio. Server playback and elapsed
   time were verified after the service restart; owner listening remains distinct.
 - The GUI includes queue, library albums/artists, artist albums, album tracks
-  and prompt. Playlists, lyrics, waveform, full ranger columns remain
-  outside this prototype. No nonfunctional page buttons are shown for them.
+  prompt, local lyrics and connected artist/album/track columns. Playlists,
+  waveform/Three.js visualization, live palette consumption and scriptable
+  composition remain outside this baseline. No nonfunctional page buttons are shown.
 - Queue moves use a stable source ID and a freshly resolved destination. MPD has no
   compare-and-swap move command; simultaneous edits by another client can race.
 - MPD command lists stop at the first error and do not roll back earlier additions.

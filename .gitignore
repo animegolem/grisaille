@@ -4,3 +4,9 @@ dist/
 review/
 *.log
 .DS_Store
+
+# Independent implementation clones and local delivery state
+.workspaces/
+.relay/
+__pycache__/
+*.pyc

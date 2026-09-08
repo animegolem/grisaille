@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Claude Code seat ear: rings every live session named {{SEAT_PREFIX}}*
+       when the channel inbox changes. Hint only; carrier is truth. -->
+  <key>Label</key><string>com.{{OWNER}}.{{PROJECT}}.relay-doorbell</string>
+  <key>ProgramArguments</key>
+  <array><string>{{TICKET_ROOT}}/scripts/relay-doorbell.sh</string>
+         <string>relay doorbell: new mail in {{CHANNEL_DIR}}/inbox — scan when you can.</string></array>
+  <key>EnvironmentVariables</key>
+  <dict><key>SEAT_PREFIX</key><string>{{SEAT_PREFIX}}</string>
+        <key>STATE_DIR</key><string>{{STATE_DIR}}/doorbell</string>
+        <key>CLAUDE_BIN</key><string>{{HOME}}/.local/bin/claude</string>
+        <key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+  <key>WatchPaths</key><array><string>{{CHANNEL_DIR}}/inbox</string></array>
+  <key>StandardErrorPath</key><string>{{STATE_DIR}}/doorbell/stderr.log</string>
+</dict></plist>
