@@ -17,3 +17,11 @@ implementation/review agents never tick these boxes from synthetic results.
   reading comfort, focus retention and artwork balance.
 - [ ] HT-007 — Shared visualizer motion and lyric legibility during real listening,
   including latency, resizing and pauses after a dedicated audio feed is admitted.
+- [ ] HT-008 — Library shelf performance on the owner's actual display: preserve
+  the currently praised scroll feel; record cover-ready distance at both leading
+  edges, direction changes, frame-time distribution and monitor refresh rate.
+
+Owner evidence, 2026-09-09: continuous album-shelf scrolling feels excellent.
+Visible covers can lag behind fast movement and populate after the region has
+been visited. This accepts the current interaction feel, not cover latency or a
+measured frame-rate target. See `RAG/observations/2026-09-09-library-fluency.md`.

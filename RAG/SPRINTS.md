@@ -25,3 +25,12 @@ explicit ownership; parallel agents do not independently rewrite those files.
 
 No full second sprint is automatically assigned when the first runs dry. The
 Review Lead can extend a healthy sitting with a new explicit brief/range.
+
+## Candidate future slice: library fluency
+
+Owner field evidence on 2026-09-09 adds contiguous mark-in/mark-out track
+actions, a direct whole-album queue action, faster leading-edge cover delivery
+and actual-host frame pacing. This is design intake, not a cut sprint. Measure
+the cover pipeline before choosing an album/artwork cache and prefetch model;
+preserve the currently praised scrolling feel. See DQ-008–010 and
+`RAG/observations/2026-09-09-library-fluency.md`.

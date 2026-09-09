@@ -18,3 +18,15 @@ Consultations may challenge decisions; they do not silently ratify them.
   requires an explicit inventory and preservation strategy.
 - DQ-007 — Remote URL, bound implementation task, publication remote and any
   idle-wake activation. No service is healthy merely because templates exist.
+- DQ-008 — Mark-in/mark-out range semantics for track lists: stable endpoint
+  identity, inclusive action scope, cancellation/reversal and behavior across
+  sorting, filtering, reload and navigation. Owner wants contiguous track pulls.
+- DQ-009 — Library artwork delivery model and priority: measure queue, MPD read,
+  decode and paint latency; compare album/art identity caching, directional
+  prefetch, reprioritization, cancellation/backpressure and bounded thumbnails.
+- DQ-010 — Native frame pacing evidence: available GPUIX instrumentation,
+  monitor refresh discovery, percentile frame times and a repeatable bidirectional
+  shelf-scroll scenario. Hill-climb toward display rate without making it a gate.
+- DQ-011 — Delivery-seat topology after the current sitting: current two-Astra
+  split versus Fable planning/rulings/merge plus one Astra doing adversarial
+  round 1 and implementation. Independent submitted-head review remains required.
