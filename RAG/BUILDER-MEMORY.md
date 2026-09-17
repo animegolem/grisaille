@@ -1,7 +1,9 @@
 # Grisaille builder-memory declaration
 
-Revision 0.1 · 2026-09-17 · PROPOSED — pending Astra adversarial
-sign-off. Governs grisaille's participation in the shared
+Revision 0.2 · 2026-09-17 · SIGNED OFF — Astra's adversarial
+sign-off (shared-builder-memory r3, on rev 0.1 commit b5eadbb)
+required the three amendments folded into this revision; a faithful
+fold completes the sign-off per that letter. Governs grisaille's participation in the shared
 builder-memory corpus (advisory seam per
 `sol-seat-memory-preference` r13 + Astra's required amendments
 r14; fixture-based v1). Tally's ruling on the VampireOTP
@@ -26,11 +28,29 @@ role-handoff ratification (theme-engine r8 pending), so records on
 either side of a transition carry correct role provenance (r13
 acceptance test 1 exercises exactly this).
 
-## Initial admitted state (rev 0.1)
+## Initial fixture profile and future registration constraints
 
-- Binding: seat `astra`, role per the currently ratified charter,
-  sharing ceiling = explicit seat-list audiences within the estate
-  only. No group or wildcard audiences in v1.
+This revision declares intended fixture behavior and constraints
+on future registrations. It admits no live session or binding.
+Fixture bindings exist only in an isolated test registry. Any
+eventual live registration identifies its session, stable seat,
+project, binding version, source-event effective boundary,
+effective charter revision, exact permitted audience set, and
+authorization record. A role or sharing-scope change creates a new
+version with an explicit effective boundary; it never relabels
+earlier records. Two-lead authorization requires the distinct
+seats designated by that charter; the owner's existing unilateral
+path remains available.
+
+- Fixture profile: seat `astra`, role per the currently ratified
+  charter. Each fixture or future live binding carries an explicit
+  FINITE set of permitted seat IDs recorded with its version — the
+  sharing ceiling. "Within the estate" is a scope restriction, not
+  a self-updating membership grant: adding an eligible recipient
+  to a ceiling is a ceiling change governed by the same
+  authorization rule, and a ceiling change never alters the fixed
+  audience on an existing record. No group or wildcard audiences
+  in v1.
 - No other grisaille bindings. Unknown or conflicting sessions
   reject per the r13 decision table; nothing acquires the
   namespace by cwd.
@@ -45,12 +65,23 @@ acceptance test 1 exercises exactly this).
 
 ## Source locators into this repository
 
-Commit-addressed only: revision + path + span, never a
-working-tree path — span digests must stay verifiable after
-history moves. A working-tree locator is invalid at admission and
-cannot enter the unresolved-source path as if it had once
-verified. (Feeds A3's frozen encoding; propose carrying this into
-the implementation ticket's byte fixtures.)
+A repository source locator identifies the source repository, a
+full immutable commit object ID, a repository-relative path at
+that commit, and either the whole raw Git blob or a half-open byte
+interval [start, end) within it. SHA-256 covers those exact raw
+blob bytes, before checkout filters or text normalization. Mutable
+branches/tags, abbreviated revisions, and working-tree paths are
+invalid as admitted source revisions. Immutable addressing
+guarantees which bytes are meant, not that the object remains
+available; an unavailable source remains unresolved and excluded
+under the contract's source rules, without substitution from a
+newer revision.
+
+Implementation-ticket fixture requirements (carried with A3's
+frozen retry encoding): a moved branch / renamed current path, a
+non-ASCII byte span, and an unavailable referenced object. No
+repository-retention policy or Git settings change is authorized
+here.
 
 ## Boundaries (restated as binding here)
 
@@ -67,6 +98,11 @@ the implementation ticket's byte fixtures.)
 
 The fixture-based initial seam requires **no grisaille
 implementation ticket** — this reviewed declaration is the
-project's whole contribution. A tracked ticket becomes required
-when either (a) live capture touches grisaille sessions, or
-(b) recall becomes a runtime dependency of grisaille behavior.
+project's whole contribution. A reviewed Grisaille integration
+ticket is required before live capture touches Grisaille sessions,
+before corpus-derived recall is supplied to a live Grisaille
+agent/session (including harness hooks or context injection), or
+before the corpus becomes a runtime dependency of the application.
+Static founding notes and isolated fixtures remain within this
+declaration's scope. This declaration authorizes none of those
+live integrations.
