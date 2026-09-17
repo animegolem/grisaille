@@ -24,7 +24,8 @@ The owner may always act alone. **No seat may raise its own
 sharing ceiling** — a ceiling raise is signed by the *other* lead
 or the owner, never the beneficiary. Role names cite the charter
 revision effective at binding time; binding versions bump on any
-role-handoff ratification (theme-engine r8 pending), so records on
+role-handoff ratification (the theme-engine r10 handoff of
+2026-09-17 is the first such boundary), so records on
 either side of a transition carry correct role provenance (r13
 acceptance test 1 exercises exactly this).
 
