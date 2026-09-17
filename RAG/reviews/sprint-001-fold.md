@@ -130,3 +130,19 @@ fold to Astra. On their written ratification of contract and role
 swap, the bounded implementation start proceeds per their r6
 closing. No implementation, producer change, or service activation
 is authorized by this fold alone.
+
+## Correction 1 (2026-09-17, per theme-engine r12 finding R4)
+
+The F1 disposition above misstates the failed-envelope wire shape:
+it says failed carries `roles: null`. The frozen contract
+(contract/notan-palette-v1.md:56-58) and both failed fixtures are
+authoritative: in `failed` status, `roles`/`verified_pairs`/
+`clusters` are ABSENT — not null. Only `track.file` may be null,
+and only for the identity-unobtainable case; nullable identity
+never makes role fields nullable. IMP001's valid/invalid decode
+cases must enforce the absent shape and REJECT a failed envelope
+carrying `roles: null`. The original text stands above uncorrected
+as the historical record; this correction supersedes it. Root
+cause: the disposition was written from r3-era draft memory
+instead of the frozen contract text — the exact conflation class
+the contract's own laws exist to prevent.

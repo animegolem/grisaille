@@ -9,11 +9,18 @@ clone, branch/base and first-command timestamp before a lease can be renewed.
 | work | assignee | state | since | progress_at | next_actor | evidence / trigger |
 |---|---|---|---|---|---|---|
 | SPRINT-001 round-1 | astra (Code Lead; adversarial contract review) | parked | 2026-09-08T13:55:48.132126+00:00 | 2026-09-17T09:42:14+00:00 | astra | Numbered fold at RAG/reviews/sprint-001-fold.md; r7-r9 received and role handoff acknowledged in .inbox/tofable/theme-engine-consumption-r10.md; next: contract/fixture and interpolation review, then Notan-owned bounded IMP001 assignment; contract ratification and implementation start remain pending |
-| ROLE-HANDOFF documents | notan (Review Lead) | offered | 2026-09-17T09:42:14+00:00 | 2026-09-17T09:42:14+00:00 | notan | Owner-directed role swap acknowledged by Astra in .inbox/tofable/theme-engine-consumption-r10.md after Notan r8; role agreement effective; next: fold role, protocol, entry-point and dispatch references and return exact commit/diff for consistency review |
-| BUILDER-MEM declaration | notan (Review Lead) | offered | 2026-09-17 | 2026-09-17T09:42:14+00:00 | notan | RAG/BUILDER-MEMORY.md rev 0.1 remains PROPOSED; Astra returned required amendments in .inbox/tofable/shared-builder-memory-r3.md; next: Notan folds rev 0.2 and returns commit/diff receipt; no live registration or implementation authorized |
+| ROLE-HANDOFF documents | notan (Review Lead) | corrections-folded | 2026-09-17T09:42:14+00:00 | 2026-09-17 | astra | Initial fold 1abab9f (r11 receipt); r12 findings R1/R2 corrected: SPEC rev 0.2 role amendment + separate-review gate restored in PROTOCOL step 4 (this commit); next: Astra consistency review of the corrected fold |
 | DELIVERY-ACTIVATION | review-lead | parked | 2026-09-08 | | review-lead | AI-IMP-015; bind owner-designated implementation task after bootstrap review; activation is separate |
 
 ## History
+
+BUILDER-MEM declaration CLOSED 2026-09-17: rev 0.2 folded at ea776f6 +
+f191ae0; Astra faithful-fold receipt at
+.inbox/tofable/shared-builder-memory-r5.md; SIGNED OFF, fixture-only scope,
+no live registration or implementation authorized. (Ledger correction per
+r12 R3: the r11 claim of a ledger update was false — that edit silently
+no-op'd against rows Astra had already rewritten; this entry is the real
+update, diff-verified before claiming.)
 
 Bootstrap cleared independent review and integrated to main at 3608afe; see
 RAG/reviews/bootstrap-clearance.md and AI-LOG-001. Independent Code Lead clone

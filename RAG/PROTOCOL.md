@@ -357,13 +357,15 @@ replace the generic charter's blanket no-push sentence for this project only.
    A `ready-to-implement` ruling is separate from the explicit implementation
    start named in the work ledger; it is NOT an accepted/merged verdict.
 3. Code Lead implements the authorized scope and self-reviews its subagents.
-4. A reviewer independent of authorship reviews the exact submitted head. Its
-   record names scope, SHA, findings, evidence and limitations. With the
-   Code Lead authoring implementations, the Review Lead's step-5 review
-   supplies authorship independence in the default case; a separate review
-   agent (Codex or Claude) may be assigned in addition. Model identity alone
-   is not independence — the boundary is authorship, and it applies
-   symmetrically: the Review Lead does not solely review work it authored.
+4. A reviewer independent of authorship reviews the exact submitted head as a
+   SEPARATE, REQUIRED step (SPEC §12) — it is not supplied by the Review
+   Lead's step-5 review. Its record names scope, SHA, findings, evidence and
+   limitations. It may be a separate review agent of any model; model
+   identity alone is not independence — authorship is the boundary, and it
+   applies symmetrically: the Review Lead's own authored work also requires
+   review independent of authorship. (Rev note 2026-09-17: an earlier fold
+   briefly weakened this step; restored per r12 finding R2 — the role
+   handoff renames holders and changes no review gate.)
 5. Review Lead reviews boundaries, load-bearing logic and reproduced gates.
    Blocking findings are resolved or explicitly ruled before merge. A changed
    head requires review of the changed portion and renewed gate evidence; a

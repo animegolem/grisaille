@@ -2,7 +2,7 @@
 
 | STATUS | REVISION | LAST UPDATED |
 |---|---|---|
-| Adopted direction; implementation staged | 0.1 | 2026-09-08 |
+| Adopted direction; implementation staged | 0.2 | 2026-09-17 |
 
 > Grisaille is an artwork-led, keyboard-driven MPD music interface with native
 > and terminal presentations, reusable content components, and themes that
@@ -292,17 +292,20 @@ simulated playback where possible.
 
 ## 12. Delivery governance
 
-This canonical Astra seat is Review Lead: constitution, design, ticket scopes,
-assignments, final review, integration merges and releases. A separate Astra is
-Code Lead per assigned epic, in an independent clone. It may break approved
-issues into subagent waves, review their work, and consolidate one atomic commit
-per issue in dependency order. It returns one integrated, UNMERGED epic PR.
+notan (Fable, Claude Code) is Review Lead: constitution, design, ticket
+scopes, assignments, final review, integration merges and releases (rev 0.2
+role amendment; provenance in §17). Astra (Codex) is Code Lead per assigned
+epic, in an independent clone, and additionally holds adversarial review of
+proposed plans and contracts with blocking power. The Code Lead may break
+approved issues into subagent waves, review their work, and consolidate one
+atomic commit per issue in dependency order, returning one integrated,
+UNMERGED epic PR.
 
 A second reviewer independent of implementation reviews the submitted commit
-before final merge. The Review Lead checks boundaries and load-bearing logic,
-reproduces relevant gates, resolves findings and merges to `main`. Fable can
-provide intermittent outside consultation; its scope and reviewed revision are
-recorded. Detailed execution and destructive-operation rules live solely in
+before final merge; this separate review step is REQUIRED and is not supplied
+by the Review Lead's own final review. The Review Lead checks boundaries and
+load-bearing logic, reproduces relevant gates, resolves findings and merges to
+`main`. Detailed execution and destructive-operation rules live solely in
 `RAG/PROTOCOL.md`; role charters point there.
 
 ## 13. Current slice
@@ -368,13 +371,23 @@ is required before declaring the aesthetic work accepted.
 - Named compact/regular/wide profiles and theme-defined rules are required.
 - Full-frame visualization, floating artwork and outlined lyrics is the primary
   listening direction; understated and no-lyrics variants are theme choices.
-- This seat owns design and final merges; epic implementers integrate their
-  subagents and submit unmerged PRs; a separate second review is required.
+- notan (Review Lead) owns design and final merges; Astra (Code Lead)
+  implements, adversarially reviews plans/contracts, integrates subagents and
+  submits unmerged PRs; a separate second review is required (rev 0.2).
 - Current authorization is workflow/spec/ticket adoption. First feature sprint
   is prepared for read-only round 1; implementation and runtime activation are
   separate recorded starts. No reversal has occurred in rev 0.1.
 
 ## 17. Evidence and amendment record
+
+2026-09-17, rev 0.2: role amendment — Review Lead seat passes to notan
+(Fable); Astra holds Code Lead plus adversarial review of plans/contracts.
+Provenance: owner direction 2026-09-10 (reaffirmed in-session 2026-09-17);
+notan acceptance `.inbox/toastra/theme-engine-consumption-r8.md`; Astra
+written acknowledgment `.inbox/tofable/theme-engine-consumption-r10.md`;
+entry-point/protocol/charter fold at commit 1abab9f; this SPEC fold completes
+r12 finding R1. The separate-second-review gate is unchanged by the
+amendment (r12 finding R2). Roles were not re-chosen.
 
 2026-09-08, rev 0.1: owner accepted the component/composition and responsive
 boundary and requested the move beyond greenfield into this review-led workflow.
