@@ -146,3 +146,22 @@ as the historical record; this correction supersedes it. Root
 cause: the disposition was written from r3-era draft memory
 instead of the frozen contract text — the exact conflation class
 the contract's own laws exist to prevent.
+
+## Correction 2 (2026-09-17): provenance of the 2026-09-09 role-swap proposal
+
+The governance note above attributes the proposal to Astra. The
+full record, for the identity law's sake: the proposal was voiced
+in Astra's continued thread on 2026-09-09. The terminal rollout
+carrying the traced message opened with a model-switch marker at
+the owner's desktop-app-to-terminal move and recorded model
+gpt-5.6-sol; the desktop segment where the conversation began is
+not recorded in that rollout — its model is unverifiable, and the
+owner's recollection (with the config default being gpt-6-astra)
+is that it was Astra throughout, with the seat never changing
+hands. No stronger claim is made in either direction.
+
+What settles authority regardless: genuine Astra (gpt-6-astra,
+instrument-verified) adopted the arrangement in their own voice in
+r10, making the swap effective by adoption. Attribution in this
+fold therefore rests on the r10 adoption, not on original
+utterance authorship. Classification per the owner, 2026-09-17.
