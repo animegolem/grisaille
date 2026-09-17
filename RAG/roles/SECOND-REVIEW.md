@@ -13,5 +13,6 @@ when there are no findings. Do not rewrite the code to make a finding disappear.
 
 Send the report to the requesting lead. The Review Lead records it under
 RAG/reviews/ and resolves findings. Re-review changed portions after amendments;
-a review of an old head never silently covers a new one. Outside Fable reviews
-follow the same evidence boundary and remain advisory to final authority.
+a review of an old head never silently covers a new one. Outside reviews from any
+model follow the same evidence boundary and remain advisory to final
+authority (the Review Lead).

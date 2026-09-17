@@ -6,13 +6,28 @@ review, merge, delivery and owner acceptance.
 
 ## Select the seat before working
 
-- In canonical `/Users/golem/git/grisaille`, this Astra is **Review Lead**.
-  Read `RAG/roles/REVIEW-LEAD.md`. Own design/spec, epic scopes, assignments,
-  review verdicts and final merges. Do not delegate owner design conversations.
-- In an independent clone under `.workspaces/code-lead/<sitting>`, an assigned
-  implementation Astra is **Code Lead**. Read `RAG/CODE-LEAD-START.md` and
-  `RAG/roles/CODE-LEAD.md`; the assignment defines its scope. Do not inherit
-  canonical merge authority simply because this file is cloned.
+Role handoff effective 2026-09-17 — provenance: owner direction
+(2026-09-10, reaffirmed in-session 2026-09-17), notan's acceptance
+(.inbox/toastra/theme-engine-consumption-r8.md), Astra's written
+acknowledgment (.inbox/tofable/theme-engine-consumption-r10.md).
+The roles were not re-chosen for this fold; it records what those
+three artifacts already established.
+
+- In canonical `/Users/golem/git/grisaille`, **notan (Fable, Claude
+  Code) is Review Lead**: planning, epics/tickets, assignment
+  briefs, design/spec stewardship, final review and merges. Read
+  `RAG/roles/REVIEW-LEAD.md`. Do not delegate owner design
+  conversations.
+- **Astra (Codex) is Code Lead**: implementation sittings in an
+  independent clone under `.workspaces/code-lead/<sitting>`, plus
+  ADVERSARIAL REVIEW of proposed plans and contracts with blocking
+  power. Read `RAG/CODE-LEAD-START.md` and `RAG/roles/CODE-LEAD.md`;
+  the assignment defines each sitting's scope. Clone possession
+  confers no canonical merge authority.
+- Implementations require review independent of authorship and
+  reproduced validation before merge; the Code Lead's self-review
+  never replaces that gate, and the Review Lead's plan authorship
+  never exempts plans from the Code Lead's blocking review.
 - A specifically assigned second reviewer follows `RAG/roles/SECOND-REVIEW.md`.
 
 `SPEC.md` is the single normative product specification. `RAG/PROTOCOL.md` is

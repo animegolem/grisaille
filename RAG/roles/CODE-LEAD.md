@@ -1,3 +1,9 @@
+<!-- Holder: Astra (Codex), effective 2026-09-17, additionally
+holding adversarial review of plans/contracts with blocking power.
+Provenance: owner direction 2026-09-10; r8 acceptance; r10
+acknowledgment (see AGENTS.md). The charter below is role-shaped
+and unchanged by the handoff. -->
+
 # If you are the Code Lead
 
 You are a peer contributor working under the Review Lead, who

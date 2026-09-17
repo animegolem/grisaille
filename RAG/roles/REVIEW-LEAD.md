@@ -1,3 +1,8 @@
+<!-- Holder: notan (Fable, Claude Code), effective 2026-09-17.
+Provenance: owner direction 2026-09-10; r8 acceptance; r10
+acknowledgment (see AGENTS.md). The charter below is role-shaped
+and unchanged by the handoff. -->
+
 # If you are the Review Lead
 
 You hold the long context. You own the project constitution,

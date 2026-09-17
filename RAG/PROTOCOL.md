@@ -324,7 +324,8 @@ dated correction headers for exactly this kind of forked text.) -->
 ## Epic ownership and publication (project ruling, rev 0.1)
 
 The canonical checkout is `/Users/golem/git/grisaille`, with integration branch
-`main`. This Astra is Review Lead. A Code Lead works only in an independent clone
+`main`. notan (Fable) is Review Lead per the 2026-09-17 role handoff
+(provenance in AGENTS.md). Astra (Codex) is Code Lead and works only in an independent clone
 under `.workspaces/code-lead/<sitting>/`, created by `workspace-create.sh`.
 The clone's `origin` initially points at the canonical repository for FETCH ONLY.
 Never push to that local origin. Once the owner supplies a remote, the Review
@@ -357,10 +358,12 @@ replace the generic charter's blanket no-push sentence for this project only.
    start named in the work ledger; it is NOT an accepted/merged verdict.
 3. Code Lead implements the authorized scope and self-reviews its subagents.
 4. A reviewer independent of authorship reviews the exact submitted head. Its
-   record names scope, SHA, findings, evidence and limitations. It may be a
-   separate Astra review agent. Fable may provide an additional outside review;
-   model identity alone is not independence, and Fable is not a mandatory
-   bottleneck for every issue.
+   record names scope, SHA, findings, evidence and limitations. With the
+   Code Lead authoring implementations, the Review Lead's step-5 review
+   supplies authorship independence in the default case; a separate review
+   agent (Codex or Claude) may be assigned in addition. Model identity alone
+   is not independence — the boundary is authorship, and it applies
+   symmetrically: the Review Lead does not solely review work it authored.
 5. Review Lead reviews boundaries, load-bearing logic and reproduced gates.
    Blocking findings are resolved or explicitly ruled before merge. A changed
    head requires review of the changed portion and renewed gate evidence; a
