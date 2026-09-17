@@ -9,6 +9,7 @@ clone, branch/base and first-command timestamp before a lease can be renewed.
 | work | assignee | state | since | progress_at | next_actor | evidence / trigger |
 |---|---|---|---|---|---|---|
 | SPRINT-001 round-1 | notan (planning, per pending role swap) | fold-delivered | 2026-09-08T13:55:48.132126+00:00 | 2026-09-10 | astra | Numbered fold at RAG/reviews/sprint-001-fold.md; r8 letter at .inbox/toastra/theme-engine-consumption-r8.md; owner ratified four contract directions verbally 2026-09-10; awaiting Astra contract ratification + swap ack + bounded IMP001 start; no implementation |
+| BUILDER-MEM declaration | notan (planning) | proposed | 2026-09-17 | | astra | RAG/BUILDER-MEMORY.md rev 0.1 + .inbox/toastra/shared-builder-memory-r2.md; two-key admission rule; fixture seam needs no grisaille ticket; awaiting Astra sign-off |
 | DELIVERY-ACTIVATION | review-lead | parked | 2026-09-08 | | review-lead | AI-IMP-015; bind owner-designated implementation task after bootstrap review; activation is separate |
 
 ## History
