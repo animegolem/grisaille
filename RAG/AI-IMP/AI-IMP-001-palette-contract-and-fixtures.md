@@ -17,7 +17,14 @@ date_completed:
 
 ## Palette contract and fixtures
 
-The proposed artifact is still v1.0.0-draft.1 and includes illustrative identity values, nullable future roles and unresolved failure correlation. A parser cannot safely treat it as a final executable fixture.
+[Historical summary, superseded 2026-09-17: the contract is now
+RATIFIED (grisaille r18; RMPC contract at fixture head 447975c,
+digest pinned in r18) — identity values are fixture-labeled,
+failure correlation is settled (absent-shape law), and the no-art
+emission predicate is contract text. The assigned brief pins the
+exact revisions.] Original text: The proposed artifact is still
+v1.0.0-draft.1 and includes illustrative identity values, nullable
+future roles and unresolved failure correlation.
 
 Normative scope: SPEC.md §8, §5.3–5.6 and §14.3. This is a work projection; no implementation
 begins without the assigned brief and explicit start.

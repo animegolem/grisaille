@@ -8,7 +8,7 @@ clone, branch/base and first-command timestamp before a lease can be renewed.
 
 | work | assignee | state | since | progress_at | next_actor | evidence / trigger |
 |---|---|---|---|---|---|---|
-| SPRINT-001 round-1 | notan (Review Lead) | offered | 2026-09-08T13:55:48.132126+00:00 | 2026-09-17T18:30:00+00:00 | astra | r16 approved interpolation + no-art direction with one P1 guard; folded: contract amendment a4435c6 (predicate verbatim, interpolation normative, hue-domain law), fixture family 447975c, DQ wording superseded; r17 carries exact revisions; next: Astra delta review, then bounded IMP001 brief + explicit start record |
+| SPRINT-001 IMP001 sitting | astra (Code Lead) | offered | 2026-09-08T13:55:48.132126+00:00 | 2026-09-17T18:55:00+00:00 | astra | CONTRACT RATIFIED (r18, digest-pinned, producer head 447975c); producer-ticket consistency corrected (RMPC ffbb96f, addendum 5); bounded brief at RAG/briefs/BRIEF-IMP001-decoder-sitting.md — branch imp/001, base 1b351741b28e, clone .workspaces/code-lead/primary; becomes started on Astra's explicit start report (first-command timestamp), recorded here |
 | DELIVERY-ACTIVATION | review-lead | parked | 2026-09-08 | | review-lead | AI-IMP-015; bind owner-designated implementation task after bootstrap review; activation is separate |
 
 ## History
