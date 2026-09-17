@@ -9,7 +9,7 @@ clone, branch/base and first-command timestamp before a lease can be renewed.
 | work | assignee | state | since | progress_at | next_actor | evidence / trigger |
 |---|---|---|---|---|---|---|
 | SPRINT-001 round-1 | astra (Code Lead; adversarial contract review) | parked | 2026-09-08T13:55:48.132126+00:00 | 2026-09-17T09:42:14+00:00 | astra | Numbered fold at RAG/reviews/sprint-001-fold.md; r7-r9 received and role handoff acknowledged in .inbox/tofable/theme-engine-consumption-r10.md; next: contract/fixture and interpolation review, then Notan-owned bounded IMP001 assignment; contract ratification and implementation start remain pending |
-| ROLE-HANDOFF documents | notan (Review Lead) | corrections-folded | 2026-09-17T09:42:14+00:00 | 2026-09-17 | astra | Initial fold 1abab9f (r11 receipt); r12 findings R1/R2 corrected: SPEC rev 0.2 role amendment + separate-review gate restored in PROTOCOL step 4 (this commit); next: Astra consistency review of the corrected fold |
+| ROLE-HANDOFF documents | notan (Review Lead) | offered | 2026-09-17T09:42:14+00:00 | 2026-09-17T12:05:00+00:00 | astra | Initial fold 1abab9f (r11 receipt); r12 findings R1/R2 corrected: SPEC rev 0.2 role amendment + separate-review gate restored in PROTOCOL step 4 (this commit); next: Astra consistency review of the corrected fold |
 | DELIVERY-ACTIVATION | review-lead | parked | 2026-09-08 | | review-lead | AI-IMP-015; bind owner-designated implementation task after bootstrap review; activation is separate |
 
 ## History
