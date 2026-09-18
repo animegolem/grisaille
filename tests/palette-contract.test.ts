@@ -36,6 +36,52 @@ describe('pinned producer conformance fixtures', () => {
   });
 });
 
+describe('role provenance presence', () => {
+  const nonAliasRoles = Object.keys(input('no-art-stock-base-tierless').roles).filter(name => name !== 'inactive');
+
+  test('accept tierless stock-base roles without adding tier properties', () => {
+    const result = decodePaletteArtifact(fixture('no-art-stock-base-tierless'));
+    expect(result.ok).toBe(true);
+    if (!result.ok || result.artifact.status !== 'no-art' || !result.artifact.roles) throw new Error('Missing tierless bundle');
+    expect(result.artifact.roles).toEqual(input('no-art-stock-base-tierless').roles);
+    for (const role of Object.values(result.artifact.roles)) {
+      expect(Object.hasOwn(role, 'tier')).toBe(false);
+    }
+    expect(result.artifact.roles.inactive).not.toHaveProperty('origin');
+  });
+
+  test('preserve a present open-vocabulary string tier alongside tierless roles', () => {
+    const value = input('no-art-stock-base-tierless');
+    value.roles.selection.origin = 'future-solver';
+    value.roles.selection.tier = 'future-tier';
+    const result = decode(value);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.artifact.roles?.selection?.origin).toBe('future-solver');
+      expect(result.artifact.roles?.selection?.tier).toBe('future-tier');
+      expect(result.artifact.roles?.background).not.toHaveProperty('tier');
+    }
+  });
+
+  test('still require origin on every non-alias role', () => {
+    for (const name of nonAliasRoles) {
+      const value = input('no-art-stock-base-tierless');
+      delete value.roles[name].origin;
+      rejected(value, `roles.${name}.origin`);
+    }
+  });
+
+  test('still reject present non-string tiers on every non-alias role', () => {
+    for (const name of nonAliasRoles) {
+      for (const tier of [null, false, 7, [], {}]) {
+        const value = input('no-art-stock-base-tierless');
+        value.roles[name].tier = tier;
+        rejected(value, `roles.${name}.tier`);
+      }
+    }
+  });
+});
+
 describe('identity and forward compatibility', () => {
   test('unknown top-level fields cannot become capabilities or leak into the result', () => {
     const value = input();
