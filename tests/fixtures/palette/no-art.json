@@ -1,0 +1,22 @@
+{
+  "schema": "notan-palette/1",
+  "schema_version": "1.0.0",
+  "fixture_note": "SYNTHETIC conformance fixture. The STOCK-BASE no-art case: the effective base theme uses terminal-dependent reset/named colors, so no role bundle resolves to portable final bytes \u2014 roles and verified_pairs are BOTH ABSENT (never null, never partial), features omits selection, clusters is [] and art_sha256 null per no-art's own shape. Distinct from failed: nothing failed; there is no art.",
+  "producer": {
+    "name": "rmpc-auto-theme",
+    "revision": "0000000",
+    "spec_revision": "0.11"
+  },
+  "features": [],
+  "sequence": 42,
+  "generated_at": "2026-09-08T15:03:00Z",
+  "status": "no-art",
+  "track": {
+    "file": "Various/No Cover/01 - Untitled.flac",
+    "artist": "Various",
+    "album": "No Cover",
+    "title": "Untitled",
+    "art_sha256": null
+  },
+  "clusters": []
+}
