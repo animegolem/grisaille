@@ -1,5 +1,5 @@
 ---
-node_id: AI-IMP-016
+node_id: AI-IMP-018
 tags:
   - IMP-LIST
   - Implementation
@@ -13,7 +13,7 @@ date_created: 2026-09-18
 date_completed:
 ---
 
-# AI-IMP-016-decoder-provenance-presence-amendment
+# AI-IMP-018-decoder-provenance-presence-amendment
 
 ## Narrow consumer amendment: tier optionality + origin presence matrix
 

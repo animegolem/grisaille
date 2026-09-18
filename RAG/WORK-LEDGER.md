@@ -8,7 +8,7 @@ clone, branch/base and first-command timestamp before a lease can be renewed.
 
 | work | assignee | state | since | progress_at | next_actor | evidence / trigger |
 |---|---|---|---|---|---|---|
-| AI-IMP-016 provenance-presence sitting | astra (Code Lead) | offered | 2026-09-18 | 2026-09-18T06:15:00+00:00 | astra | Narrow consumer amendment per Astra r21 / addendum A4 (contract 29e7907, SHA256 1ea902c7…d3821a): tier optional iff solver, origin matrix; brief at RAG/briefs/BRIEF-IMP016-provenance-presence-sitting.md — branch imp/016, base b313338, clone .workspaces/code-lead/primary; becomes started on Astra's explicit start report, recorded here |
+| AI-IMP-018 provenance-presence sitting | astra (Code Lead) | offered | 2026-09-18 | 2026-09-18T06:15:00+00:00 | astra | Narrow consumer amendment per Astra r21 / addendum A4 (contract 29e7907, SHA256 1ea902c7…d3821a): tier optional iff solver, origin matrix; brief at RAG/briefs/BRIEF-IMP018-provenance-presence-sitting.md — branch imp/018, base b313338, clone .workspaces/code-lead/primary; becomes started on Astra's explicit start report, recorded here |
 | DELIVERY-ACTIVATION | review-lead | parked | 2026-09-08 | | review-lead | AI-IMP-015; bind owner-designated implementation task after bootstrap review; activation is separate |
 
 ## History
