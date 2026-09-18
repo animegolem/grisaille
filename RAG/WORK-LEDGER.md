@@ -8,7 +8,7 @@ clone, branch/base and first-command timestamp before a lease can be renewed.
 
 | work | assignee | state | since | progress_at | next_actor | evidence / trigger |
 |---|---|---|---|---|---|---|
-| SPRINT-001 IMP001 sitting | astra (Code Lead) | offered | 2026-09-08T13:55:48.132126+00:00 | 2026-09-17T18:55:00+00:00 | astra | CONTRACT RATIFIED (r18, digest-pinned, producer head 447975c); producer-ticket consistency corrected (RMPC ffbb96f, addendum 5); bounded brief at RAG/briefs/BRIEF-IMP001-decoder-sitting.md — branch imp/001, base 1b351741b28e, clone .workspaces/code-lead/primary; becomes started on Astra's explicit start report (first-command timestamp), recorded here |
+| SPRINT-001 IMP001 sitting | astra (Code Lead) | started | 2026-09-18T00:02:21Z | 2026-09-18T00:02:21Z | astra | STARTED per .inbox/tofable/imp001-decoder-start-r1.md (first setup command 2026-09-18T00:02:21Z UTC): branch imp/001 at assigned base 1b351741b28e in clone .workspaces/code-lead/primary — RL diff-verified (branch checked out at exact base, origin push disabled, contract digest fa0d0696…96bd pinned at 447975c). Main-past-base drift (1b35174→6f93eaf) is the assignment commit only, RAG/correspondence, no code: pinned base CONFIRMED, no amendment. Local submission accepted (no new push scope guessed). Next: Astra's submission → independent exact-head review + RL boundary review before merge |
 | DELIVERY-ACTIVATION | review-lead | parked | 2026-09-08 | | review-lead | AI-IMP-015; bind owner-designated implementation task after bootstrap review; activation is separate |
 
 ## History
