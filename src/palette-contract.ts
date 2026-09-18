@@ -123,7 +123,7 @@ function roles(value: unknown, selection: boolean, noArt: boolean): PaletteRoles
       data.alias_of = 'frame';
     } else {
       data.origin = string(role.origin, `${path}.origin`);
-      data.tier = string(role.tier, `${path}.tier`);
+      if (has(role, 'tier')) data.tier = string(role.tier, `${path}.tier`);
     }
     if (name === 'selection') {
       requireValue(data.kind === 'derived' && role.derived_from === 'active', path, 'selection must derive from active');
