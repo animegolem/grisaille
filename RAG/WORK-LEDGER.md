@@ -8,10 +8,21 @@ clone, branch/base and first-command timestamp before a lease can be renewed.
 
 | work | assignee | state | since | progress_at | next_actor | evidence / trigger |
 |---|---|---|---|---|---|---|
-| SPRINT-001 IMP001 sitting | astra (Code Lead) | started | 2026-09-18T00:02:21Z | 2026-09-18T00:02:21Z | astra | STARTED per .inbox/tofable/imp001-decoder-start-r1.md (first setup command 2026-09-18T00:02:21Z UTC): branch imp/001 at assigned base 1b351741b28e in clone .workspaces/code-lead/primary — RL diff-verified (branch checked out at exact base, origin push disabled, contract digest fa0d0696…96bd pinned at 447975c). Main-past-base drift (1b35174→6f93eaf) is the assignment commit only, RAG/correspondence, no code: pinned base CONFIRMED, no amendment. Local submission accepted (no new push scope guessed). Next: Astra's submission → independent exact-head review + RL boundary review before merge |
 | DELIVERY-ACTIVATION | review-lead | parked | 2026-09-08 | | review-lead | AI-IMP-015; bind owner-designated implementation task after bootstrap review; activation is separate |
 
 ## History
+
+SPRINT-001 IMP001 sitting CLOSED 2026-09-18: started 2026-09-18T00:02:21Z
+(start record .inbox/tofable/imp001-decoder-start-r1.md, RL-verified);
+submitted r1 at tip 0b69abe on pinned base 1b35174 (carrier event
+67d954340b1c8559, exact-event ACKed); independent second review of both
+heads clean (.inbox/tofable/imp001-decoder-independent-review-r1.md);
+RL final review at RAG/reviews/imp001-final-review.md (gates reproduced:
+typecheck PASS, 99/0/413; three contract questions ruled); verdict
+ACCEPTED (.relay archive imp001-decoder-{inbox,outbox}-r1.md); MERGED to
+main at b313338; AI-IMP-001 ticket completed. Clone branch cleanup owed
+by RL under the destructive-op fence; genuine-capture conformance is a
+separate future gate.
 
 ROLE-HANDOFF documents CLOSED 2026-09-17: initial fold 1abab9f;
 r12 R1/R2 corrections at ff995fd (SPEC rev 0.2, gate restored);

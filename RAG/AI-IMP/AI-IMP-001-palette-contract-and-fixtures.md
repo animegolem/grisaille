@@ -4,13 +4,13 @@ tags:
   - IMP-LIST
   - Implementation
   - grisaille
-kanban_status: planned
+kanban_status: completed
 depends_on: []
 parent_epic: [[AI-EPIC-001-theme-consumption]]
 confidence_score: 0.72
 assignee: code-lead
 date_created: 2026-09-08
-date_completed:
+date_completed: 2026-09-18
 ---
 
 # AI-IMP-001-palette-contract-and-fixtures
@@ -50,11 +50,11 @@ into neighboring responsibilities. Report new seams before editing them.
 Before marking an item complete on the checklist MUST **stop** and **think**. Have you validated all aspects are **implemented** and **tested**?
 </CRITICAL_RULE>
 
-- [ ] Verify claims and proposed file boundaries against current source and the cited spec.
-- [ ] Resolve open contract/design decisions in the Review Lead's fold.
-- [ ] Deliver the bounded change or investigation outcome described above.
-- [ ] Reproduce relevant behavioral/host evidence and the assigned full gate; report exact counts and missing checks.
-- [ ] Submit the atomic issue commit/evidence for independent second review and Review Lead disposition.
+- [x] Verify claims and proposed file boundaries against current source and the cited spec.
+- [x] Resolve open contract/design decisions in the Review Lead's fold.
+- [x] Deliver the bounded change or investigation outcome described above.
+- [x] Reproduce relevant behavioral/host evidence and the assigned full gate; report exact counts and missing checks.
+- [x] Submit the atomic issue commit/evidence for independent second review and Review Lead disposition.
 
 ### Acceptance Criteria
 
@@ -63,4 +63,13 @@ GIVEN ratified valid, malformed, unsupported-version, no-art and failed-request 
 ### Issues Encountered
 
 <!-- Filled during the sitting. Record failed attempts, blockers, deviations and missing tests honestly. -->
-Not started. No implementation or acceptance is claimed.
+CLOSED 2026-09-18: merged to main at b313338 (imp/001 tip 0b69abe, one
+atomic commit, accepted r1). Independent second review found one P2
+(share-sum binary roundoff rejected the inclusive 1.001 decimal boundary) —
+fixed with a Number.EPSILON*length bound and boundary regressions, changed
+head re-reviewed. A proposed failed-fixture rejection was withdrawn against
+the pinned producer fixtures. Three contract wording questions ruled in
+RAG/reviews/imp001-final-review.md; producer-side prose addenda queued to
+the RMPC court. Gates at head and on merged main: typecheck PASS, bun test
+99/0/413. Fixtures remain synthetic; genuine-capture conformance is a
+separate gate.
