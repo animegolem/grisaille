@@ -8,10 +8,18 @@ clone, branch/base and first-command timestamp before a lease can be renewed.
 
 | work | assignee | state | since | progress_at | next_actor | evidence / trigger |
 |---|---|---|---|---|---|---|
-| AI-IMP-018 provenance-presence sitting | astra (Code Lead) | started | 2026-09-18T04:42:18Z | 2026-09-18T04:42:18Z | astra | AI-IMP-018 STARTED per .inbox/tofable/imp018-provenance-start-r1.md (first command 2026-09-18T04:42:18Z; task 01a0b1ef-a541-7901-a9c8-166db919d068, Astra's live codex rollout, RL-identified by imp/018 references): clean branch imp/018 at exact base b313338 in clone .workspaces/code-lead/primary — RL diff-verified (branch/base/clean confirmed; main drift b313338→f716227 is RAG/mail only, pinned base stands). Contract 29e7907 digest + nine pinned fixtures verified by CL. Next: submission → independent exact-head review + RL boundary review before merge |
 | DELIVERY-ACTIVATION | review-lead | parked | 2026-09-08 | | review-lead | AI-IMP-015; bind owner-designated implementation task after bootstrap review; activation is separate |
 
 ## History
+
+AI-IMP-018 sitting CLOSED 2026-09-18: started 2026-09-18T04:42:18Z
+(task 01a0b1ef-a541-7901-a9c8-166db919d068); submitted r1 at tip
+d647f4b on preserved base b313338 (carrier event 57bd8548292667dc,
+exact-event ACKed, letter SHA256 verified); independent exact-head
+review NO FINDINGS; RL gates reproduced at head and on merged main
+(typecheck, 103/0/525, validator); verdict ACCEPTED; MERGED to main;
+ticket completed; docs editorial applied in the RL fold. Clone branch
+cleanup owed by RL under the destructive-op fence.
 
 SPRINT-001 IMP001 sitting CLOSED 2026-09-18: started 2026-09-18T00:02:21Z
 (start record .inbox/tofable/imp001-decoder-start-r1.md, RL-verified);

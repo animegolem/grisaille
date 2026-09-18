@@ -4,13 +4,13 @@ tags:
   - IMP-LIST
   - Implementation
   - grisaille
-kanban_status: planned
+kanban_status: completed
 depends_on: []
 parent_epic: [[AI-EPIC-001-theme-consumption]]
 confidence_score: 0.9
 assignee: code-lead
 date_created: 2026-09-18
-date_completed:
+date_completed: 2026-09-18
 ---
 
 # AI-IMP-018-decoder-provenance-presence-amendment
@@ -54,11 +54,11 @@ present non-string tier still rejected); tests/fixtures/palette/
 Before marking an item complete on the checklist MUST **stop** and **think**. Have you validated all aspects are **implemented** and **tested**?
 </CRITICAL_RULE>
 
-- [ ] Make tier optional per A4; origin requirement unchanged; alias handling unchanged.
-- [ ] Add the tierless producer-shaped regression fixture (additive; pinned nine untouched).
-- [ ] Add regressions: tierless accepted; absent origin rejected; non-string present tier rejected.
-- [ ] Reproduce full gates (typecheck, bun test, changed-ticket validator); report exact counts.
-- [ ] Submit atomic commit for independent second review and RL disposition.
+- [x] Make tier optional per A4; origin requirement unchanged; alias handling unchanged.
+- [x] Add the tierless producer-shaped regression fixture (additive; pinned nine untouched).
+- [x] Add regressions: tierless accepted; absent origin rejected; non-string present tier rejected.
+- [x] Reproduce full gates (typecheck, bun test, changed-ticket validator); report exact counts.
+- [x] Submit atomic commit for independent second review and RL disposition.
 
 ### Acceptance Criteria
 
@@ -70,4 +70,12 @@ rejected.
 
 ### Issues Encountered
 
-Not started.
+CLOSED 2026-09-18: merged to main at the imp/018 merge (tip d647f4b,
+one guarded read at src/palette-contract.ts:126). Independent exact-head
+review: no findings; reviewer byte-verified the nine pinned fixtures and
+the additive fixture's provenance-only delta. RL reproduced gates at the
+exact head and on merged main: typecheck PASS, bun test 103/0/525,
+changed-ticket validator nothing to validate. Docs editorial (A4/new-
+fixture provenance in docs/palette-contract.md) applied in the RL fold
+as Astra requested — it was outside the three-file brief and correctly
+not touched by the sitting.

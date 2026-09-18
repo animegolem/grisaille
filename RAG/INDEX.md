@@ -7,10 +7,10 @@
 | Status | EPICs | IMPs |
 |--------|-------|------|
 | In Progress | 0 | 0 |
-| Planned | 5 | 13 |
+| Planned | 5 | 12 |
 | Deferred | 1 | 3 |
 | Cancelled | 0 | 0 |
-| Completed | 0 | 2 |
+| Completed | 0 | 3 |
 | **Total** | **6** | **18** |
 
 ## Planned
@@ -22,7 +22,7 @@
 - [[AI-IMP-001-palette-contract-and-fixtures|IMP-001]] Palette contract and fixtures — completed
 - [[AI-IMP-002-transactional-palette-subscription|IMP-002]] Transactional palette subscription — planned
 - [[AI-IMP-003-host-theme-mapping-and-ramp|IMP-003]] Host theme mapping and ramp — planned
-- [[AI-IMP-018-decoder-provenance-presence-amendment|IMP-018]] Narrow consumer amendment: tier optionality + origin presence matrix — planned
+- [[AI-IMP-018-decoder-provenance-presence-amendment|IMP-018]] Narrow consumer amendment: tier optionality + origin presence matrix — completed
 
 ---
 

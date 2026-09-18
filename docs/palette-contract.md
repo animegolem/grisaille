@@ -23,6 +23,17 @@ Accepted fixtures: `ok`, `no-art`, `no-art-verified`, `failed`,
 `invalid-schema-major`, `invalid-no-art-partial-bundle`,
 `invalid-no-art-null-roles`.
 
+Amendment (AI-IMP-018, 2026-09-18): contract addenda A1–A4 were folded
+at RMPC commit `29e7907`, document SHA256
+`1ea902c71fcd75e6791112d4621b6b9fcd67ba12896979fe43cf7c6d34d3821a`.
+Per addendum A4 the decoder now reads `tier` only when a non-alias role
+owns the property — omission is valid and preserved as absence
+(`origin` remains required; alias roles carry neither). A tenth,
+additive fixture `no-art-stock-base-tierless` (accepted) exercises the
+producer-shaped tierless stock-base bundle; it is synthetic, authored
+in this repository, and is NOT part of the nine pinned producer copies
+above. The nine originals remain byte-immutable at the pinned head.
+
 ## Consumer boundary
 
 `artifact.status` discriminates three states. `ok` contains a palette and artwork
