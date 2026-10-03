@@ -84,3 +84,15 @@ Routine choices ratified: docs/palette-runtime.md, MUSIC_UI_PALETTE_PATH,
 conservative non-default-MPD binding. Awaiting Code Lead delta recheck and
 explicit start record. Routing corrected: Grisaille Code Lead is
 astra_grisaille at w3:pB, not the VampireOTP seat.
+
+2026-10-03 SITTING OPEN — AI-IMP-002 (transactional palette subscription).
+Start record .relay/inbox/imp002-palette-start.md (durable copy
+.inbox/tofable/imp002-palette-start-r1.md, SHA256 fa33255c verified);
+carrier event e2bb7ece123b3bf4 ACKed exactly after r4 delta recheck CLEAR.
+First command 2026-10-03T13:31:35.521014+00:00; observed origin/main
+df69c73; branch imp/002 created clean at assigned base d0e0de4; previous
+refs preserved per fence. Lease: Code Lead (astra_grisaille, w3:pB) holds
+the imp/002 sitting within the corrected bounded scope (BRIEF-IMP002 +
+dispositions r2 as corrected by r3/r4). No product result claimed yet.
+Review path on submission: independent exact-head review, then RL boundary
+review and merge.
