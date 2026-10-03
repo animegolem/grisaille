@@ -96,3 +96,10 @@ the imp/002 sitting within the corrected bounded scope (BRIEF-IMP002 +
 dispositions r2 as corrected by r3/r4). No product result claimed yet.
 Review path on submission: independent exact-head review, then RL boundary
 review and merge.
+
+2026-10-03: Owner designation (verbal, carried by RL): the VampireOTP Astra
+seat is Grisaille's STANDING independent second reviewer — a distinct
+instance from the implementing astra_grisaille per the owner's same-day
+instance ruling. IMP002 second review assigned there
+(RAG/briefs/SECOND-REVIEW-IMP002.md, head 899722e); submission held until
+rounds close.
