@@ -4,13 +4,13 @@ tags:
   - IMP-LIST
   - Implementation
   - grisaille
-kanban_status: planned
+kanban_status: completed
 depends_on: ["AI-IMP-001"]
 parent_epic: [[AI-EPIC-001-theme-consumption]]
 confidence_score: 0.78
 assignee: code-lead
 date_created: 2026-09-08
-date_completed:
+date_completed: 2026-10-03
 ---
 
 # AI-IMP-002-transactional-palette-subscription
@@ -47,7 +47,7 @@ Before marking an item complete on the checklist MUST **stop** and **think**. Ha
 - [x] Resolve open contract/design decisions in the Review Lead's fold.
 - [x] Deliver the bounded change or investigation outcome described above.
 - [x] Reproduce relevant behavioral/host evidence and the assigned full gate; report exact counts and missing checks.
-- [ ] Submit the atomic issue commit/evidence for independent second review and Review Lead disposition.
+- [x] Submit the atomic issue commit/evidence for independent second review and Review Lead disposition.
 
 ### Acceptance Criteria
 
