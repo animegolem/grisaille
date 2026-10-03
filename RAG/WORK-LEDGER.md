@@ -103,3 +103,13 @@ instance from the implementing astra_grisaille per the owner's same-day
 instance ruling. IMP002 second review assigned there
 (RAG/briefs/SECOND-REVIEW-IMP002.md, head 899722e); submission held until
 rounds close.
+
+2026-10-03: IMP002 second review r1 returned (VampOTP Astra seat, standing
+reviewer): gate reproduced at 899722e, no P1/P2, one P3 (exit listener
+survives synchronous owner stop during palette startup, probe included).
+RL disposition .inbox/toastra/imp002-review-disposition-r1.md: fence ruled —
+assigned-ticket checklist/evidence + regenerated INDEX are authorized round-2
+bookkeeping (SPRINT-001 brief authority; supersedes IMP001 zero-edit
+observation as precedent); P3 repair REQUIRED before submission; amended head
+needs delta re-review; RL will byte-check INDEX at merge. Submission remains
+held.
