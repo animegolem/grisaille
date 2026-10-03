@@ -2,6 +2,8 @@ import { Children, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyn
 import { flushSync, motion, render, useGpuixRequired, useWindowSize, type EventPayload, type PublicInstance, type StyleDesc } from '@gpuix/react';
 import type { GpuixRenderer } from '@gpuix/native';
 import { DemoBackend } from './demo';
+import { PaletteSession } from './palette-session';
+import { paletteSourceFromEnvironment } from './palette-file';
 import { MpdBackend } from './mpd';
 import { FocusSteps } from './focus';
 import { albumsOf, artistsOf, albumKey, duration, fuzzyScore, searchLibrary, type Album, type Artist, type MusicBackend, type QueueTrack, type Result, type Track } from './model';
@@ -27,7 +29,7 @@ let didFocusControl: () => void = () => {};
 const demo = process.argv.includes('--demo');
 const backend: MusicBackend = demo ? new DemoBackend() : new MpdBackend();
 const navigationLog = new NavigationLog(demo ? 'demo' : 'mpd');
-const session = new MusicSession(backend);
+const session = new MusicSession(backend, 1000, new PaletteSession(paletteSourceFromEnvironment(demo)));
 const navigationState = new NavigationStateStore(navigationStatePath(demo ? 'demo' : 'mpd', 'gui'));
 // GPUIX exits on window close; signals must also release the owned MPD helper.
 process.once('SIGTERM', () => process.exit(0));

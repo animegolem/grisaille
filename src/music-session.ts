@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { MusicBackend, Snapshot, Track } from './model';
+import { PaletteSession, type PaletteContext } from './palette-session';
 
 export type MusicState = {
   library: Track[]; snapshot: Snapshot; loading: boolean; connection: 'connecting' | 'connected' | 'down';
@@ -27,25 +28,43 @@ export class MusicSession {
   private libraryRetry?: ReturnType<typeof setTimeout>;
   private snapshotFailures = 0;
   private libraryFailures = 0;
-  constructor(readonly backend: MusicBackend, private retryMs = 1000) {}
+  private paletteSnapshotObserved = false;
+  constructor(readonly backend: MusicBackend, private retryMs = 1000, readonly palette = new PaletteSession()) {}
   getState = () => this.state;
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private update(patch: Partial<MusicState>) {
     if (!this.active) return;
     this.state = { ...this.state, ...patch };
+    this.updatePaletteContext();
     for (const listener of this.listeners) listener();
+  }
+  private updatePaletteContext() {
+    const { connection, snapshot } = this.state;
+    const track = snapshot.queue.find(track => track.queueId === snapshot.currentId);
+    const state: PaletteContext['state'] = !this.paletteSnapshotObserved ? 'waiting'
+      : connection === 'down' ? 'disconnected' : connection !== 'connected' ? 'waiting' : snapshot.state === 'stop' ? 'stopped'
+      : !track ? 'unresolved' : snapshot.state === 'pause' ? 'paused' : 'playing';
+    const resolved = state === 'playing' || state === 'paused';
+    this.palette.setContext({ state, uri: resolved ? track!.uri : null, queueId: resolved ? track!.queueId : null });
   }
   setNotice = (notice: string) => this.update({ notice });
   start = () => {
     if (this.active) return;
-    this.active = true; this.generation++;
+    this.active = true;
+    const generation = ++this.generation;
+    this.paletteSnapshotObserved = false;
+    this.updatePaletteContext();
     this.unsubscribe = this.backend.subscribe(event => { void this.refresh(); if (event === 'database') void this.reloadLibrary(); });
+    this.palette.start();
+    // Palette observers can synchronously stop or replace this owner lifecycle.
+    if (!this.active || generation !== this.generation) return;
     process.once('exit', this.stop);
     void this.reloadLibrary(); void this.refresh();
   };
   stop = () => {
     if (!this.active) return;
     this.active = false; this.generation++;
+    this.paletteSnapshotObserved = false; this.palette.stop();
     this.unsubscribe?.(); this.unsubscribe = undefined;
     clearTimeout(this.snapshotRetry); clearTimeout(this.libraryRetry);
     this.snapshotRetry = this.libraryRetry = undefined;
@@ -67,11 +86,13 @@ export class MusicSession {
           if (this.active && generation === this.generation) {
             const recovering = this.state.connection === 'down';
             clearTimeout(this.snapshotRetry); this.snapshotRetry = undefined; this.snapshotFailures = 0;
+            this.paletteSnapshotObserved = true;
             this.update({ snapshot, snapshotReady: true, problem: '', connection: 'connected' });
             if (recovering) void this.reloadLibrary();
           }
         } catch (error) {
           if (this.active && generation === this.generation) {
+            this.paletteSnapshotObserved = true;
             this.update({ problem: messageOf(error), connection: 'down' });
             this.retry('snapshot');
           }
