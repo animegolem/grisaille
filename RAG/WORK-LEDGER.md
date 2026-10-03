@@ -122,3 +122,11 @@ reproduced the full gate in canonical (135/0/794, build, package, validators
 zero-diff. Final review RAG/reviews/imp002-final-review.md; ticket completed.
 Lease released. Open next: genuine-capture gate brief; IMP003 (host color
 mapping); RL ref cleanup coordinated with Code Lead.
+
+2026-10-03: Accepted verdict published to channel (outbox event
+332af75e72df91da) for Code Lead exact-event ACK and pair archive. RL ref
+cleanup EXECUTED per destructive-op fence, coordinated (clone parked on
+main at a49c91a by Code Lead first): deleted imp/001, imp/018, imp/002 in
+the Code Lead clone and imp/002 + review/imp002 in canonical. All were
+merged ancestors of main; nothing force-deleted. AI-LOG-002's owed fence
+cleanup is now closed.
