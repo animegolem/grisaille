@@ -1,9 +1,12 @@
 # ASSIGNMENT — IMP002 independent exact-head second review
 
-Cut 2026-10-03 by notan (RL). Reviewer: the independent second-review
-seat, not the implementation author (astra_grisaille) and not the RL.
-Charter: `RAG/roles/SECOND-REVIEW.md` — read it first; read-only
-throughout; advisory to final authority.
+Cut 2026-10-03 by notan (RL). Reviewer: ASSIGNED (owner-designated,
+same day) to the VampireOTP Astra seat — a DIFFERENT INSTANCE from the
+implementing astra_grisaille per the owner's instance ruling of
+2026-10-03, and the seat that independently flagged the R1 fence
+conflict on this very submission. Not the implementation author, not
+the RL. Charter: `RAG/roles/SECOND-REVIEW.md` — read it first;
+read-only throughout; advisory to final authority.
 
 - Reviewed head: `899722ea35a4332a54d1314dcb761c0e07240201`
   (branch `imp/002`, clone `.workspaces/code-lead/primary`; one
