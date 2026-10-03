@@ -74,3 +74,13 @@ D4 ownership/files pinned, capture gate sequenced as separate parallel brief.
 Ticket AI-IMP-002 amended; BRIEF-IMP002 cut, branch imp/002, base d41b0875.
 Apple Music/Jev direction note banked as future intake. No sitting started;
 start remains explicit on the Code Lead's start report.
+
+2026-10-03 (later): Code Lead adversarial review r3 (digest 47969ab4
+verified) found three dispatch faults in the r2/brief package; all accepted
+and corrected at d0e0de4: ref-cleanup permission withdrawn (PROTOCOL fence,
+RL-only), src/music-session.ts admitted ownership-only, base re-pinned to
+d0e0de4 via r4. SPEC rev 0.3 editorial alignment applied (4.2/15/16/17).
+Routine choices ratified: docs/palette-runtime.md, MUSIC_UI_PALETTE_PATH,
+conservative non-default-MPD binding. Awaiting Code Lead delta recheck and
+explicit start record. Routing corrected: Grisaille Code Lead is
+astra_grisaille at w3:pB, not the VampireOTP seat.
