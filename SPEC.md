@@ -2,7 +2,7 @@
 
 | STATUS | REVISION | LAST UPDATED |
 |---|---|---|
-| Adopted direction; implementation staged | 0.2 | 2026-09-17 |
+| Adopted direction; implementation staged | 0.3 | 2026-10-03 |
 
 > Grisaille is an artwork-led, keyboard-driven MPD music interface with native
 > and terminal presentations, reusable content components, and themes that
@@ -118,7 +118,11 @@ separate responsibilities.
 A generation associates a track change and its asynchronous artwork, lyrics,
 palette and composition results. Old results must never become the current
 track's presentation. Artifact schema version, recipe version and producer
-revision are distinct identities.
+revision are distinct identities. For external palette artifacts this
+invariant is consumer-side: it rejects the consumer's own obsolete work via
+lifecycle epochs and commit-time guards. The v1 palette contract proves URI
+association at publication, not occurrence or current-art freshness
+(F5/F6, ratified 2026-09-10; rev 0.3).
 
 ## 5. Core invariants
 
@@ -199,14 +203,22 @@ and terminal alternatives need actual host evidence.
 
 The external color engine owns artwork analysis and semantic roles. Grisaille
 owns composition, component mapping and final-surface legibility. The artifact
-must be useful without Grisaille's layout language. Fable's r3 proposal is a
-DRAFT contract, not a shipped conformance fixture or ratified v1 schema.
+must be useful without Grisaille's layout language. The v1 contract is
+ratified with addenda A1–A4 folded (digest pinned in
+`docs/palette-contract.md`); the first genuine-capture conformance gate
+remains a separately briefed check (rev 0.3; formerly described here as the
+r3 draft boundary).
 
 ### 8.2 Consumer requirements
 
 Prefer a versioned JSON file published by atomic replacement; watch its parent
 directory, including rename. Track/generation correlation must reject obsolete
-updates. A failure must identify the failed request separately from any retained
+updates, where correlation means v1 URI association: a wrong-URI artifact
+never associates, and the consumer's lifecycle epochs reject its own obsolete
+work. v1 carries no shared occurrence identity, so a retained same-URI
+artifact is admissible with its provenance honestly labeled, and no stronger
+freshness may be claimed without a separately ruled mechanism (rev 0.3). A
+failure must identify the failed request separately from any retained
 successful palette; an old identity plus null roles is insufficient by itself.
 
 Carry producer revision, artwork hash, base/derived role distinction, final

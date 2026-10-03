@@ -1,3 +1,12 @@
+---
+node_id: AI-LOG-002
+tags:
+  - AI-log
+  - development-summary
+closed_tickets: ["AI-IMP-001", "AI-IMP-018"]
+date_created: 2026-09-20
+---
+
 # AI-LOG-002 — Review Lead session, 2026-09-17 → 09-20 (notan)
 
 Two implementation sittings accepted first-round; the contract fold

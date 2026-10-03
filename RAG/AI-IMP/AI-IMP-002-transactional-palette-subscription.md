@@ -28,11 +28,11 @@ No theme script loader, producer orchestration, polling daemon, palette sampling
 
 ### Design/Approach
 
-Add an app-owned subscription watching the artifact parent directory. Correlate playback generation/art identity, handle atomic rename/deletion/partial invalid writes, retain last-good/default state, and dispose watchers. Coalesce duplicate events without losing a replacement. Report errors without changing playback.
+Add an app-owned subscription watching the artifact parent directory. Associate artifacts to playback by v1 URI association (SPEC §8.2 rev 0.3; no occurrence/current-art verification claim), handle atomic rename/deletion/partial invalid writes, retain last-good/default state per the ratified retention table (imp002-preparation-2026-10-02 §3), and dispose watchers. Coalesce duplicate events without losing a replacement; identical bytes still need re-evaluation when playback context changes. Report errors without changing playback. Read/watch only: injected explicit source path with documented env override and the producer's XDG default; bounded 1/2/4/8/10s capped reattachment continuing at the cap; never create producer directories; demo never opens a live palette source.
 
 ### Files to Touch
 
-Proposed src/palette-session.ts and src/use-palette.ts; shared session integration only where verified necessary; tests/palette-session.test.ts.
+Proposed src/palette-session.ts (immutable state, retention, read scheduling, lifecycle guards), src/palette-file.ts (read-only path/watcher adapter, bounded reattachment; no producer invocation), src/use-palette.ts (subscription only, via useSyncExternalStore); ownership-only wiring at the two host construction seams (src/app.tsx, src/terminal/main.tsx — one PaletteSession per MusicSession per app instance; useMusic keeps start/stop and the palette hook never calls it); tests/palette-session.test.ts and tests/palette-file.test.ts; a consumer runtime document. No changes expected to src/model.ts or src/mpd.ts; src/palette-contract.ts and the nine pinned fixtures stay frozen absent a separately evidenced ruling.
 
 Paths are proposed boundaries to verify in round 1, not permission to expand
 into neighboring responsibilities. Report new seams before editing them.

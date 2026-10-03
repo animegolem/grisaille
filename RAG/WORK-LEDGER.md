@@ -65,3 +65,12 @@ review. Role-document synchronization is offered to Notan. The r7-r9 contract
 and interpolation decisions remain with Astra; no implementation start was
 issued. The builder-memory next action was corrected to Notan's rev 0.2 fold
 following Astra's already-deposited r3 amendments.
+
+2026-10-03: IMP002 preparation handoff reviewed and dispositioned (r2 in
+.inbox/toastra/imp002-preparation-r2.md; report digest d18b4ecf verified).
+D1 association-not-freshness confirmed, SPEC rev 0.3 (§4.6/§8.1/§8.2); D2
+read/watch-only + continue-at-cap recovery ruled; D3 retention table adopted;
+D4 ownership/files pinned, capture gate sequenced as separate parallel brief.
+Ticket AI-IMP-002 amended; BRIEF-IMP002 cut, branch imp/002, base d41b0875.
+Apple Music/Jev direction note banked as future intake. No sitting started;
+start remains explicit on the Code Lead's start report.
