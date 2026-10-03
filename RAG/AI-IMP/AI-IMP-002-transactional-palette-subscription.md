@@ -43,10 +43,10 @@ into neighboring responsibilities. Report new seams before editing them.
 Before marking an item complete on the checklist MUST **stop** and **think**. Have you validated all aspects are **implemented** and **tested**?
 </CRITICAL_RULE>
 
-- [ ] Verify claims and proposed file boundaries against current source and the cited spec.
-- [ ] Resolve open contract/design decisions in the Review Lead's fold.
-- [ ] Deliver the bounded change or investigation outcome described above.
-- [ ] Reproduce relevant behavioral/host evidence and the assigned full gate; report exact counts and missing checks.
+- [x] Verify claims and proposed file boundaries against current source and the cited spec.
+- [x] Resolve open contract/design decisions in the Review Lead's fold.
+- [x] Deliver the bounded change or investigation outcome described above.
+- [x] Reproduce relevant behavioral/host evidence and the assigned full gate; report exact counts and missing checks.
 - [ ] Submit the atomic issue commit/evidence for independent second review and Review Lead disposition.
 
 ### Acceptance Criteria
@@ -56,4 +56,29 @@ GIVEN track A changes to B while A analysis is late, WHEN A then B artifacts arr
 ### Issues Encountered
 
 <!-- Filled during the sitting. Record failed attempts, blockers, deviations and missing tests honestly. -->
-Not started. No implementation or acceptance is claimed.
+Implemented within the corrected IMP002 brief and r2/r4 rulings. The initial
+source/contract review and r3 dispatch corrections preceded the sitting. Runtime
+ownership adds a palette-only new-snapshot guard because MusicState intentionally
+retains its connected snapshot across stop/restart; no MPD action semantics changed.
+
+Initial candidate (899722e) validation: typecheck PASS; 132 tests, 0 failures, 769 assertions across 14 files;
+compiled build and macOS packaging PASS. New palette suites cover 29 cases,
+including real temporary-directory file/parent replacement, controlled recovery
+scheduling, deferred reads, retained provenance and zero playback calls. An initial
+typecheck caught two test assertion generic-type mismatches; fixed by comparing the
+wider candidate against the narrowed retained type, without changing runtime code.
+
+Native GUI/TUI palette painting and ramps remain IMP003; no live producer run,
+owner playback probe or genuine-capture conformance claim is made. Submission and
+independent submitted-head review precede RL disposition; status stays planned
+until the Review Lead merges.
+
+
+Independent review R1 reproduced a P3 exit-listener leak when a palette observer
+synchronously stopped the owner during startup. The bounded amendment guards the
+owner lifecycle after palette startup, also preventing stale startup continuation
+after synchronous stop/restart. Three owner-integration cases were added: on
+899722e the ordinary cleanup control passed while stop leaked one exit listener
+and restart performed two library reads instead of one; with the guard all three
+pass (25 assertions). Full amended-head counts are recorded in the amendment
+letter; independent delta re-review and RL disposition remain pending.

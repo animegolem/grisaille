@@ -84,7 +84,7 @@ Git edit date so a second review can be judged.
 ### > 600 LOC
 
 - RAG/scripts/carrier.py (1060 LOC)
-- src/app.tsx (803 LOC)
+- src/app.tsx (805 LOC)
 - RAG/scripts/generate-index.sh (662 LOC)
 - RAG/scripts/codex-relay-wake.py (646 LOC)
 - RAG/scripts/test-codex-runtime.py (604 LOC)
@@ -97,10 +97,12 @@ Git edit date so a second review can be judged.
 - SPEC.md (426 LOC)
 - RAG/PROTOCOL.md (426 LOC)
 - src/terminal/app.tsx (401 LOC)
+- tests/palette-session.test.ts (374 LOC)
 - tests/terminal.test.tsx (351 LOC)
 - RAG/scripts/codex-app-server-bell.mjs (339 LOC)
 - RAG/scripts/codex-memory.py (338 LOC)
 - RAG/templates/PROTOCOL-TEMPLATE.md (327 LOC)
+- tests/palette-file.test.ts (322 LOC)
 
 ---
 
