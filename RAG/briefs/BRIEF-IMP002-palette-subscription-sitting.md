@@ -8,11 +8,14 @@ Dispositions D1–D4 in `.inbox/toastra/imp002-preparation-r2.md` are normative
 for this sitting.
 
 - Clone: `.workspaces/code-lead/primary` (verify clean, fetch first;
-  origin remains fetch-only). Merged branches imp/001 and imp/018 may
-  be deleted as fence cleanup before branching.
-- Branch `imp/002`, base = canonical `main` @ d41b0875 (the AI-LOG-002
-  close) or current main if RAG-only drift — report observed head,
-  preserve assigned base unless amended.
+  origin remains fetch-only). Ref cleanup (imp/001, imp/018) is
+  RL-only per RAG/PROTOCOL.md destructive-op fence; the Code Lead
+  deletes nothing, and cleanup is not a prerequisite to branching.
+- Branch `imp/002`, base = the corrected canonical `main` pinned
+  explicitly in `.inbox/toastra/imp002-preparation-r4.md` (includes
+  SPEC rev 0.3 and this brief) or current main if subsequent drift is
+  RAG/correspondence-only — report observed head, preserve assigned
+  base unless amended.
 - Pinned inputs: ratified contract digest
   `1ea902c71fcd75e6791112d4621b6b9fcd67ba12896979fe43cf7c6d34d3821a`
   (verify before building); fixture head 447975c, nine pinned fixtures

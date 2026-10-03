@@ -90,8 +90,10 @@ individually addressable. Reconnection cannot assume old IDs remain valid.
 ### 4.2 Artwork and palette
 
 Artwork identity uses a content hash. Analysis can be cached per artwork while
-a publication also identifies the requesting playback generation. Semantic UI
-roles and expressive extraction clusters are separate parts of one artifact.
+a publication also identifies the requesting track URI — v1 association as
+bounded in §4.6/§8.2, not a shared playback-occurrence identity (rev 0.3).
+Semantic UI roles and expressive extraction clusters are separate parts of
+one artifact.
 
 ### 4.3 Content components and pages
 
@@ -363,8 +365,11 @@ is required before declaring the aesthetic work accepted.
 
 ## 15. Open questions
 
-- DQ-001: final palette schema, failed-request identity, numeric representation
-  consistency, missing selection behavior and fixture provenance with Fable.
+- DQ-001: RESOLVED rev 0.3 — v1 palette schema ratified with addenda A1–A4
+  (digest pinned in `docs/palette-contract.md`); failed-request identity,
+  numeric representation, missing-selection behavior and fixture provenance
+  are fixed by the ratified contract and merged decoder. Still open from that
+  arc: the genuine-capture conformance gate (separately briefed).
 - DQ-002: measured default breakpoint thresholds and short-height policy.
 - DQ-003: GPUIX bridge strategy, supported Three.js subset and performance budget.
 - DQ-004: simultaneous component instances, outline implementation and terminal
@@ -386,11 +391,20 @@ is required before declaring the aesthetic work accepted.
 - notan (Review Lead) owns design and final merges; Astra (Code Lead)
   implements, adversarially reviews plans/contracts, integrates subagents and
   submits unmerged PRs; a separate second review is required (rev 0.2).
-- Current authorization is workflow/spec/ticket adoption. First feature sprint
-  is prepared for read-only round 1; implementation and runtime activation are
-  separate recorded starts. No reversal has occurred in rev 0.1.
+- Sprint 001 is underway: IMP001 (decoder) and IMP018 (tier optionality)
+  are accepted and merged; IMP002 is briefed with an amended ticket, and
+  implementation starts remain separate recorded starts (rev 0.3). No
+  reversal has occurred since rev 0.1.
 
 ## 17. Evidence and amendment record
+
+2026-10-03, rev 0.3: palette-freshness reconciliation — §4.2/§4.6/§8.2 now
+state the v1 limit (URI association at publication, no occurrence/current-art
+freshness claim; F5/F6 mechanism unchanged); §8.1 reflects contract
+ratification with addenda A1–A4; §15 DQ-001 marked resolved with the
+genuine-capture gate still open; §16 sprint summary aligned. Issued with the
+IMP002 dispositions (.inbox/toastra/imp002-preparation-r2.md, corrected per
+Code Lead adversarial review r3).
 
 2026-09-17, rev 0.2: role amendment — Review Lead seat passes to notan
 (Fable); Astra holds Code Lead plus adversarial review of plans/contracts.
