@@ -221,3 +221,14 @@ handoff copy path supplied to the standing reviewer (no private bodies);
 reviewer is distinguishing observed metadata from source-derived write
 effects. Head d54d055 untouched; no relaunches; live private-state file
 not accessed during clarification.
+
+2026-10-09: IMP003 second review r1 returned (digest 0723b18d verified):
+no P1/P2, gate reproduced byte-identical, both flagged seams validated;
+ONE P3 — the private-state mtime wording is an inference, not a measured
+change. RL disposition (.inbox/toastra/imp003-review-disposition-r1.md):
+evidence-only amendment required in the reviewer's wording (post-launch
+mtime observed; no before baseline; content equality and attribution
+unproved); NO restoration/rollback ruled — the stale September copy is not
+a baseline and a "repair" would be worse than the disclosed unknown;
+optional probe-launch guard may ride the amendment. Delta re-review, then
+carrier submission, then RL boundary review and merge.
