@@ -175,3 +175,11 @@ pre-edit event (flushSync + exact echo), measured bridge latency recorded
 on actual host with real IME, hide latched through composition, platform
 limit stated honestly; native-frame atomicity explicitly NOT required and
 would be a separate upstream admission. Sitting continues; no scope change.
+
+2026-10-09 (clarification, in-sitting): the IME ruling's "real IME
+session" is satisfied by macOS dead-key marked text on the existing U.S.
+keyboard (it exercises the same marked-text path: pre-edit via onChange,
+marked_range, hide+latch). Installing a language input source is NOT
+required; any host input-source change would need owner approval and is
+not to be done as incidental setup. If dead keys do not produce marked
+text in the GPUIX input, report rather than install.
