@@ -8,7 +8,10 @@ import { MpdBackend } from './mpd';
 import { FocusSteps } from './focus';
 import { albumsOf, artistsOf, albumKey, duration, fuzzyScore, searchLibrary, type Album, type Artist, type MusicBackend, type QueueTrack, type Result, type Track } from './model';
 import { directionOf, gridSelection, listReveal, pageShortcut, pointerDrag } from './navigation';
-import { inputTheme, surface, theme } from './theme';
+import { pairForState, type TextTone, type ThemePair } from './theme';
+import { surface, ThemedInput } from './native-theme';
+import { ThemeProvider, ThemePairProvider, useTheme, useThemePair } from './use-theme';
+import { demoPaletteProbeConfiguration, nativeProbeObserver } from './demo-palette-probe';
 import { NavigationHistory, type BrowserColumn, type BrowserTrail, type Place, type Route, type Viewport } from './history';
 import { browserColumns, browserTarget, browserTrail, rememberBrowser } from './browser';
 import { NavigationLog } from './navigation-log';
@@ -19,7 +22,6 @@ import { NavigationStateStore, navigationStatePath, type NavigationState } from 
 import { lyricRows } from './lyrics';
 import { useLyrics } from './use-lyrics';
 
-const C = theme.colors;
 const FONT = 'Menlo';
 const ROW = 68;
 type QueueDrag = { id: number; target: number; startY?: number; dy: number };
@@ -27,17 +29,19 @@ let dispatchKey: (event: EventPayload) => void = () => {};
 let focusedButton: { token: object; activate: () => void } | undefined;
 let didFocusControl: () => void = () => {};
 const demo = process.argv.includes('--demo');
+const probe = demoPaletteProbeConfiguration();
 const backend: MusicBackend = demo ? new DemoBackend() : new MpdBackend();
-const navigationLog = new NavigationLog(demo ? 'demo' : 'mpd');
-const session = new MusicSession(backend, 1000, new PaletteSession(paletteSourceFromEnvironment(demo)));
-const navigationState = new NavigationStateStore(navigationStatePath(demo ? 'demo' : 'mpd', 'gui'));
+const navigationLog = new NavigationLog(demo ? 'demo' : 'mpd', probe?.navigationLogDirectory);
+const session = new MusicSession(backend, 1000, new PaletteSession(probe?.paletteSource ?? paletteSourceFromEnvironment(demo)));
+const navigationState = new NavigationStateStore(navigationStatePath(demo ? 'demo' : 'mpd', 'gui', probe?.navigationStateDirectory));
 // GPUIX exits on window close; signals must also release the owned MPD helper.
 process.once('SIGTERM', () => process.exit(0));
 process.once('SIGINT', () => process.exit(0));
 
-function Text({ children, size = 13, color = C.text, style = {}, onClick }: { children: ReactNode; size?: number; color?: string; style?: StyleDesc; onClick?: () => void }) {
+function Text({ children, size = 13, tone = 'text', style = {}, onClick }: { children: ReactNode; size?: number; tone?: TextTone; style?: StyleDesc; onClick?: () => void }) {
+  const pair = useThemePair();
   // GPUIX lays out separate primitive children as separate native text nodes.
-  return <text onClick={onClick} style={{ fontFamily: FONT, fontSize: size, color, whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0, ...style }}>{Children.toArray(children).join('')}</text>;
+  return <text onClick={onClick} style={{ fontFamily: FONT, fontSize: size, color: pair.colors[tone], whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0, ...style }}>{Children.toArray(children).join('')}</text>;
 }
 function useControlFocus(onClick: () => void) {
   const [focused, setFocused] = useState(false);
@@ -49,16 +53,20 @@ function useControlFocus(onClick: () => void) {
   function blur() { setFocused(false); if (focusedButton?.token === token) focusedButton = undefined; }
   return { focused, onFocus: focus, onBlur: blur };
 }
-function Button({ children, onClick, active = false, id, style = {}, tab = false }: { children: ReactNode; onClick: () => void; active?: boolean; id?: string; style?: StyleDesc; tab?: boolean }) {
+function Button({ children, onClick, active = false, id, style = {}, tab = false, pair: explicitPair }: { children: ReactNode; onClick: () => void; active?: boolean; id?: string; style?: StyleDesc; tab?: boolean; pair?: ThemePair }) {
+  const theme = useTheme(), surrounding = useThemePair();
+  const pair = explicitPair ?? (active ? theme.pairs.active : surrounding);
   const { focused, ...focusProps } = useControlFocus(onClick);
-  return <div testId={id} tabIndex={0} onClick={onClick} {...focusProps} style={{ paddingTop: 7, paddingBottom: 7, paddingLeft: 11, paddingRight: 11, borderWidth: 1, borderColor: focused ? theme.borders.focus : theme.borders.control, borderRadius: 3, cursor: 'pointer', ...surface(tab ? active ? 'tabActive' : 'tab' : active ? 'controlActive' : 'control'), hover: surface(tab ? 'tabHover' : 'controlHover'), userSelect: 'none', ...style }}><Text color={active ? C.controlActive : C.control}>{children}</Text></div>;
+  return <ThemePairProvider pair={pair}><div testId={id} tabIndex={0} onClick={onClick} {...focusProps} style={{ paddingTop: 7, paddingBottom: 7, paddingLeft: 11, paddingRight: 11, borderWidth: 1, borderColor: focused ? pair.marker : 'transparent', borderRadius: 3, cursor: 'pointer', userSelect: 'none', ...style, background: pair.background, hover: { borderColor: pair.border } }}><Text>{children}</Text></div></ThemePairProvider>;
 }
 function Link({ children, onClick, muted = false, size = 13, style = {} }: { children: string; onClick: () => void; muted?: boolean; size?: number; style?: StyleDesc }) {
+  const pair = useThemePair(), C = pair.colors;
   const { focused, ...focusProps } = useControlFocus(onClick);
-  return <text tabIndex={0} onClick={onClick} {...focusProps} style={{ fontFamily: FONT, fontSize: size, color: focused ? C.linkHover : muted ? C.linkMuted : C.link, borderBottomWidth: 1, borderColor: focused ? theme.borders.focus : theme.borders.control, cursor: 'pointer', whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0, hover: { color: C.linkHover }, userSelect: 'none', ...style }}>{children}</text>;
+  return <text tabIndex={0} onClick={onClick} {...focusProps} style={{ fontFamily: FONT, fontSize: size, color: focused ? C.linkHover : muted ? C.linkMuted : C.link, borderBottomWidth: 1, borderColor: focused ? pair.marker : 'transparent', cursor: 'pointer', whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0, hover: { borderColor: pair.border }, userSelect: 'none', ...style }}>{children}</text>;
 }
 
 function Cover({ track, size, onClick }: { track?: Track; size: number; onClick?: () => void }) {
+  const theme = useTheme();
   const [source, setSource] = useState(track?.art);
   useEffect(() => {
     let cancelled = false;
@@ -66,9 +74,9 @@ function Cover({ track, size, onClick }: { track?: Track; size: number; onClick?
     if (track) void backend.artwork(track).then(art => { if (!cancelled) setSource(art); });
     return () => { cancelled = true; };
   }, [track?.uri]);
-  return <div onClick={onClick} style={{ width: size, height: size, flexShrink: 0, ...surface('coverPlaceholder'), pointerEvents: onClick ? 'auto' : 'none', cursor: onClick ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-    {source ? <img src={source} objectFit="contain" style={{ width: size, height: size }} /> : <Text size={Math.min(40, size / 2)} color={C.placeholder}>♪</Text>}
-  </div>;
+  return <ThemePairProvider pair={theme.pairs.normal}><div onClick={onClick} style={{ width: size, height: size, flexShrink: 0, ...surface(theme, 'coverPlaceholder'), pointerEvents: onClick ? 'auto' : 'none', cursor: onClick ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    {source ? <img src={source} objectFit="contain" style={{ width: size, height: size }} /> : <Text size={Math.min(40, size / 2)} tone={'muted'}>♪</Text>}
+  </div></ThemePairProvider>;
 }
 
 function BrowserList({ listRef, point, count, rowHeight, revision, preserve, width, height, onScroll, onWheel, align = 'edge', row }: {
@@ -115,12 +123,16 @@ function BrowserList({ listRef, point, count, rowHeight, revision, preserve, wid
     <virtual-list ref={listRef} itemCount={count} windowStart={range.start} estimatedItemHeight={rowHeight} onVisibleRange={sync} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>
       {Array.from({ length: Math.max(0, Math.min(count, range.end) - range.start) }, (_, index) => row(range.start + index))}
     </virtual-list>
-    {!count && <Text size={12} color={C.muted}>Nothing here</Text>}
+    {!count && <Text size={12} tone={'muted'}>Nothing here</Text>}
   </div>;
 }
 
 function App() {
+  const theme = useTheme();
+  const C = theme.colors;
   const renderer = useGpuixRequired();
+  // An opted-in demo probe needs AppKit activation for targeted OS input.
+  useEffect(() => { if (probe && process.env.GPUIX_BACKGROUND !== '1') renderer.activateWindow?.(); }, [renderer]);
   const focusSteps = useMemo(() => new FocusSteps(
     direction => direction === 'next' ? renderer.focusNext?.() : renderer.focusPrevious?.(),
     () => focusedButton?.activate(),
@@ -561,20 +573,21 @@ function App() {
   function queueRow(track: QueueTrack, index: number) {
     const held = drag?.id === track.queueId;
     const destination = !!drag && drag.target === index && !held;
-    return <div key={track.queueId} testId={`queue-${track.queueId}`} onClick={() => selectFromPointer(index)} style={{ width: '100%', height: ROW, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 8, paddingRight: 10, borderBottomWidth: destination ? 2 : 1, borderColor: destination ? theme.borders.queueInsertion : theme.borders.queueRow, ...surface(selection === index ? 'queueRowSelected' : 'queueRow'), hover: selection === index ? undefined : surface('queueRowHover'), opacity: held ? theme.opacity.heldSource : 1, userSelect: 'none' }}>
-      <div testId={`handle-${track.queueId}`} onMouseDown={e => { if (e.button === 0) flushSync(() => { selectFromPointer(index); updateDrag({ id: track.queueId, target: index, startY: e.y ?? 0, dy: 0 }); }); }} style={{ width: 18, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab' }}><Text color={C.muted}>⠿</Text></div>
-      <Text size={11} color={snapshot.currentId === track.queueId ? C.accent : C.muted} style={{ width: 18 }}>{snapshot.currentId === track.queueId ? '▸' : String(track.number).padStart(2, '0')}</Text>
+    const pair = pairForState(theme, { selected: selection === index, active: snapshot.currentId === track.queueId });
+    return <ThemePairProvider key={track.queueId} pair={pair}><div testId={`queue-${track.queueId}`} onClick={() => selectFromPointer(index)} style={{ width: '100%', height: ROW, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 8, paddingRight: 10, borderBottomWidth: destination ? 2 : 1, borderColor: destination ? pair.marker : pair.border, background: pair.background, hover: { borderColor: pair.marker }, opacity: held ? theme.opacity.heldSource : 1, userSelect: 'none' }}>
+      <div testId={`handle-${track.queueId}`} onMouseDown={e => { if (e.button === 0) flushSync(() => { selectFromPointer(index); updateDrag({ id: track.queueId, target: index, startY: e.y ?? 0, dy: 0 }); }); }} style={{ width: 18, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab' }}><Text tone={'muted'}>⠿</Text></div>
+      <Text size={11} tone={snapshot.currentId === track.queueId ? 'accent' : 'muted'} style={{ width: 18 }}>{snapshot.currentId === track.queueId ? '▸' : String(track.number).padStart(2, '0')}</Text>
       <Cover track={track} size={44} onClick={() => openTrack(track)} />
       <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
         <Text onClick={() => selectFromPointer(index)} style={{ cursor: 'pointer' }}>{track.title}</Text>
         <div style={{ display: 'flex', flexDirection: 'row', gap: 5, minWidth: 0 }}>
           <Link muted size={11} onClick={() => openArtist(track.artist)} style={{ flexShrink: 1 }}>{track.artist}</Link>
-          <Text size={11} color={C.muted}>·</Text>
+          <Text size={11} tone={'muted'}>·</Text>
           <Link muted size={11} onClick={() => openTrack(track)} style={{ flexShrink: 1 }}>{track.album}</Link>
         </div>
       </div>
-      <Text color={C.muted} size={12}>{duration(track.duration)}</Text>
-    </div>;
+      <Text tone={'muted'} size={12}>{duration(track.duration)}</Text>
+    </div></ThemePairProvider>;
   }
 
   const scrollAnchor = queueRef.current ? renderer.getListScrollTop?.(queueRef.current.id) : undefined;
@@ -583,22 +596,27 @@ function App() {
   const dragTop = 40 + (previewIndex - (scrollAnchor?.[0] || 0)) * ROW - (scrollAnchor?.[1] || 0) + (drag?.startY !== undefined ? drag.dy : 0);
   const previewTop = Math.max(40, Math.min(height - 240, dragTop));
   const heldTrack = snapshot.queue.find(t => t.queueId === drag?.id);
-  const heldStyle: StyleDesc = { position: 'absolute', left: 0, right: 0, height: ROW, padding: 12, ...surface('queueHeld'), borderWidth: 1, borderColor: theme.borders.queueHeld, pointerEvents: 'none', display: 'flex', flexDirection: 'row', gap: 12, alignItems: 'center' };
-  const heldContent = <><Cover track={heldTrack} size={42} /><Text style={{ flexGrow: 1 }}>{heldTrack?.title}</Text><Text color={C.accent}>→ {(drag?.target || 0) + 1}</Text></>;
+  const heldPair = pairForState(theme, { selected: selection === sourceIndex, active: heldTrack?.queueId === snapshot.currentId });
+  const heldStyle: StyleDesc = { position: 'absolute', left: 0, right: 0, height: ROW, padding: 12, background: heldPair.background, borderWidth: 1, borderColor: heldPair.marker, pointerEvents: 'none', display: 'flex', flexDirection: 'row', gap: 12, alignItems: 'center' };
+  const heldContent = <ThemePairProvider pair={heldPair}><Cover track={heldTrack} size={42} />{heldTrack?.queueId === snapshot.currentId && <Text tone={'accent'}>▸</Text>}<Text style={{ flexGrow: 1 }}>{heldTrack?.title}</Text><Text tone={'accent'}>→ {(drag?.target || 0) + 1}</Text></ThemePairProvider>;
   const browserListProps = { revision: locationRevision, preserve: selectionScroll.current === 'preserve', width, height, onScroll: rememberPosition };
   function browserRowStyle(column: BrowserColumn, index: number, rowHeight: number): StyleDesc {
     const chosen = browse?.[column].selection === index;
+    const pair = browserRowPair(column, index);
     return { width: '100%', height: rowHeight, flexShrink: 0, padding: 9, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10,
-      ...surface(chosen ? browse?.active === column ? 'browserRowSelected' : 'browserRowContext' : 'browserRow'),
-      hover: chosen ? undefined : surface('browserRowHover'), borderLeftWidth: 2,
-      borderColor: chosen && browse?.active === column ? theme.borders.browserActive : theme.borders.control, cursor: 'pointer' };
+      background: pair.background, hover: { borderColor: pair.border }, borderLeftWidth: 2,
+      borderColor: chosen ? pair.marker : 'transparent', cursor: 'pointer' };
+  }
+  function browserRowPair(column: BrowserColumn, index: number) {
+    const chosen = browse?.[column].selection === index;
+    return pairForState(theme, { selected: chosen && browse?.active === column, context: chosen && browse?.active !== column });
   }
   function columnHeading(column: BrowserColumn, title: string, count: number) {
     return <div onClick={() => focusColumn(column)} style={{ height: 32, flexShrink: 0, borderBottomWidth: 1, borderColor: browse?.active === column ? theme.borders.browserActive : theme.borders.browserColumn, display: 'flex', flexDirection: 'row', gap: 6, alignItems: 'center', cursor: 'pointer' }}>
-      <Text size={11} color={browse?.active === column ? C.accent : C.muted} style={{ flexGrow: 1 }}>{title}</Text><Text size={11} color={C.muted}>{count}</Text>
+      <Text size={11} tone={browse?.active === column ? 'accent' : 'muted'} style={{ flexGrow: 1 }}>{title}</Text><Text size={11} tone={'muted'}>{count}</Text>
     </div>;
   }
-  const lyricsView = view === 'lyrics' && <div style={{ width: '100%', minHeight: 0, ...surface('lyrics'), display: 'flex', flexDirection: 'column', gap: 18 }}>
+  const lyricsView = view === 'lyrics' && <div style={{ width: '100%', minHeight: 0, ...surface(theme, 'lyrics'), display: 'flex', flexDirection: 'column', gap: 18 }}>
     <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'row', gap: 18, alignItems: 'center' }}>
       <Cover track={current} size={narrow ? 72 : 96} onClick={current ? () => openTrack(current) : undefined} />
       <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -608,25 +626,26 @@ function App() {
       {lyrics.lyrics?.synced && <Button active={lyrics.following} onClick={() => lyrics.follow()}>{lyrics.following ? 'Following' : 'Follow playback'}</Button>}
       <Button onClick={() => lyrics.reload()}>Reload</Button>
     </div>
-    {lyrics.loading ? <Text color={C.muted}>Reading local lyrics…</Text> : lyrics.error ? <Text color={C.warning}>{lyrics.error}</Text> : lyrics.lyrics ? <>
+    {lyrics.loading ? <Text tone={'muted'}>Reading local lyrics…</Text> : lyrics.error ? <Text tone={'warning'}>{lyrics.error}</Text> : lyrics.lyrics ? <>
       <div style={{ flexGrow: 1, minHeight: 0, width: lyricWidth, alignSelf: 'center', display: 'flex', flexDirection: 'column' }}>
         <BrowserList key={current?.uri} listRef={lyricRef} point={{ route: { page: 'lyrics' }, selection: lyricSelection }} count={lyricLines.length} rowHeight={42}
           revision={locationRevision} preserve={!lyrics.following && lyricPointer.current} align={lyrics.following ? 'middle' : 'edge'} width={width} height={height - (prompt === 'local' ? 56 : 0)}
           onScroll={() => {}} onWheel={() => { lyricPointer.current = true; lyrics.read(); }} row={index => {
             const row = lyricLines[index]!, active = row.line === lyrics.activeLine, chosen = row.line === lyrics.selectedLine;
-            return <div key={index} onClick={() => selectLyric(row.line, true)} style={{ height: 42, width: '100%', paddingLeft: 18, paddingRight: 18, display: 'flex', alignItems: 'center',
-              ...surface(chosen && !lyrics.following ? 'lyricRowSelected' : 'lyricRow'), borderLeftWidth: 2, borderColor: active ? theme.borders.focus : theme.borders.control, cursor: 'pointer' }}>
-              <Text size={18} color={active ? C.accent : C.text} style={{ flexGrow: 1 }}>{row.text || '· · ·'}</Text>
-            </div>;
+            const pair = pairForState(theme, { selected: chosen && !lyrics.following, active });
+            return <ThemePairProvider key={index} pair={pair}><div onClick={() => selectLyric(row.line, true)} style={{ height: 42, width: '100%', paddingLeft: 18, paddingRight: 18, display: 'flex', alignItems: 'center',
+              background: pair.background, borderLeftWidth: 2, borderColor: active ? pair.marker : 'transparent', cursor: 'pointer' }}>
+              <Text size={18} style={{ flexGrow: 1 }}>{row.text || '· · ·'}</Text>
+            </div></ThemePairProvider>;
           }} />
       </div>
       <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'row', gap: 12 }}>
-        <Text size={11} color={C.muted} style={{ flexGrow: 1 }}>{lyrics.lyrics.synced ? `${lyrics.following ? 'Following playback' : 'Reading'} · ${snapshot.state === 'pause' ? 'paused' : connection === 'down' ? 'disconnected' : 'synced lyrics'}` : 'Untimed lyrics'}</Text>
-        <Text size={11} color={C.muted}>{lyrics.lyrics.synced ? 'j/k read · enter seek · f follow · / find · r reload' : 'j/k read · / find · r reload'}</Text>
+        <Text size={11} tone={'muted'} style={{ flexGrow: 1 }}>{lyrics.lyrics.synced ? `${lyrics.following ? 'Following playback' : 'Reading'} · ${snapshot.state === 'pause' ? 'paused' : connection === 'down' ? 'disconnected' : 'synced lyrics'}` : 'Untimed lyrics'}</Text>
+        <Text size={11} tone={'muted'}>{lyrics.lyrics.synced ? 'j/k read · enter seek · f follow · / find · r reload' : 'j/k read · / find · r reload'}</Text>
       </div>
     </> : <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12 }}>
       <Text size={17}>{current ? 'No local lyrics found' : 'Choose a track to see its lyrics'}</Text>
-      {current && <Text color={C.muted}>Reload after adding or updating this track’s lyric file.</Text>}
+      {current && <Text tone={'muted'}>Reload after adding or updating this track’s lyric file.</Text>}
     </div>}
   </div>;
   const browserView = browse && <div style={{ width: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -634,7 +653,7 @@ function App() {
       <Button onClick={() => openPage('library', 'covers')}>Albums</Button>
       <Button active onClick={() => openPage('library', 'artists')}>Artists</Button>
       <div style={{ flexGrow: 1 }} />
-      <Text size={11} color={C.muted}>{browse.active === 'artists' ? 'Choose an artist' : browse.active === 'albums' ? 'Choose an album' : 'Choose a track'}</Text>
+      <Text size={11} tone={'muted'}>{browse.active === 'artists' ? 'Choose an artist' : browse.active === 'albums' ? 'Choose an album' : 'Choose a track'}</Text>
       {view !== 'record' && <Button id="library-sort" onClick={openSort}>{sortLabel} ▾</Button>}
     </div>
     <div style={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'row', gap: narrow ? 12 : 18 }}>
@@ -642,19 +661,19 @@ function App() {
         {columnHeading('artists', 'ARTISTS', artists.length)}
         <BrowserList {...browserListProps} listRef={browserArtistRef} point={browse.artists} count={artists.length} rowHeight={52} row={index => {
           const person = artists[index]!;
-          return <div key={person.name} onClick={() => focusColumn('artists', index)} style={browserRowStyle('artists', index, 52)}>
-            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}><Text size={12}>{person.name}</Text><Text size={10} color={C.muted}>{person.albums.length} {person.albums.length === 1 ? 'album' : 'albums'}</Text></div>
-          </div>;
+          return <ThemePairProvider key={person.name} pair={browserRowPair('artists', index)}><div onClick={() => focusColumn('artists', index)} style={browserRowStyle('artists', index, 52)}>
+            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}><Text size={12}>{person.name}</Text><Text size={10} tone={'muted'}>{person.albums.length} {person.albums.length === 1 ? 'album' : 'albums'}</Text></div>
+          </div></ThemePairProvider>;
         }} />
       </div>
       <div style={{ width: Math.floor(width * .25), flexShrink: 0, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
         {columnHeading('albums', 'ALBUMS', browse.person?.albums.length || 0)}
         <BrowserList key={browse.person?.name || 'empty-albums'} {...browserListProps} listRef={browserAlbumRef} point={browse.albums} count={browse.person?.albums.length || 0} rowHeight={64} row={index => {
           const album = browse.person!.albums[index]!;
-          return <div key={album.key} onClick={() => focusColumn('albums', index)} style={browserRowStyle('albums', index, 64)}>
+          return <ThemePairProvider key={album.key} pair={browserRowPair('albums', index)}><div onClick={() => focusColumn('albums', index)} style={browserRowStyle('albums', index, 64)}>
             <Cover track={album.tracks[0]} size={42} />
-            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}><Text size={12}>{album.title}</Text><Text size={10} color={C.muted}>{[album.year, `${album.tracks.length} tracks`].filter(Boolean).join(' · ')}</Text></div>
-          </div>;
+            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}><Text size={12}>{album.title}</Text><Text size={10} tone={'muted'}>{[album.year, `${album.tracks.length} tracks`].filter(Boolean).join(' · ')}</Text></div>
+          </div></ThemePairProvider>;
         }} />
         {browse.album && <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
           <Button id="play-album" onClick={() => void act(() => backend.enqueueAlbum(browse.album!, true), `Playing ${browse.album!.title}`)}>Play album</Button>
@@ -667,17 +686,17 @@ function App() {
           <Cover track={browse.track} size={narrow ? 76 : 96} />
           <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
             <Text size={14}>{browse.active === 'tracks' ? browse.track?.title : browse.album.title}</Text>
-            <Text size={11} color={C.muted}>{browse.track?.artist || browse.person?.name}</Text>
-            {browse.active === 'tracks' && <Text size={11} color={C.muted}>{browse.album.title}</Text>}
-            <Text size={10} color={C.muted}>{browse.active === 'tracks' ? `Track ${browse.track?.number || browse.tracks.selection + 1} · ${duration(browse.track?.duration || 0)}` : `${browse.album.year} · ${duration(browse.album.tracks.reduce((total, track) => total + track.duration, 0))}`}</Text>
+            <Text size={11} tone={'muted'}>{browse.track?.artist || browse.person?.name}</Text>
+            {browse.active === 'tracks' && <Text size={11} tone={'muted'}>{browse.album.title}</Text>}
+            <Text size={10} tone={'muted'}>{browse.active === 'tracks' ? `Track ${browse.track?.number || browse.tracks.selection + 1} · ${duration(browse.track?.duration || 0)}` : `${browse.album.year} · ${duration(browse.album.tracks.reduce((total, track) => total + track.duration, 0))}`}</Text>
           </div>
         </div>}
         <BrowserList key={browse.album?.key || 'empty-tracks'} {...browserListProps} listRef={browserTrackRef} point={browse.tracks} count={browse.album?.tracks.length || 0} rowHeight={52} row={index => {
           const track = browse.album!.tracks[index]!;
-          return <div key={track.uri} onClick={() => focusColumn('tracks', index)} style={browserRowStyle('tracks', index, 52)}>
-            <Text size={11} color={C.muted} style={{ width: 28, flexShrink: 0 }}>{track.disc && track.disc > 1 ? `${track.disc}.${track.number}` : String(track.number).padStart(2, '0')}</Text>
-            <Text size={12} style={{ flexGrow: 1, flexBasis: 0 }}>{track.title}</Text><Text size={11} color={C.muted} style={{ width: 42, flexShrink: 0, textAlign: 'right' }}>{duration(track.duration)}</Text>
-          </div>;
+          return <ThemePairProvider key={track.uri} pair={browserRowPair('tracks', index)}><div onClick={() => focusColumn('tracks', index)} style={browserRowStyle('tracks', index, 52)}>
+            <Text size={11} tone={'muted'} style={{ width: 28, flexShrink: 0 }}>{track.disc && track.disc > 1 ? `${track.disc}.${track.number}` : String(track.number).padStart(2, '0')}</Text>
+            <Text size={12} style={{ flexGrow: 1, flexBasis: 0 }}>{track.title}</Text><Text size={11} tone={'muted'} style={{ width: 42, flexShrink: 0, textAlign: 'right' }}>{duration(track.duration)}</Text>
+          </div></ThemePairProvider>;
         }} />
         {browse.track && <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
           <Button onClick={() => void act(() => backend.enqueue(browse.track!, true), `Playing ${browse.track!.title}`)}>Play track</Button>
@@ -685,11 +704,11 @@ function App() {
         </div>}
       </div>
     </div>
-    <Text size={11} color={C.muted}>j/k select · h/l columns · enter {browse.active === 'tracks' ? 'play' : 'open'} · / find in column · o/i history</Text>
+    <Text size={11} tone={'muted'}>j/k select · h/l columns · enter {browse.active === 'tracks' ? 'play' : 'open'} · / find in column · o/i history</Text>
   </div>;
 
-  return <div testId="music-root" style={{ width: '100%', height: '100%', ...surface('canvas'), selectionColor: C.textSelection, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-    <div style={{ height: 56, flexShrink: 0, paddingLeft: process.platform === 'darwin' ? 94 : 22, paddingRight: 18, ...surface('header'), borderBottomWidth: 1, borderColor: theme.borders.header, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, userSelect: 'none' }}>
+  return <div testId="music-root" style={{ width: '100%', height: '100%', ...surface(theme, 'canvas'), selectionColor: C.textSelection, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+    <div style={{ height: 56, flexShrink: 0, paddingLeft: process.platform === 'darwin' ? 94 : 22, paddingRight: 18, ...surface(theme, 'header'), borderBottomWidth: 1, borderColor: theme.borders.header, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16, userSelect: 'none' }}>
       <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'row', gap: 6 }}>
         <Button tab active={view === 'queue'} onClick={() => openPage('queue')} id="view-queue">Now playing</Button>
         <Button tab active={view === 'lyrics'} onClick={() => openPage('lyrics')} id="view-lyrics">Lyrics</Button>
@@ -700,12 +719,12 @@ function App() {
       <Button id="open-prompt" onClick={() => openPrompt('global')}>Prompt :</Button>
     </div>
 
-    <div onScroll={rememberPosition} style={{ flexGrow: 1, minHeight: 0, padding: 22, ...surface('main'), display: 'flex', flexDirection: 'row', gap: 26 }}>
-      {lyricsView || browserView || (isGrid ? <div onScroll={() => syncVisibleRows()} style={{ width: '100%', minHeight: 0, ...surface('library'), display: 'flex', flexDirection: 'column', gap: 18 }}>
+    <div onScroll={rememberPosition} style={{ flexGrow: 1, minHeight: 0, padding: 22, ...surface(theme, 'main'), display: 'flex', flexDirection: 'row', gap: 26 }}>
+      {lyricsView || browserView || (isGrid ? <div onScroll={() => syncVisibleRows()} style={{ width: '100%', minHeight: 0, ...surface(theme, 'library'), display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Button active onClick={() => openPage('library', 'covers')}>Albums</Button>
           <Button onClick={() => openPage('library', 'artists')}>Artists</Button>
-          <div style={{ flexGrow: 1 }} /><Text color={C.muted}>{albums.length} albums</Text>
+          <div style={{ flexGrow: 1 }} /><Text tone={'muted'}>{albums.length} albums</Text>
           <Button id="library-sort" onClick={openSort}>{sortLabel} ▾</Button>
         </div>
         <virtual-list ref={albumGridRef} itemCount={gridRows} windowStart={gridRange.start} estimatedItemHeight={gridRowHeight} onVisibleRange={event => syncVisibleRows(event)} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>
@@ -714,33 +733,34 @@ function App() {
             return <div key={`${gridKey}:${row}`} style={{ width: '100%', height: gridRowHeight, paddingBottom: 20, display: 'flex', flexDirection: 'row', gap: 20 }}>
               {shelf.slice(row * columns, (row + 1) * columns).map((a, column) => {
                 const index = row * columns + column;
-                return <div key={a.key} onClick={() => openAlbum(a, undefined, sourceAt(index))} style={{ width: albumTileSize, height: albumTileSize + 58, display: 'flex', flexDirection: 'column', gap: 9, cursor: 'pointer', ...surface(selection === index ? 'albumCardSelected' : 'albumCard'), hover: selection === index ? undefined : surface('albumCardHover') }}>
+                const pair = pairForState(theme, { selected: selection === index });
+                return <ThemePairProvider key={a.key} pair={pair}><div onClick={() => openAlbum(a, undefined, sourceAt(index))} style={{ width: albumTileSize, height: albumTileSize + 58, display: 'flex', flexDirection: 'column', gap: 9, cursor: 'pointer', background: pair.background, borderBottomWidth: 1, borderColor: 'transparent', hover: { borderColor: pair.marker } }}>
                   <Cover track={a.tracks[0]} size={albumTileSize} />
                   <Text style={{ height: 22, flexShrink: 0 }}>{a.title}</Text>
-                  <div style={{ height: 18, flexShrink: 0, display: 'flex', flexDirection: 'row', gap: 6 }}><Link muted size={11} onClick={() => openArtist(a.artist)}>{a.artist}</Link><Text size={11} color={C.muted}>{a.year}</Text></div>
-                </div>;
+                  <div style={{ height: 18, flexShrink: 0, display: 'flex', flexDirection: 'row', gap: 6 }}><Link muted size={11} onClick={() => openArtist(a.artist)}>{a.artist}</Link><Text size={11} tone={'muted'}>{a.year}</Text></div>
+                </div></ThemePairProvider>;
               })}
             </div>;
           })}
         </virtual-list>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text size={11} color={C.muted}>hjkl / arrows select · enter open · / find · o/i history</Text>
+          <Text size={11} tone={'muted'}>hjkl / arrows select · enter open · / find · o/i history</Text>
         </div>
       </div> : <>
-        <div style={{ flexGrow: 1, minWidth: 0, minHeight: 0, ...surface('queue'), display: 'flex', flexDirection: 'column', gap: 16, position: 'relative' }}>
+        <div style={{ flexGrow: 1, minWidth: 0, minHeight: 0, ...surface(theme, 'queue'), display: 'flex', flexDirection: 'column', gap: 16, position: 'relative' }}>
           <div style={{ height: 24, flexShrink: 0, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <Text size={17} style={{ flexGrow: 1 }}>Queue</Text>
-            <Text size={11} color={C.muted}>{buffer.length} tracks</Text>
+            <Text size={11} tone={'muted'}>{buffer.length} tracks</Text>
             {snapshot.queue.length > 0 && <Button id="remove-track" onClick={removeSelected}>Remove</Button>}
           </div>
           <virtual-list ref={queueRef} estimatedItemHeight={ROW} style={{ width: '100%', flexGrow: 1, minHeight: 0 }}>{snapshot.queue.map(queueRow)}</virtual-list>
-          {loading && <Text color={C.muted}>Reading the library…</Text>}
-          {!loading && buffer.length === 0 && <Text color={C.muted}>Queue is empty. Find an album with :</Text>}
-          <div style={{ display: 'flex', flexDirection: 'row' }}><Text size={11} color={C.muted} style={{ flexGrow: 1 }}>{drag ? 'hjkl / arrows move · enter drop · esc cancel' : 'enter play · m move · ⌫ remove · o/i history'}</Text><Text size={11} color={C.muted}>{duration(buffer.reduce((n, t) => n + t.duration, 0))} total</Text></div>
+          {loading && <Text tone={'muted'}>Reading the library…</Text>}
+          {!loading && buffer.length === 0 && <Text tone={'muted'}>Queue is empty. Find an album with :</Text>}
+          <div style={{ display: 'flex', flexDirection: 'row' }}><Text size={11} tone={'muted'} style={{ flexGrow: 1 }}>{drag ? 'hjkl / arrows move · enter drop · esc cancel' : 'enter play · m move · ⌫ remove · o/i history'}</Text><Text size={11} tone={'muted'}>{duration(buffer.reduce((n, t) => n + t.duration, 0))} total</Text></div>
           {drag && (drag.startY !== undefined ? <div style={{ ...heldStyle, top: previewTop }}>{heldContent}</div> : <motion.div initial={false} animate={{ top: previewTop }} transition={{ duration: 0.10, ease: 'easeOut' }} style={heldStyle}>{heldContent}</motion.div>)}
         </div>
-        <div style={{ width: artSize + 24, minWidth: 0, ...surface('detail'), borderLeftWidth: 1, borderColor: theme.borders.detail, paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <Text size={11} color={C.muted}>{view === 'queue' && current ? 'NOW PLAYING' : 'SELECTION'}</Text>
+        <div style={{ width: artSize + 24, minWidth: 0, ...surface(theme, 'detail'), borderLeftWidth: 1, borderColor: theme.borders.detail, paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <Text size={11} tone={'muted'}>{view === 'queue' && current ? 'NOW PLAYING' : 'SELECTION'}</Text>
           <Cover track={shown} size={artSize} onClick={() => shown && openTrack(shown)} />
           {shown ? <div style={{ display: 'flex', flexDirection: 'row', gap: 12 }}>
             <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -748,27 +768,27 @@ function App() {
               <Link onClick={() => openArtist(shown.artist)}>{shown.artist}</Link>
               <Link muted onClick={() => openTrack(shown)}>{shown.album}</Link>
             </div>
-            {!narrow && artSize >= 280 && <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}><Text size={11} color={C.muted}>{shown.year}</Text><Text size={11} color={C.muted}>Track {shown.number}</Text></div>}
-          </div> : <Text color={C.muted}>Nothing playing</Text>}
+            {!narrow && artSize >= 280 && <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}><Text size={11} tone={'muted'}>{shown.year}</Text><Text size={11} tone={'muted'}>Track {shown.number}</Text></div>}
+          </div> : <Text tone={'muted'}>Nothing playing</Text>}
 
         </div>
       </>)}
     </div>
 
-    <div style={{ padding: 15, borderTopWidth: 1, borderColor: theme.borders.transport, ...surface('transport'), display: 'flex', flexDirection: 'row', gap: 14, alignItems: 'center' }}>
+    <div style={{ padding: 15, borderTopWidth: 1, borderColor: theme.borders.transport, ...surface(theme, 'transport'), display: 'flex', flexDirection: 'row', gap: 14, alignItems: 'center' }}>
       <Cover track={current} size={38} />
-      <div style={{ width: narrow ? 140 : 220, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}><Text size={12}>{current?.title || 'Stopped'}</Text>{current ? <Link muted size={11} onClick={() => openArtist(current.artist)}>{current.artist}</Link> : <Text size={11} color={C.muted}>MPD</Text>}</div>
+      <div style={{ width: narrow ? 140 : 220, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}><Text size={12}>{current?.title || 'Stopped'}</Text>{current ? <Link muted size={11} onClick={() => openArtist(current.artist)}>{current.artist}</Link> : <Text size={11} tone={'muted'}>MPD</Text>}</div>
       <Button id="previous" onClick={() => void act(() => backend.previous())}>|‹</Button>
       <Button id="toggle" active onClick={() => void act(() => backend.toggle())}>{snapshot.state === 'play' ? 'Pause' : 'Play'}</Button>
       <Button id="next" onClick={() => void act(() => backend.next())}>›|</Button>
-      <Text size={11} color={C.muted}>{duration(elapsed)}</Text>
+      <Text size={11} tone={'muted'}>{duration(elapsed)}</Text>
       <div ref={progressRef} testId="seek" onClick={seekAt} style={{ flexGrow: 1, minWidth: 30, height: 24, display: 'flex', justifyContent: 'center', flexDirection: 'column', cursor: current && snapshot.state !== 'stop' ? 'pointer' : 'default' }}>
-        <div style={{ width: '100%', height: 4, ...surface('progressTrack'), pointerEvents: 'none' }}><div style={{ width: `${Math.min(100, elapsed / (current?.duration || 1) * 100)}%`, height: 4, ...surface('progressFill'), pointerEvents: 'none' }} /></div>
+        <div style={{ width: '100%', height: 4, ...surface(theme, 'progressTrack'), borderWidth: 1, borderColor: theme.pairs.normal.border, pointerEvents: 'none' }}><div style={{ width: `${Math.min(100, elapsed / (current?.duration || 1) * 100)}%`, height: '100%', ...surface(theme, 'progressFill'), pointerEvents: 'none' }} /></div>
       </div>
-      <Text size={11} color={C.muted}>{duration(current?.duration || 0)}</Text>
+      <Text size={11} tone={'muted'}>{duration(current?.duration || 0)}</Text>
     </div>
-    {prompt === 'local' && <div style={{ display: 'flex', flexDirection: 'row', gap: 12, alignItems: 'center', padding: 12, ...surface('localFind') }}><Text color={C.accent} style={{ width: 14, flexShrink: 0 }}>/</Text><input autoFocus value={query} placeholder={`Find in ${browse?.active || (isGrid ? 'albums' : view)}`} theme={inputTheme()} onFocus={() => { promptReady.current = true; }} onChange={e => { promptReady.current = true; setQuery(e.value || ''); }} onSubmit={() => flushSync(() => closePrompt(false))} style={{ flexGrow: 1, flexBasis: 0, minWidth: 0, height: 28, ...surface('localFindInput'), selectionColor: C.textSelection, color: C.text, fontSize: 14, fontFamily: FONT }} /><Text color={C.muted} style={{ flexShrink: 0 }}>{matches.length} matches</Text><Button onClick={() => closePrompt(true)}>esc</Button></div>}
-    <div style={{ height: 32, paddingLeft: 18, paddingRight: 18, ...surface('status'), display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10 }}><Text size={11} color={error || stateError || navigationLog.error ? C.warning : C.muted} style={{ flexGrow: 1 }}>{stateError || (navigationLog.error ? `Navigation log: ${navigationLog.error}` : error ? `${demo ? 'Demo' : 'MPD'}: ${error}` : restoring.current ? 'Restoring your place…' : notice)}</Text><Text size={11} color={C.muted}>{demo ? 'Demo · simulated' : connection === 'connected' ? 'MPD connected' : connection === 'down' ? 'MPD down' : 'MPD connecting'} · {library.length.toLocaleString()} songs</Text></div>
+    {prompt === 'local' && <div style={{ display: 'flex', flexDirection: 'row', gap: 12, alignItems: 'center', padding: 12, ...surface(theme, 'localFind') }}><Text tone={'accent'} style={{ width: 14, flexShrink: 0 }}>/</Text><ThemedInput testId="local-find-input" autoFocus value={query} placeholder={`Find in ${browse?.active || (isGrid ? 'albums' : view)}`} onFocus={() => { promptReady.current = true; }} onChange={e => { promptReady.current = true; setQuery(e.value || ''); }} onSubmit={() => flushSync(() => closePrompt(false))} style={{ flexGrow: 1, flexBasis: 0, minWidth: 0, height: 28, ...surface(theme, 'localFindInput'), selectionColor: C.textSelection, color: C.text, fontSize: 14, fontFamily: FONT }} /><Text tone={'muted'} style={{ flexShrink: 0 }}>{matches.length} matches</Text><Button onClick={() => closePrompt(true)}>esc</Button></div>}
+    <div style={{ height: 32, paddingLeft: 18, paddingRight: 18, ...surface(theme, 'status'), display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10 }}><Text size={11} tone={error || stateError || navigationLog.error ? 'warning' : 'muted'} style={{ flexGrow: 1 }}>{stateError || (navigationLog.error ? `Navigation log: ${navigationLog.error}` : error ? `${demo ? 'Demo' : 'MPD'}: ${error}` : restoring.current ? 'Restoring your place…' : notice)}</Text><Text size={11} tone={'muted'}>{demo ? 'Demo · simulated' : connection === 'connected' ? 'MPD connected' : connection === 'down' ? 'MPD down' : 'MPD connecting'} · {library.length.toLocaleString()} songs</Text></div>
 
     {drag && drag.startY !== undefined && <div
       onMouseMove={event => flushSync(() => { if (event.pressedButton === 0) positionDrag(event); else updateDrag(undefined); })}
@@ -778,28 +798,29 @@ function App() {
     />}
 
     {sortOpen && <div onClick={() => { setSortOpen(false); clearFocus(); }} style={{ position: 'absolute', top: 56, bottom: 0, left: 0, right: 0, pointerEvents: 'auto' }}>
-      <div style={{ position: 'absolute', top: 72, right: 22, width: 260, padding: 6, display: 'flex', flexDirection: 'column', ...surface('sortMenu'), borderWidth: 1, borderColor: theme.borders.sortMenu, borderRadius: 3 }}>
-        {sortOptions.map((option, index) => <Button key={option.value} onClick={() => chooseSort(option.value)} active={index === sortIndex} style={{ ...surface(index === sortIndex ? 'sortItemSelected' : 'sortItem') }}>{option.label}{order[orderContext] === option.value ? ' ✓' : ''}</Button>)}
+      <div style={{ position: 'absolute', top: 72, right: 22, width: 260, padding: 6, display: 'flex', flexDirection: 'column', ...surface(theme, 'sortMenu'), borderWidth: 1, borderColor: theme.borders.sortMenu, borderRadius: 3 }}>
+        {sortOptions.map((option, index) => <Button key={option.value} onClick={() => chooseSort(option.value)} pair={index === sortIndex ? theme.pairs.selected : theme.pairs.normal}>{option.label}{order[orderContext] === option.value ? ' ✓' : ''}</Button>)}
       </div>
     </div>}
-    {prompt === 'global' && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, ...surface('promptScrim'), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div testId="prompt" onMouseDownOutside={() => closePrompt(true)} style={{ width: Math.min(680, width - 80), ...surface('prompt'), borderWidth: 1, borderColor: theme.borders.prompt, borderRadius: 6, padding: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12 }}><Text color={C.accent}>:</Text><input testId="prompt-input" autoFocus value={query} placeholder="Find an album, track, artist or action" theme={inputTheme()} onFocus={() => { promptReady.current = true; }} onChange={e => { promptReady.current = true; setQuery(e.value || ''); setResultIndex(0); }} onSubmit={() => flushSync(() => activateResult(results[resultIndex]))} style={{ height: 36, flexGrow: 1, ...surface('promptInput'), selectionColor: C.textSelection, color: C.text, fontSize: 16, fontFamily: FONT }} /><Button onClick={() => closePrompt(true)}>esc</Button></div>
+    {prompt === 'global' && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, ...surface(theme, 'promptScrim'), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div testId="prompt" onMouseDownOutside={() => closePrompt(true)} style={{ width: Math.min(680, width - 80), ...surface(theme, 'prompt'), borderWidth: 1, borderColor: theme.borders.prompt, borderRadius: 6, padding: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12 }}><Text tone={'accent'}>:</Text><ThemedInput testId="prompt-input" autoFocus value={query} placeholder="Find an album, track, artist or action" onFocus={() => { promptReady.current = true; }} onChange={e => { promptReady.current = true; setQuery(e.value || ''); setResultIndex(0); }} onSubmit={() => flushSync(() => activateResult(results[resultIndex]))} style={{ height: 36, flexGrow: 1, ...surface(theme, 'promptInput'), selectionColor: C.textSelection, color: C.text, fontSize: 16, fontFamily: FONT }} /><Button onClick={() => closePrompt(true)}>esc</Button></div>
         <div style={{ height: 1, background: theme.borders.promptDivider }} />
-        {results.length > 0 && <virtual-list ref={promptListRef} estimatedItemHeight={69} style={{ width: '100%', height: Math.min(height - 180, results.length * 69 + 13), flexShrink: 0, ...surface('promptResults') }}>{results.map((result, i) => {
+        {results.length > 0 && <virtual-list ref={promptListRef} estimatedItemHeight={69} style={{ width: '100%', height: Math.min(height - 180, results.length * 69 + 13), flexShrink: 0, ...surface(theme, 'promptResults') }}>{results.map((result, i) => {
           const t = result.kind === 'track' ? result.track : result.kind === 'album' ? result.album.tracks[0] : result.kind === 'artist' ? result.artist.albums[0]?.tracks[0] : undefined;
           const title = result.kind === 'track' ? result.track.title : result.kind === 'album' ? result.album.title : result.kind === 'artist' ? result.artist.name : result.title;
           const detail = result.kind === 'track' ? `${result.track.artist} · ${result.track.album}` : result.kind === 'album' ? `${result.album.artist} · ${result.album.year} · ${result.album.tracks.length} tracks` : result.kind === 'artist' ? `${result.artist.albums.length} albums in your library` : 'Action';
-          return <div key={result.key} style={{ width: '100%', height: i === resultIndex ? 82 : 69, paddingBottom: 12 }}><div testId={`result-${i}`} onClick={() => activateResult(result)} style={{ width: '100%', height: i === resultIndex ? 70 : 57, padding: 8, borderRadius: 3, ...surface(i === resultIndex ? 'promptResultSelected' : 'promptResult'), hover: i === resultIndex ? undefined : surface('promptResultHover'), display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
-            {t ? <Cover track={t} size={i === resultIndex ? 50 : 38} /> : <Text color={C.muted} style={{ width: 38 }}>⌘</Text>}
-            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}><Text>{title}</Text><Text size={11} color={C.muted}>{detail}</Text></div><Text size={11} color={C.accent}>{result.kind}</Text>
-          </div></div>;
+          const pair = pairForState(theme, { selected: i === resultIndex });
+          return <ThemePairProvider key={result.key} pair={pair}><div style={{ width: '100%', height: i === resultIndex ? 82 : 69, paddingBottom: 12 }}><div testId={`result-${i}`} onClick={() => activateResult(result)} style={{ width: '100%', height: i === resultIndex ? 70 : 57, padding: 8, borderRadius: 3, background: pair.background, borderWidth: 1, borderColor: 'transparent', hover: { borderColor: pair.marker }, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+            {t ? <Cover track={t} size={i === resultIndex ? 50 : 38} /> : <Text tone={'muted'} style={{ width: 38 }}>⌘</Text>}
+            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}><Text>{title}</Text><Text size={11} tone={'muted'}>{detail}</Text></div><Text size={11} tone={'accent'}>{result.kind}</Text>
+          </div></div></ThemePairProvider>;
         })}</virtual-list>}
-        {results.length === 0 && <Text color={C.muted}>No matches</Text>}
-        <Text size={11} color={C.muted}>↑↓ choose · enter open · esc return</Text>
+        {results.length === 0 && <Text tone={'muted'}>No matches</Text>}
+        <Text size={11} tone={'muted'}>↑↓ choose · enter open · esc return</Text>
       </div>
     </div>}
   </div>;
 }
 
-render(<App />, { title: demo ? 'Music — Demo' : 'Music — MPD UI Prototype', appName: 'Music Prototype', width: 1120, height: 820, minWidth: 720, minHeight: 620, titlebarTransparent: true, trafficLightX: 16, trafficLightY: 20, focus: process.env.GPUIX_BACKGROUND !== '1', onKeyDown: event => flushSync(() => dispatchKey(event)) });
+render(<ThemeProvider session={session}><App /></ThemeProvider>, { title: demo ? 'Music — Demo' : 'Music — MPD UI Prototype', appName: 'Music Prototype', width: 1120, height: 820, minWidth: 720, minHeight: 620, titlebarTransparent: true, trafficLightX: 16, trafficLightY: 20, focus: process.env.GPUIX_BACKGROUND !== '1', onKeyDown: event => flushSync(() => dispatchKey(event)), onEvent: nativeProbeObserver(probe) });

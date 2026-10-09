@@ -1,0 +1,3745 @@
+{
+  "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+  "cases": [
+    {
+      "name": "gray-00",
+      "expectedBackground": "#000000",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 1,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 21.0
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 21.0
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 21.0
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 21.0
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 21.0
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 21.0
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#000000",
+            "oklch_extraction": [
+              0.0,
+              0.0,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-01",
+      "expectedBackground": "#010101",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 2,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#010101",
+            "oklch": [
+              0.06720462,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#010101",
+            "oklch": [
+              0.06720462,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 20.873
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 20.873
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 20.873
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 20.873
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 20.873
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 20.873
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#010101",
+            "oklch_extraction": [
+              0.06720462,
+              0.0,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-0a",
+      "expectedBackground": "#0a0a0a",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 3,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#0a0a0a",
+            "oklch": [
+              0.14478795,
+              1e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#0a0a0a",
+            "oklch": [
+              0.14478795,
+              1e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.798
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.798
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 19.798
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 19.798
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.798
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.798
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#0a0a0a",
+            "oklch_extraction": [
+              0.14478795,
+              1e-08,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-0b",
+      "expectedBackground": "#0b0b0b",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 4,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#0b0b0b",
+            "oklch": [
+              0.14957712,
+              1e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#0b0b0b",
+            "oklch": [
+              0.14957712,
+              1e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.683
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.683
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 19.683
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 19.683
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.683
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.683
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#0b0b0b",
+            "oklch_extraction": [
+              0.14957712,
+              1e-08,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-20",
+      "expectedBackground": "#202020",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 5,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#202020",
+            "oklch": [
+              0.24353474,
+              1e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#202020",
+            "oklch": [
+              0.24353474,
+              1e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 16.293
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 16.293
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 16.293
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 16.293
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 16.293
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 16.293
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#202020",
+            "oklch_extraction": [
+              0.24353474,
+              1e-08,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-40",
+      "expectedBackground": "#404040",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 6,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#404040",
+            "oklch": [
+              0.37149494,
+              1e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#404040",
+            "oklch": [
+              0.37149494,
+              1e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 10.368
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 10.368
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 10.368
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 10.368
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 10.368
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 10.368
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#404040",
+            "oklch_extraction": [
+              0.37149494,
+              1e-08,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-60",
+      "expectedBackground": "#606060",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 7,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#606060",
+            "oklch": [
+              0.48905645,
+              2e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#606060",
+            "oklch": [
+              0.48905645,
+              2e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.289
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.289
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 6.289
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 6.289
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.289
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.289
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#606060",
+            "oklch_extraction": [
+              0.48905645,
+              2e-08,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-80",
+      "expectedBackground": "#808080",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 8,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#808080",
+            "oklch": [
+              0.5998708,
+              2e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#808080",
+            "oklch": [
+              0.5998708,
+              2e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 5.317
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 5.317
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 5.317
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 5.317
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 5.317
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 5.317
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#808080",
+            "oklch_extraction": [
+              0.5998708,
+              2e-08,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-a0",
+      "expectedBackground": "#a0a0a0",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 9,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#a0a0a0",
+            "oklch": [
+              0.70575701,
+              3e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#a0a0a0",
+            "oklch": [
+              0.70575701,
+              3e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.031
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.031
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 8.031
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 8.031
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.031
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.031
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#a0a0a0",
+            "oklch_extraction": [
+              0.70575701,
+              3e-08,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-c0",
+      "expectedBackground": "#c0c0c0",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 10,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#c0c0c0",
+            "oklch": [
+              0.80779623,
+              3e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#c0c0c0",
+            "oklch": [
+              0.80779623,
+              3e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 11.542
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 11.542
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 11.542
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 11.542
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 11.542
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 11.542
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#c0c0c0",
+            "oklch_extraction": [
+              0.80779623,
+              3e-08,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-e0",
+      "expectedBackground": "#e0e0e0",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 11,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#e0e0e0",
+            "oklch": [
+              0.90670069,
+              3e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#e0e0e0",
+            "oklch": [
+              0.90670069,
+              3e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.908
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.908
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 15.908
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 15.908
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.908
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.908
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#e0e0e0",
+            "oklch_extraction": [
+              0.90670069,
+              3e-08,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "gray-ff",
+      "expectedBackground": "#ffffff",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 12,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 21.0
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 21.0
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 21.0
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 21.0
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 21.0
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 21.0
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#ffffff",
+            "oklch_extraction": [
+              0.99999999,
+              4e-08,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "red",
+      "expectedBackground": "#ff0000",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 13,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#ff0000",
+            "oklch": [
+              0.62795536,
+              0.25768331,
+              29.233885
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#ff0000",
+            "oklch": [
+              0.62795536,
+              0.25768331,
+              29.233885
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 5.252
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 5.252
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 5.252
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 5.252
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 5.252
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 5.252
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#ff0000",
+            "oklch_extraction": [
+              0.62795536,
+              0.25768331,
+              29.233885
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "green",
+      "expectedBackground": "#00ff00",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 14,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#00ff00",
+            "oklch": [
+              0.86643961,
+              0.29482724,
+              142.495339
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#00ff00",
+            "oklch": [
+              0.86643961,
+              0.29482724,
+              142.495339
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.304
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.304
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 15.304
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 15.304
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.304
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.304
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#00ff00",
+            "oklch_extraction": [
+              0.86643961,
+              0.29482724,
+              142.495339
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "blue",
+      "expectedBackground": "#0000ff",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 15,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#0000ff",
+            "oklch": [
+              0.45201372,
+              0.31321437,
+              264.052021
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#0000ff",
+            "oklch": [
+              0.45201372,
+              0.31321437,
+              264.052021
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.592
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.592
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 8.592
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 8.592
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.592
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.592
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#0000ff",
+            "oklch_extraction": [
+              0.45201372,
+              0.31321437,
+              264.052021
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "cyan",
+      "expectedBackground": "#00ffff",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 16,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#00ffff",
+            "oklch": [
+              0.90539923,
+              0.15455001,
+              194.768948
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#00ffff",
+            "oklch": [
+              0.90539923,
+              0.15455001,
+              194.768948
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 16.748
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 16.748
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 16.748
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 16.748
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 16.748
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 16.748
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#00ffff",
+            "oklch_extraction": [
+              0.90539923,
+              0.15455001,
+              194.768948
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "magenta",
+      "expectedBackground": "#ff00ff",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 17,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#ff00ff",
+            "oklch": [
+              0.70167386,
+              0.32249096,
+              328.363418
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#ff00ff",
+            "oklch": [
+              0.70167386,
+              0.32249096,
+              328.363418
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.696
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.696
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 6.696
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 6.696
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.696
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.696
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#ff00ff",
+            "oklch_extraction": [
+              0.70167386,
+              0.32249096,
+              328.363418
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "yellow",
+      "expectedBackground": "#ffff00",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 18,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#ffff00",
+            "oklch": [
+              0.96798272,
+              0.21100591,
+              109.769232
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#ffff00",
+            "oklch": [
+              0.96798272,
+              0.21100591,
+              109.769232
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.556
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.556
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 19.556
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 19.556
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.556
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 19.556
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#ffff00",
+            "oklch_extraction": [
+              0.96798272,
+              0.21100591,
+              109.769232
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "asymmetric-123456",
+      "expectedBackground": "#123456",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 19,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#123456",
+            "oklch": [
+              0.31916842,
+              0.07245452,
+              251.168449
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#123456",
+            "oklch": [
+              0.31916842,
+              0.07245452,
+              251.168449
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 12.717
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 12.717
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 12.717
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 12.717
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 12.717
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 12.717
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#123456",
+            "oklch_extraction": [
+              0.31916842,
+              0.07245452,
+              251.168449
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "asymmetric-654321",
+      "expectedBackground": "#654321",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 20,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#654321",
+            "oklch": [
+              0.41400516,
+              0.0676151,
+              63.983281
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#654321",
+            "oklch": [
+              0.41400516,
+              0.0676151,
+              63.983281
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.83
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.83
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 8.83
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 8.83
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.83
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 8.83
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#654321",
+            "oklch_extraction": [
+              0.41400516,
+              0.0676151,
+              63.983281
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "asymmetric-01fe7f",
+      "expectedBackground": "#01fe7f",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 21,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#01fe7f",
+            "oklch": [
+              0.87243745,
+              0.23407928,
+              151.098543
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#01fe7f",
+            "oklch": [
+              0.87243745,
+              0.23407928,
+              151.098543
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#000000",
+            "oklch": [
+              0.0,
+              0.0,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.484
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.484
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 15.484
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 15.484
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.484
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 15.484
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#01fe7f",
+            "oklch_extraction": [
+              0.87243745,
+              0.23407928,
+              151.098543
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "asymmetric-7f01fe",
+      "expectedBackground": "#7f01fe",
+      "artifact": {
+        "schema": "notan-palette/1",
+        "schema_version": "1.0.0",
+        "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+        "producer": {
+          "name": "synthetic-host-ramp",
+          "revision": "0000000",
+          "spec_revision": "0.10"
+        },
+        "features": [],
+        "sequence": 22,
+        "generated_at": "2026-10-09T00:00:00Z",
+        "status": "ok",
+        "track": {
+          "file": "sample/loveless/0",
+          "artist": "My Bloody Valentine",
+          "album": "Loveless",
+          "title": "Only Shallow",
+          "art_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "roles": {
+          "background": {
+            "hex": "#7f01fe",
+            "oklch": [
+              0.52859279,
+              0.2920066,
+              293.764988
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "text": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "active": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "highlight_text": {
+            "hex": "#7f01fe",
+            "oklch": [
+              0.52859279,
+              0.2920066,
+              293.764988
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "frame": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "header_accent": {
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "origin": "synthetic-host-ramp",
+            "tier": "strict",
+            "kind": "base"
+          },
+          "inactive": {
+            "alias_of": "frame",
+            "hex": "#ffffff",
+            "oklch": [
+              0.99999999,
+              4e-08,
+              0
+            ],
+            "kind": "base"
+          }
+        },
+        "verified_pairs": [
+          {
+            "kind": "contrast",
+            "fg": "text",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.291
+          },
+          {
+            "kind": "contrast",
+            "fg": "accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.291
+          },
+          {
+            "kind": "contrast",
+            "fg": "active",
+            "bg": "background",
+            "floor": 3,
+            "measured": 6.291
+          },
+          {
+            "kind": "contrast",
+            "fg": "highlight_text",
+            "bg": "active",
+            "floor": 4.5,
+            "measured": 6.291
+          },
+          {
+            "kind": "contrast",
+            "fg": "frame",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.291
+          },
+          {
+            "kind": "contrast",
+            "fg": "header_accent",
+            "bg": "background",
+            "floor": 4.5,
+            "measured": 6.291
+          }
+        ],
+        "clusters": [
+          {
+            "id": 0,
+            "share": 1,
+            "hex": "#7f01fe",
+            "oklch_extraction": [
+              0.52859279,
+              0.2920066,
+              293.764988
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

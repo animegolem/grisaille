@@ -2,6 +2,7 @@
 import { createCliRenderer } from '@opentui/core';
 import { createRoot } from '@opentui/react';
 import { DemoBackend } from '../demo';
+import { demoPaletteProbeConfiguration } from '../demo-palette-probe';
 import { PaletteSession } from '../palette-session';
 import { paletteSourceFromEnvironment } from '../palette-file';
 import { MpdBackend } from '../mpd';
@@ -11,9 +12,10 @@ import { TerminalApp } from './app';
 import { NavigationStateStore, navigationStatePath } from '../navigation-state';
 
 const demo = process.argv.includes('--demo');
-const session = new MusicSession(demo ? new DemoBackend() : new MpdBackend(), 1000, new PaletteSession(paletteSourceFromEnvironment(demo)));
-const journal = new NavigationLog(demo ? 'demo' : 'mpd', undefined, 'tui');
-const navigationState = new NavigationStateStore(navigationStatePath(demo ? 'demo' : 'mpd', 'tui'));
+const probe = demoPaletteProbeConfiguration();
+const session = new MusicSession(demo ? new DemoBackend() : new MpdBackend(), 1000, new PaletteSession(probe?.paletteSource ?? paletteSourceFromEnvironment(demo)));
+const journal = new NavigationLog(demo ? 'demo' : 'mpd', probe?.navigationLogDirectory, 'tui');
+const navigationState = new NavigationStateStore(navigationStatePath(demo ? 'demo' : 'mpd', 'tui', probe?.navigationStateDirectory));
 const renderer = await createCliRenderer({ exitOnCtrlC: false, useMouse: false, screenMode: 'alternate-screen', onDestroy: () => { navigationState.detach(); session.stop(); } });
 const root = createRoot(renderer);
 function quit() { navigationState.detach(); root.unmount(); session.stop(); renderer.destroy(); }
