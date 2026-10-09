@@ -139,3 +139,12 @@ Owner also ruled the decomposition direction: carve pure cores along
 ruled contracts (cover service cross-court, color kernels as Bend pilot,
 palette decoder, session state machines); RL coordinates with Astra and
 Sol; RFC in the commons. No sitting started; start remains explicit.
+
+2026-10-09 (later): IMP003 round 1 received (digest 3bcac80d verified) and
+dispositioned in r2: R1 placeholder overlay ADMITTED (+IME-composition
+acceptance case); R2 precedence table and 4.5/3.0 floors ADOPTED (+marker
+re-checked on winning background; hover cue-only); R3 pure-core boundary,
+all requested paths, and fail-closed probe seam ADMITTED (NavigationLog
+isolation is acceptance evidence); R4 composite families ADOPTED — RL owes
+their filing to the RMPC design queue; nothing gates the sitting. Start
+AUTHORIZED on the Code Lead's start record. Base pins to this commit.
