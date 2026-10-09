@@ -158,3 +158,13 @@ is adopting cover-service resolve() when it lands (Grisaille stops fetching
 art itself); interim alignment is a small ticket to cut post-compact
 (IMP020 candidate). Astra's cover-service point-3 changes went directly to
 Plumb (letter in interchange/to-plumb/, digest 76e3aebb).
+
+2026-10-09 SITTING OPEN — AI-IMP-003 (host theme mapping and ramp).
+Start record .relay/inbox/imp003-theme-start.md (durable copy identical,
+SHA256 aa0c0a3d verified both); carrier event ee9ff145ece4621b ACKed
+exactly. Branch imp/003 clean at exact assigned base 1f83303; first
+command 2026-10-09T22:47:04.499980+00:00. Lease: Code Lead
+(astra_grisaille, w3:pB) within BRIEF-IMP003 + r2 dispositions (IME case
+checked early, per her start note). Review path: independent exact-head
+second review (standing reviewer), then RL boundary review, INDEX
+byte-check, merge.
