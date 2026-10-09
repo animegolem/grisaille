@@ -168,3 +168,10 @@ command 2026-10-09T22:47:04.499980+00:00. Lease: Code Lead
 checked early, per her start note). Review path: independent exact-head
 second review (standing reviewer), then RL boundary review, INDEX
 byte-check, merge.
+
+2026-10-09 (in-sitting ruling): IMP003 IME seam (r1 digest ffc59e0d
+verified) ruled — the R1 acceptance condition means FIRST delivered
+pre-edit event (flushSync + exact echo), measured bridge latency recorded
+on actual host with real IME, hide latched through composition, platform
+limit stated honestly; native-frame atomicity explicitly NOT required and
+would be a separate upstream admission. Sitting continues; no scope change.
