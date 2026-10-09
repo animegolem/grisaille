@@ -148,3 +148,13 @@ all requested paths, and fail-closed probe seam ADMITTED (NavigationLog
 isolation is acceptance evidence); R4 composite families ADOPTED — RL owes
 their filing to the RMPC design queue; nothing gates the sitting. Start
 AUTHORIZED on the Code Lead's start record. Base pins to this commit.
+
+2026-10-09 (recorded for a future ticket, outside IMP003): Astra observed
+Grisaille's artwork adapter tries readpicture BEFORE albumart — the reverse
+of the RMPC producer's resolution (publisher.rs:918-920) and of
+cover-service/1's ruled binding law. For both-sources tracks, displayed art
+can differ from the art whose hash rides the palette artifact. Correct fix
+is adopting cover-service resolve() when it lands (Grisaille stops fetching
+art itself); interim alignment is a small ticket to cut post-compact
+(IMP020 candidate). Astra's cover-service point-3 changes went directly to
+Plumb (letter in interchange/to-plumb/, digest 76e3aebb).
