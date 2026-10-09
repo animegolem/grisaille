@@ -211,3 +211,13 @@ remains failed (late getTree timeout, no complete-pass claim), two
 self-audit repairs flagged for review, one CUA rebinding incident
 disclosed. SECOND-REVIEW-IMP003 assignment cut for the standing reviewer.
 Submission held for independent rounds.
+
+2026-10-09 (in-review precision correction, Code Lead self-reported): the
+candidate packet's CUA-incident wording "snapshot mtime updated" was an
+INFERENCE — only a post-launch mtime (23:36:21.727100Z) was observed; no
+contemporaneous before hash/copy/stat exists, so a pre/post difference is
+not established. Recorded argv/PID observation and a stale September
+handoff copy path supplied to the standing reviewer (no private bodies);
+reviewer is distinguishing observed metadata from source-derived write
+effects. Head d54d055 untouched; no relaunches; live private-state file
+not accessed during clarification.
