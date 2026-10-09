@@ -191,3 +191,14 @@ an OS-delivered click for actual click-through evidence — no dependency
 patch, no scope change. Recorded as a pinned-dependency finding; candidate
 for the same upstream GPUIX report as the placeholder hardcode. Guard: the
 OS-delivered click targets only the probe-launched app.
+
+2026-10-09 (in-sitting ruling): native-evidence boundary set (r1 digest
+7c27e3c2 verified) — conservative same-clock upper bounds + functional
+pre-edit sequence ACCEPTED in place of unmeasurable isolated bridge
+latency; metric named honestly everywhere. R4 family-2 tuple corrected to
+(#7c86ff, 89/255, input background), hardcoded upstream — PROTOTYPE.md
+correction owed by RL at merge. Pinned-dependency findings now four
+(placeholder hardcode, simulate_click panic, selection wash, no native
+timestamp) — one consolidated upstream report candidate, owner's call.
+Self-audit repairs (fill==track; drag-preview state pair) proceed in
+ratified rules; reviewer re-checks those seams at candidate.
