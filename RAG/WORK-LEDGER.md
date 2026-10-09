@@ -183,3 +183,11 @@ marked_range, hide+latch). Installing a language input source is NOT
 required; any host input-source change would need owner approval and is
 not to be done as incidental setup. If dead keys do not produce marked
 text in the GPUIX input, report rather than install.
+
+2026-10-09 (in-sitting, probe infra): GPUIX 0.7 automation simulate_click
+reproducibly aborts (double_lease_panic) after repeated captures. Code Lead
+works around via child stderr/exit recording, existing keyboard action, and
+an OS-delivered click for actual click-through evidence — no dependency
+patch, no scope change. Recorded as a pinned-dependency finding; candidate
+for the same upstream GPUIX report as the placeholder hardcode. Guard: the
+OS-delivered click targets only the probe-launched app.
