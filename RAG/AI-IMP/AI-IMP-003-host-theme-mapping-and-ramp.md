@@ -28,7 +28,7 @@ No component/page extraction, visualizer, producer algorithm changes or arbitrar
 
 ### Design/Approach
 
-Ratify mapping for normal/muted/playing/selection/context states, with explicit fallback for absent derived selection. Bind both hosts to the accepted palette snapshot, including input colors. Add a known color ramp and actual-host conformance record; do not claim dynamic-background or full-gradient contrast.
+Ratify mapping for normal/muted/playing/selection/context states, with explicit fallback for absent derived selection. Bind both hosts to the accepted palette snapshot, including input colors. Add a known color ramp and actual-host conformance record; do not claim dynamic-background or full-gradient contrast. The mapping core is a PURE function (accepted snapshot in, one complete mapped theme out — no host reads, no clocks, no IO) published reactively per fold F8; host binding and repaint live at the edges. This is a decomposition requirement (amended 2026-10-09, owner-ruled direction): the pure core is a future standalone library, so its boundary is part of acceptance, not style.
 
 ### Files to Touch
 

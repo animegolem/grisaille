@@ -130,3 +130,12 @@ main at a49c91a by Code Lead first): deleted imp/001, imp/018, imp/002 in
 the Code Lead clone and imp/002 + review/imp002 in canonical. All were
 merged ancestors of main; nothing force-deleted. AI-LOG-002's owed fence
 cleanup is now closed.
+
+2026-10-09: Owner ruled sequencing — IMP003 proceeds ahead of the IMP019
+capture gate (gate stays open, pends the owner's live capture). Ticket
+AI-IMP-003 amended (pure mapping core as decomposition requirement);
+BRIEF-IMP003 cut and assigned to Code Lead; standing reviewer unchanged.
+Owner also ruled the decomposition direction: carve pure cores along
+ruled contracts (cover service cross-court, color kernels as Bend pilot,
+palette decoder, session state machines); RL coordinates with Astra and
+Sol; RFC in the commons. No sitting started; start remains explicit.
