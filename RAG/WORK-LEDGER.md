@@ -202,3 +202,12 @@ correction owed by RL at merge. Pinned-dependency findings now four
 timestamp) — one consolidated upstream report candidate, owner's call.
 Self-audit repairs (fill==track; drag-preview state pair) proceed in
 ratified rules; reviewer re-checks those seams at candidate.
+
+2026-10-09: IMP003 candidate received (packet digest 74b20187 verified;
+head d54d055, one atomic commit on canonical 0f82a22, clone clean,
++5397/-254 across 16 files). Exact-head gate green per packet
+(155/0/1048 + validators). Honest disclosures: native automation script
+remains failed (late getTree timeout, no complete-pass claim), two
+self-audit repairs flagged for review, one CUA rebinding incident
+disclosed. SECOND-REVIEW-IMP003 assignment cut for the standing reviewer.
+Submission held for independent rounds.
