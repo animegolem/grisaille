@@ -7,10 +7,10 @@
 | Status | EPICs | IMPs |
 |--------|-------|------|
 | In Progress | 0 | 0 |
-| Planned | 5 | 12 |
+| Planned | 5 | 11 |
 | Deferred | 1 | 3 |
 | Cancelled | 0 | 0 |
-| Completed | 0 | 4 |
+| Completed | 0 | 5 |
 | **Total** | **6** | **19** |
 
 ## Planned
@@ -21,7 +21,7 @@
 **IMPs:**
 - [[AI-IMP-001-palette-contract-and-fixtures|IMP-001]] Palette contract and fixtures — completed
 - [[AI-IMP-002-transactional-palette-subscription|IMP-002]] Transactional palette subscription — completed
-- [[AI-IMP-003-host-theme-mapping-and-ramp|IMP-003]] Host theme mapping and ramp — planned
+- [[AI-IMP-003-host-theme-mapping-and-ramp|IMP-003]] Host theme mapping and ramp — completed
 - [[AI-IMP-018-decoder-provenance-presence-amendment|IMP-018]] Narrow consumer amendment: tier optionality + origin presence matrix — completed
 - [[AI-IMP-019-genuine-capture-conformance-gate|IMP-019]] Genuine-capture conformance gate (consumer side) — planned
 
@@ -93,7 +93,7 @@ Git edit date so a second review can be judged.
 ### > 300 LOC
 
 - RAG/scripts/carrier-receiver.py (589 LOC)
-- PROTOTYPE.md (523 LOC)
+- PROTOTYPE.md (526 LOC)
 - RAG/scripts/computer_history_projector.py (443 LOC)
 - docs/palette-runtime.md (431 LOC)
 - SPEC.md (426 LOC)

@@ -262,8 +262,11 @@ palette is unchanged. It is a typed palette boundary, not a theme settings syste
   outlines. `theme.opacity.heldSource` controls the original row while grabbed.
 - Layout-only wrappers inherit their containing surface. Artwork pixels and
   macOS-owned traffic lights/window shadows are outside this app palette.
-- Native input colours are explicitly supplied through `inputTheme()`; GPUIX
-  derives some native text-selection appearance from the input accent.
+- Native input colours are explicitly supplied through `inputTheme()`.
+  CORRECTED 2026-10-10 (IMP003 evidence): GPUIX 0.7 does NOT derive native
+  text-selection appearance from the input accent — the selection wash is
+  hardcoded #7c86ff59 (pinned input.rs:1734) and ignores style.selectionColor;
+  it cannot be themed without an upstream change.
 
 For example, a future palette producer can supply this as `surfaces.canvas`:
 

@@ -249,3 +249,14 @@ attempt (154/1/1044), full rerun 155/0/1048 with zero source/dependency
 change; cause unresolved, not claimed infra-only. RL boundary gate will
 note frequency; recurs -> its own small ticket against the IMP002 watcher
 seam. Carrier submission may proceed.
+
+2026-10-10 SITTING CLOSED — AI-IMP-003 ACCEPTED AND MERGED. Submitted head
+90c9000 (r2 CLEAR); carrier event c38c0a5c exact-ACKed, payload identical
+across all three copies. RL boundary gate reproduced in canonical
+(155/0/1048, build, package, validators 27/0/0 + 1/0/0); INDEX regenerated
+byte-identical; frozen boundaries zero-diff; watcher intermittent did not
+reproduce (0/1, rule stands). PROTOTYPE.md:265-266 corrected per evidence.
+Final review RAG/reviews/imp003-final-review.md; ticket completed. Lease
+released. Open next: accepted-verdict publish + pair archive; IMP019
+(owner capture); IMP020 candidates (readpicture-order, probe guard);
+RMPC design-queue filing of R4 composite families (RL-owed).
