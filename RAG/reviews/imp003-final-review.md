@@ -55,3 +55,12 @@ conformance remains with IMP019; host visual acceptance remains the owner's.
 Ticket AI-IMP-003 completed by this review (reserved fields). Ledger
 updated; lease closed. Ref cleanup (imp/003 in clone and canonical,
 review/imp003) executed as RL-only per fence, coordinated below.
+
+---
+
+*Correction forward (2026-10-10, reported by the Code Lead post-archive):
+this review and the published verdict quote the pre-amendment diffstat
+(+5397). The accepted head's actual shortstat against bc436b0 is 16 files,
++5400/−254 — the three net lines are the incident-prose amendment itself.
+No product or gate implication; the archived verdict artifact stands as
+published, corrected here forward.*

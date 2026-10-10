@@ -260,3 +260,9 @@ Final review RAG/reviews/imp003-final-review.md; ticket completed. Lease
 released. Open next: accepted-verdict publish + pair archive; IMP019
 (owner capture); IMP020 candidates (readpicture-order, probe guard);
 RMPC design-queue filing of R4 composite families (RL-owed).
+
+2026-10-10: IMP003 channel closed by Code Lead (pair archived, 13 events /
+0 unacked / 0 leases; 90c9000 verified ancestor of merge 6173dbc, closure
+3859e71). RL ref cleanup completed: imp/003 deleted in the parked clone.
+Diffstat corrected forward in the final review (+5400/−254, not +5397 —
+the amendment's own three lines). IMP003 fully closed.
