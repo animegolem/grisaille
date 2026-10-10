@@ -240,3 +240,12 @@ Optional probe-launch guard DECLINED by Code Lead to keep the delta
 evidence-only — correct; recorded as a future probe-infra item (rides the
 IMP020-era housekeeping, not this sitting). Delta review with the standing
 reviewer; carrier hold maintained.
+
+2026-10-10: IMP003 independent r2 CLEAR at 90c9000 (digest 3b604074
+verified); rounds closed, R1 repaired, runtime byte-identical, no guard.
+STABILITY OBSERVATION retained per reviewer: one intermittent timeout in
+palette-file.test.ts:283 (atomic replacement event, 2500ms) on first gate
+attempt (154/1/1044), full rerun 155/0/1048 with zero source/dependency
+change; cause unresolved, not claimed infra-only. RL boundary gate will
+note frequency; recurs -> its own small ticket against the IMP002 watcher
+seam. Carrier submission may proceed.
