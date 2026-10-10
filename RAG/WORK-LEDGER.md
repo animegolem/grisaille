@@ -232,3 +232,11 @@ unproved); NO restoration/rollback ruled — the stale September copy is not
 a baseline and a "repair" would be worse than the disclosed unknown;
 optional probe-launch guard may ride the amendment. Delta re-review, then
 carrier submission, then RL boundary review and merge.
+
+2026-10-10: IMP003 evidence amendment delivered — new head 90c9000 (old
+d54d055), rebased onto bc436b0 (correspondence/RAG-only drift), range-diff
+confirms ticket incident prose only, gate reproduced, binary byte-identical.
+Optional probe-launch guard DECLINED by Code Lead to keep the delta
+evidence-only — correct; recorded as a future probe-infra item (rides the
+IMP020-era housekeeping, not this sitting). Delta review with the standing
+reviewer; carrier hold maintained.
