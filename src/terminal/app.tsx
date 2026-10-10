@@ -1,5 +1,5 @@
 /** @jsxImportSource @opentui/react */
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { flushSync, useKeyboard, useTerminalDimensions } from '@opentui/react';
 import type { ImageRenderProtocol, KeyEvent } from '@opentui/core';
 import { MusicSession, useMusic } from '../music-session';
@@ -8,7 +8,8 @@ import { browserColumns, browserTarget, browserTrail } from '../browser';
 import { albumPlace, identifyPlace, placeKey, resolvePlace, routeItems, routeTitle } from '../locations';
 import { albumKey, albumsOf, artistsOf, duration, fuzzyScore, searchLibrary, type Album, type Result, type Track } from '../model';
 import { directionOf } from '../navigation';
-import { theme } from '../theme';
+import { pairForState, type MusicTheme, type TextTone, type ThemePair } from '../theme';
+import { ThemeProvider, ThemePairProvider, useTheme, useThemePair } from '../use-theme';
 import { albumOrders, artistOrders, defaultOrder, orderAlbums, orderArtists, type LibraryOrder } from '../library-order';
 import type { NavigationState, NavigationStateStore } from '../navigation-state';
 import { lyricRows } from '../lyrics';
@@ -17,9 +18,8 @@ import { useLyrics } from '../use-lyrics';
 const noStateSubscription = () => () => {};
 const noStateError = () => undefined;
 
-const C = theme.colors;
 // A terminal cell has one background; a future GUI gradient uses its first stop here.
-const fill = (name: keyof typeof theme.surfaces): string => {
+const fill = (theme: MusicTheme, name: keyof MusicTheme['surfaces']): string => {
   const paint = theme.surfaces[name];
   return typeof paint === 'string' ? paint : paint.stops[0]!.color;
 };
@@ -29,10 +29,22 @@ export function reveal(index: number, top: number, count: number, capacity: numb
   const next = index < top ? index : index >= top + capacity ? index - capacity + 1 : top;
   return Math.max(0, Math.min(Math.max(0, count - capacity), next));
 }
-function Line({ text, color = C.text }: { text: string; color?: string }) {
-  return <text content={plain(text)} fg={color} height={1} flexShrink={0} wrapMode="none" truncate />;
+function Line({ text, tone = 'text', marker, suffix }: { text: string; tone?: TextTone; marker?: string; suffix?: string }) {
+  const pair = useThemePair();
+  return <text fg={pair.colors[tone]} height={1} flexShrink={0} wrapMode="none" truncate>
+    {marker && <span fg={pair.marker}>{plain(marker)}</span>}{plain(text)}{suffix && <span fg={pair.marker}>{plain(suffix)}</span>}
+  </text>;
+}
+/** Every descendant, including secondary text, inherits the winning state's complete pair. */
+function Row({ pair, height, children }: { pair: ThemePair; height: number; children: ReactNode }) {
+  return <ThemePairProvider pair={pair}><box height={height} flexShrink={0} backgroundColor={pair.background}>{children}</box></ThemePairProvider>;
+}
+function Tab({ active, label }: { active: boolean; label: string }) {
+  const theme = useTheme(), pair = pairForState(theme, { active });
+  return <text fg={active ? pair.colors.text : pair.colors.muted} bg={pair.background}>{label}</text>;
 }
 function Cover({ session, track, width, height, protocol }: { session: MusicSession; track?: Track; width: number; height: number; protocol: ImageRenderProtocol }) {
+  const theme = useTheme();
   const [source, setSource] = useState<string>();
   const [error, setError] = useState(false);
   useEffect(() => {
@@ -41,14 +53,19 @@ function Cover({ session, track, width, height, protocol }: { session: MusicSess
     if (track) void session.backend.artwork(track).then(value => { if (active) setSource(value); }).catch(() => { if (active) setError(true); });
     return () => { active = false; };
   }, [session, track?.uri]);
-  return <box width={width} height={height} justifyContent="center" alignItems="center" backgroundColor={fill('coverPlaceholder')}>
-    {source && !error ? <image source={source} width={width} height={height} fit="fit" protocol={protocol} onError={() => setError(true)} /> : <Line text={error ? 'Artwork unavailable' : 'No cover'} color={C.muted} />}
-  </box>;
+  return <ThemePairProvider pair={theme.pairs.normal}><box width={width} height={height} justifyContent="center" alignItems="center" backgroundColor={fill(theme, 'coverPlaceholder')}>
+    {source && !error ? <image source={source} width={width} height={height} fit="fit" protocol={protocol} onError={() => setError(true)} /> : <Line text={error ? 'Artwork unavailable' : 'No cover'} tone="muted" />}
+  </box></ThemePairProvider>;
 }
-export function TerminalApp({ session, record = () => {}, quit = () => {}, protocol = 'auto', logError, navigationState }: {
+type TerminalAppProps = {
   session: MusicSession; record?: (event: NavigationEvent) => void; quit?: () => void;
   protocol?: ImageRenderProtocol; logError?: () => string | undefined; navigationState?: NavigationStateStore;
-}) {
+};
+export function TerminalApp(props: TerminalAppProps) {
+  return <ThemeProvider session={props.session}><TerminalAppContent {...props} /></ThemeProvider>;
+}
+function TerminalAppContent({ session, record = () => {}, quit = () => {}, protocol = 'auto', logError, navigationState }: TerminalAppProps) {
+  const theme = useTheme(), C = theme.colors;
   const { library, snapshot, loading, libraryReady, snapshotReady, libraryProblem, connection, notice, problem, actionProblem, playClock, act, reloadLibrary, setNotice } = useMusic(session);
   const saved = useMemo(() => navigationState?.read(), [navigationState]);
   const restoring = useRef(Boolean(saved));
@@ -311,41 +328,45 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
   const resultTop = Math.max(0, resultIndex - resultCount + 1);
   const input = <box height={1} flexDirection="row" gap={1}>
     <text fg={C.accent}>{prompt === 'global' ? ':' : '/'}</text>
-    <input id="music-prompt" focused value={query} flexGrow={1} backgroundColor={fill('prompt')} textColor={C.text} focusedBackgroundColor={fill('prompt')} focusedTextColor={C.text} placeholderColor={C.muted} cursorColor={C.caret} placeholder={prompt === 'global' ? 'Find an artist, album, track or action' : 'Find in this list'} onInput={value => flushSync(() => { setQuery(value); setResultIndex(0); })} onSubmit={() => flushSync(() => { if (prompt === 'global') activateResult(results[resultIndex]); else setPrompt(undefined); })} />
+    <input id="music-prompt" focused value={query} flexGrow={1} backgroundColor={fill(theme, 'prompt')} textColor={C.text} focusedBackgroundColor={fill(theme, 'prompt')} focusedTextColor={C.text} placeholderColor={C.placeholder} cursorColor={C.caret} selectionBg={theme.pairs.selected.background} selectionFg={theme.pairs.selected.colors.text} placeholder={prompt === 'global' ? 'Find an artist, album, track or action' : 'Find in this list'} onInput={value => flushSync(() => { setQuery(value); setResultIndex(0); })} onSubmit={() => flushSync(() => { if (prompt === 'global') activateResult(results[resultIndex]); else setPrompt(undefined); })} />
   </box>;
-  if (width < 40 || height < 12) return <box padding={1}><Line text="Music · enlarge to at least 40 × 12" /><Line text="q quit · Ctrl+C quit" color={C.muted} /></box>;
-  return <box width="100%" height="100%" flexDirection="column" backgroundColor={fill('canvas')}>
-    <box height={3} paddingLeft={2} paddingRight={2} paddingTop={1} flexDirection="row" gap={3} backgroundColor={fill('header')}>
-      <text fg={route.page === 'queue' ? C.text : C.muted}>{width < 60 ? 'F1 Play' : 'F1 Now playing'}</text><text fg={route.page === 'lyrics' ? C.text : C.muted}>F2 Lyrics</text><text fg={route.page === 'library' ? C.text : C.muted}>F3 Library</text>
+  if (width < 40 || height < 12) return <box width="100%" height="100%" padding={1} backgroundColor={fill(theme, 'canvas')}><Line text="Music · enlarge to at least 40 × 12" /><Line text="q quit · Ctrl+C quit" tone="muted" /></box>;
+  return <box width="100%" height="100%" flexDirection="column" backgroundColor={fill(theme, 'canvas')}>
+    <box height={3} paddingLeft={2} paddingRight={2} paddingTop={1} flexDirection="row" gap={3} backgroundColor={fill(theme, 'header')}>
+      <Tab active={route.page === 'queue'} label={width < 60 ? 'F1 Play' : 'F1 Now playing'} /><Tab active={route.page === 'lyrics'} label="F2 Lyrics" /><Tab active={route.page === 'library'} label="F3 Library" />
     </box>
     <box flexGrow={1} minHeight={0} paddingLeft={2} paddingRight={2} paddingTop={tight ? 0 : 1} flexDirection="column">
-      {prompt === 'global' ? <box flexDirection="column" height="100%" gap={compactPrompt ? 0 : 1} backgroundColor={fill('prompt')} padding={compactPrompt ? 0 : 1}>
+      {prompt === 'global' ? <box flexDirection="column" height="100%" gap={compactPrompt ? 0 : 1} backgroundColor={fill(theme, 'prompt')} padding={compactPrompt ? 0 : 1}>
         {input}
-        {!compactPrompt && <Line text="Artists · albums · tracks · actions" color={C.muted} />}
+        {!compactPrompt && <Line text="Artists · albums · tracks · actions" tone="muted" />}
         <box flexGrow={1} minHeight={0} flexDirection="column">
           {results.slice(resultTop, resultTop + resultCount).map((result, i) => {
             const title = result.kind === 'artist' ? result.artist.name : result.kind === 'album' ? result.album.title : result.kind === 'track' ? result.track.title : result.title;
             const subtitle = result.kind === 'artist' ? `${result.artist.albums.length} albums` : result.kind === 'album' ? `${result.album.artist} · ${result.album.year}` : result.kind === 'track' ? `${result.track.artist} · ${result.track.album}` : 'Run action';
-            return <box key={result.key} height={2} flexShrink={0} backgroundColor={i + resultTop === resultIndex ? fill('promptResultSelected') : fill('prompt')}>
-              <Line text={`${i + resultTop === resultIndex ? '›' : ' '} ${result.kind.padEnd(6)} ${title}`} /><Line text={`         ${subtitle}`} color={C.muted} />
-            </box>;
+            return <Row key={result.key} height={2} pair={pairForState(theme, { selected: i + resultTop === resultIndex })}>
+              <Line marker={`${i + resultTop === resultIndex ? '›' : ' '} `} text={`${result.kind.padEnd(6)} ${title}`} /><Line text={`         ${subtitle}`} tone="muted" />
+            </Row>;
           })}
-          {!results.length && <Line text={loading ? 'Reading the library…' : 'No matches'} color={C.muted} />}
+          {!results.length && <Line text={loading ? 'Reading the library…' : 'No matches'} tone="muted" />}
         </box>
-        {!compactPrompt && <Line text="↑↓ choose · Enter open / run · Esc return" color={C.muted} />}
+        {!compactPrompt && <Line text="↑↓ choose · Enter open / run · Esc return" tone="muted" />}
       </box> : route.page === 'lyrics' ? <box flexGrow={1} minHeight={0} flexDirection="column">
-        <Line text={current?.title || 'Nothing playing'} color={C.accent} />
-        <Line text={current ? `${current.artist} · ${current.album}` : 'Choose a track to see its lyrics'} color={C.muted} />
-        <Line text={lyrics.loading ? 'Reading local lyrics…' : lyrics.error || (!lyrics.lyrics ? 'No local lyrics found · r reload' : lyrics.lyrics.synced ? `${lyrics.following ? 'Following playback' : 'Reading'} · ${snapshot.state === 'pause' ? 'paused' : connection === 'down' ? 'disconnected' : 'synced lyrics'}` : 'Untimed lyrics')} color={lyrics.error ? C.warning : C.muted} />
+        <Line text={current?.title || 'Nothing playing'} tone="accent" />
+        <Line text={current ? `${current.artist} · ${current.album}` : 'Choose a track to see its lyrics'} tone="muted" />
+        <Line text={lyrics.loading ? 'Reading local lyrics…' : lyrics.error || (!lyrics.lyrics ? 'No local lyrics found · r reload' : lyrics.lyrics.synced ? `${lyrics.following ? 'Following playback' : 'Reading'} · ${snapshot.state === 'pause' ? 'paused' : connection === 'down' ? 'disconnected' : 'synced lyrics'}` : 'Untimed lyrics')} tone={lyrics.error ? 'warning' : 'muted'} />
         {prompt === 'local' && <box height={tight ? 1 : 2} paddingTop={tight ? 0 : 1}>{input}</box>}
         <box flexGrow={1} minHeight={0} flexDirection="column">
-          {lyricLines.slice(lyricTop, lyricTop + lyricCapacity).map((row, index) => <box key={lyricTop + index} height={1} flexShrink={0} backgroundColor={row.line === lyrics.selectedLine && !lyrics.following ? fill('lyricRowSelected') : fill('canvas')}>
-            <Line text={`${row.line === lyrics.selectedLine ? '›' : row.line === lyrics.activeLine ? '•' : ' '} ${row.text || '· · ·'}`} color={row.line === lyrics.activeLine ? C.accent : C.text} />
-          </box>)}
+          {lyricLines.slice(lyricTop, lyricTop + lyricCapacity).map((row, index) => {
+            const selected = row.line === lyrics.selectedLine && !lyrics.following, active = row.line === lyrics.activeLine;
+            const marker = `${row.line === lyrics.selectedLine ? '›' : active ? '•' : ' '} `;
+            return <Row key={lyricTop + index} height={1} pair={pairForState(theme, { selected, active })}>
+              <Line marker={marker} text={row.text || '· · ·'} suffix={selected && active ? ' •' : undefined} />
+            </Row>;
+          })}
         </box>
-        {!(tight && prompt === 'local') && <Line text={lyrics.lyrics?.synced ? 'j/k read · Enter seek · f follow · / find · r reload' : 'j/k read · / find · r reload'} color={C.muted} />}
+        {!(tight && prompt === 'local') && <Line text={lyrics.lyrics?.synced ? 'j/k read · Enter seek · f follow · / find · r reload' : 'j/k read · / find · r reload'} tone="muted" />}
       </box> : <>
-        <Line text={`${heading}   ${items.length ? place.selection + 1 : 0}/${items.length}${route.page === 'library' || route.page === 'artist' ? `   s ${sortLabel} ▾` : ''}`} color={C.accent} />
+        <Line text={`${heading}   ${items.length ? place.selection + 1 : 0}/${items.length}${route.page === 'library' || route.page === 'artist' ? `   s ${sortLabel} ▾` : ''}`} tone="accent" />
         {prompt === 'local' && <box height={tight ? 1 : 2} paddingTop={tight ? 0 : 1}>{input}</box>}
         <box flexDirection="row" gap={browse ? 2 : 3} flexGrow={1} minHeight={0} paddingTop={tight ? 0 : 1}>
           {browse ? visibleColumns.map(column => {
@@ -353,20 +374,20 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
             const columnTop = point.viewport?.kind === 'list' ? point.viewport.index : 0;
             const active = browse.active === column;
             return <box key={column} flexDirection="column" flexGrow={column === 'tracks' ? 1.4 : 1} flexBasis={0} minWidth={0}>
-              {visibleColumns.length > 1 && <Line text={`${active ? '›' : ' '} ${column.toUpperCase()} ${columnItems.length}`} color={active ? C.accent : C.muted} />}
+              {visibleColumns.length > 1 && <Line text={`${active ? '›' : ' '} ${column.toUpperCase()} ${columnItems.length}`} tone={active ? 'accent' : 'muted'} />}
               {column === 'tracks' && browserArt && <box height={5} flexShrink={0} flexDirection="row" gap={1}>
                 <Cover session={session} track={browse.track} width={8} height={4} protocol={protocol} />
-                <box flexDirection="column" flexGrow={1} minWidth={0}><Line text={active ? browse.track?.title || '' : browse.album?.title || ''} /><Line text={browse.track?.artist || ''} color={C.muted} /><Line text={active ? browse.album?.title || '' : browse.album?.year || ''} color={C.muted} /></box>
+                <box flexDirection="column" flexGrow={1} minWidth={0}><Line text={active ? browse.track?.title || '' : browse.album?.title || ''} /><Line text={browse.track?.artist || ''} tone="muted" /><Line text={active ? browse.album?.title || '' : browse.album?.year || ''} tone="muted" /></box>
               </box>}
               {columnItems.slice(columnTop, columnTop + capacityFor(column)).map((track, offset) => {
                 const index = columnTop + offset, chosen = point.selection === index;
                 const title = column === 'artists' ? track.artist : column === 'albums' ? track.album : track.title;
                 const subtitle = column === 'artists' ? `${artists[index]?.albums.length || 0} albums` : column === 'albums' ? `${track.year} · ${browse.person?.albums[index]?.tracks.length || 0} tracks` : `${track.disc && track.disc > 1 ? `${track.disc}.` : ''}${String(track.number).padStart(2, '0')} · ${duration(track.duration)}`;
-                return <box key={placeKey(point.route, track)} height={2} flexShrink={0} backgroundColor={chosen ? fill(active ? 'browserRowSelected' : 'browserRowContext') : fill('canvas')}>
-                  <Line text={`${chosen ? active ? '›' : '·' : ' '} ${title}`} /><Line text={`  ${subtitle}`} color={C.muted} />
-                </box>;
+                return <Row key={placeKey(point.route, track)} height={2} pair={pairForState(theme, { selected: chosen && active, context: chosen && !active })}>
+                  <Line marker={`${chosen ? active ? '›' : '·' : ' '} `} text={title} /><Line text={`  ${subtitle}`} tone="muted" />
+                </Row>;
               })}
-              {!columnItems.length && <Line text={loading ? 'Reading…' : 'Nothing here'} color={C.muted} />}
+              {!columnItems.length && <Line text={loading ? 'Reading…' : 'Nothing here'} tone="muted" />}
             </box>;
           }) : <><box flexDirection="column" flexGrow={1} minWidth={0}>
             {items.slice(top, top + capacity).map((track, i) => {
@@ -376,26 +397,26 @@ export function TerminalApp({ session, record = () => {}, quit = () => {}, proto
               const title = route.page === 'library' && route.mode === 'artists' ? track.artist : route.page === 'artist' || route.page === 'library' ? track.album : track.title;
               const subtitle = route.page === 'library' && route.mode === 'artists' ? `${artists.find(a => a.name === track.artist)?.albums.length || 0} albums` : `${track.artist} · ${route.page === 'library' || route.page === 'artist' ? track.year : track.album}`;
               const marker = held?.target === index ? '↕' : isSelected ? '›' : playing ? '▶' : ' ';
-              return <box key={placeKey(route, track)} height={2} flexShrink={0} backgroundColor={isSelected ? fill('queueRowSelected') : fill('canvas')}>
-                <Line text={`${marker} ${String(index + 1).padStart(2)} ${playing ? '▶ ' : ''}${title}`} /><Line text={`     ${subtitle}`} color={C.muted} />
-              </box>;
+              return <Row key={placeKey(route, track)} height={2} pair={pairForState(theme, { selected: isSelected, active: playing })}>
+                <Line marker={`${marker} `} text={`${String(index + 1).padStart(2)} ${playing ? '▶ ' : ''}${title}`} /><Line text={`     ${subtitle}`} tone="muted" />
+              </Row>;
             })}
-            {!items.length && <Line text={loading ? 'Reading the library…' : 'Nothing here. Find an album with :'} color={C.muted} />}
+            {!items.length && <Line text={loading ? 'Reading the library…' : 'Nothing here. Find an album with :'} tone="muted" />}
           </box>
           {showDetail && <box width={detailWidth} flexShrink={0} flexDirection="column" gap={1}>
             <Cover session={session} track={shown} width={detailWidth} height={Math.max(4, Math.min(Math.floor(detailWidth / 2), height - 17))} protocol={protocol} />
-            <box><Line text={shown?.title || 'Nothing playing'} /><Line text={shown?.artist || ''} color={C.muted} /><Line text={shown?.album || ''} color={C.muted} /></box>
+            <box><Line text={shown?.title || 'Nothing playing'} /><Line text={shown?.artist || ''} tone="muted" /><Line text={shown?.album || ''} tone="muted" /></box>
           </box>}</>}
         </box>
       </>}
     </box>
-    <box height={4} flexShrink={0} paddingLeft={2} paddingRight={2} paddingTop={1} backgroundColor={fill('transport')}>
+    <box height={4} flexShrink={0} paddingLeft={2} paddingRight={2} paddingTop={1} backgroundColor={fill(theme, 'transport')}>
       <Line text={`${snapshot.state === 'play' ? '▶' : snapshot.state === 'pause' ? 'Ⅱ' : '■'} ${current?.title || 'Nothing playing'}   ${duration(elapsed)} / ${duration(current?.duration || 0)}   ${snapshot.volume}%`} />
-      <Line text={held ? 'Moving · arrows / hjkl position · Enter drop · Esc cancel' : route.page === 'lyrics' ? 'Space pause · [/] seek · : prompt · o/i history · q quit' : 'hjkl / arrows · Enter play/open · Space pause · : prompt · o/i history · q quit'} color={C.muted} />
-      <Line text={`${status} · ${error || notice}`} color={error ? C.warning : C.muted} />
+      <Line text={held ? 'Moving · arrows / hjkl position · Enter drop · Esc cancel' : route.page === 'lyrics' ? 'Space pause · [/] seek · : prompt · o/i history · q quit' : 'hjkl / arrows · Enter play/open · Space pause · : prompt · o/i history · q quit'} tone="muted" />
+      <Line text={`${status} · ${error || notice}`} tone={error ? 'warning' : 'muted'} />
     </box>
-    {sortOpen && <box position="absolute" top={5} right={2} width={Math.min(29, width - 4)} height={sortOptions.length + 2} padding={1} backgroundColor={fill('sortMenu')}>
-      {sortOptions.map((option, index) => <text key={option.value} height={1} fg={index === sortIndex ? C.accent : C.text} bg={index === sortIndex ? fill('sortItemSelected') : fill('sortMenu')}>{`${index === sortIndex ? '›' : ' '} ${option.label}`}</text>)}
+    {sortOpen && <box position="absolute" top={5} right={2} width={Math.min(29, width - 4)} height={sortOptions.length + 2} padding={1} backgroundColor={fill(theme, 'sortMenu')}>
+      {sortOptions.map((option, index) => <Row key={option.value} height={1} pair={pairForState(theme, { selected: index === sortIndex })}><Line marker={`${index === sortIndex ? '›' : ' '} `} text={option.label} /></Row>)}
     </box>}
   </box>;
 }
