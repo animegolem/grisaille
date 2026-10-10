@@ -266,3 +266,14 @@ RMPC design-queue filing of R4 composite families (RL-owed).
 3859e71). RL ref cleanup completed: imp/003 deleted in the parked clone.
 Diffstat corrected forward in the final review (+5400/−254, not +5397 —
 the amendment's own three lines). IMP003 fully closed.
+
+2026-10-10: Developer signing identity available house-wide (tally's
+notice, team 688P8WSL8U; custody law: owner keychain only, signing as an
+operation, never export/copy/cache). Astra confirmed one valid identity
+and routed the concrete gap: scripts/package-mac.py neither detects an
+identity nor codesigns, so adoption is NOT automatic here. Banked as the
+third IMP-candidate for post-compact cutting (with readpicture-order and
+probe-launch guard): adopt the witness/build.sh pattern — prefer "Apple
+Development", fall back ad-hoc — making TCC grants survive rebuilds for
+native probes and owner use. TCC continuity unexercised for Grisaille so
+far. No source edits, signing, or launches performed in this intake.
