@@ -1,0 +1,62 @@
+[
+  {
+    "file": "gate.log",
+    "source": "/tmp/grisaille-imp003-d54d055-gate.log",
+    "sha256": "1cd302eb2889a8ab4100028536287ea13c75d6197d2d318dd9162dee9a272270"
+  },
+  {
+    "file": "native-report.json",
+    "source": "/tmp/grisaille-imp003-native-candidate-20261009/report.json",
+    "sha256": "2e23b1ca23dabfa5800b442dbca8a864861b8a39b3ddc92ba0fe1480ff9d3013"
+  },
+  {
+    "file": "native-events.jsonl",
+    "source": "/tmp/grisaille-imp003-native-candidate-20261009/probe/native-events.jsonl",
+    "sha256": "be163150f2dde7122b219f0439b21b5ac6e6cf604a93db1931bc2e84acca5d64"
+  },
+  {
+    "file": "native-source.jsonl",
+    "source": "/tmp/grisaille-imp003-native-candidate-20261009/probe/diagnostics/source.jsonl",
+    "sha256": "003bb304ca2d20bdbe3341bc82de21a4c7514d8c2976ed9054196b14ed09bfb5"
+  },
+  {
+    "file": "native-earlier-timeout-report.json",
+    "source": "/tmp/grisaille-imp003-native-complete-20261009/report.json",
+    "sha256": "8accd563c1d574f99a94f25bd72c4d7039ad6c4476831221d2d5107fd9e15b09"
+  },
+  {
+    "file": "native-earlier-blur-report.json",
+    "source": "/tmp/grisaille-imp003-native-traced-20261009/report.json",
+    "sha256": "fe5369dbade3e326576bc5eef364f29ee678ff00b470f2b4d350e6045fe75d0a"
+  },
+  {
+    "file": "field-pixel-samples.json",
+    "source": "/tmp/grisaille-imp003-field-pixels-20261009.json",
+    "sha256": "f627001cb375eb5ba0929c71ebea5019ff5164b9c17225196da21811ce0e0b35"
+  },
+  {
+    "file": "pty-report.json",
+    "source": "/tmp/grisaille-imp003-terminal-complete-20261009/report.json",
+    "sha256": "3125ac582c627480c5a8c16568920422519d3a8e14712ca8705822e53ccc40b4"
+  },
+  {
+    "file": "ime-interactive.json",
+    "source": "/tmp/grisaille-imp003-ime-r4-20261009/interactive.json",
+    "sha256": "7fb0232ee5f175f407f865715b75b15883cc72f69f7b64cf491481a05337ac25"
+  },
+  {
+    "file": "ime-events.jsonl",
+    "source": "/tmp/grisaille-imp003-ime-r4-20261009/probe/native-events.jsonl",
+    "sha256": "c4fa207fb2f25675395958ec9fbe16f9a8be55dfcc80b9f6eafbcdbee25bc86d"
+  },
+  {
+    "file": "blur-interactive.json",
+    "source": "/tmp/grisaille-imp003-blur-r2-20261009/interactive.json",
+    "sha256": "142cc218c9b10892d60a1caf3fa2992d55d57a6c97c2d13e8fd1c5965130b5be"
+  },
+  {
+    "file": "blur-events.jsonl",
+    "source": "/tmp/grisaille-imp003-blur-r2-20261009/probe/native-events.jsonl",
+    "sha256": "bb8655a5520d0a9ee2333224546143d330c1a8a17de3dc19df7cc32c8796ae07"
+  }
+]

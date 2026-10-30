@@ -1,0 +1,83 @@
+diff --git a/color-core/src/color.rs b/color-core/src/color.rs
+index 176e043..6614273 100644
+--- a/color-core/src/color.rs
++++ b/color-core/src/color.rs
+@@ -158,17 +158,24 @@ pub fn oklch_to_oklab(lch: [f32; 3]) -> [f32; 3] {
+ 
+ /// Convert OKLab to sRGB bytes using chroma compression to keep L/h stable.
+ pub fn oklab_to_srgb8_gamut_mapped(lab: [f32; 3]) -> [u8; 3] {
++    oklab_to_srgb8_gamut_mapped_with_oklab(lab).0
++}
++
++/// Return mapped sRGB bytes and the same post-map OKLab coordinate used to
++/// produce them, before transfer encoding and 8-bit quantization.
++pub fn oklab_to_srgb8_gamut_mapped_with_oklab(lab: [f32; 3]) -> ([u8; 3], [f32; 3]) {
+     let linear = oklab_to_linear_rgb(lab);
+     if is_in_gamut_rgb(linear) {
+-        return linear_to_srgb8(linear);
++        return (linear_to_srgb8(linear), lab);
+     }
+     let lch = oklab_to_oklch(lab);
+     let l = lch[0];
+     let c = lch[1];
+     let h = lch[2];
+     if c <= 0.0 {
+-        let neutral = oklab_to_linear_rgb([l, 0.0, 0.0]).map(clamp01);
+-        return linear_to_srgb8(neutral);
++        let mapped = [l, 0.0, 0.0];
++        let neutral = oklab_to_linear_rgb(mapped).map(clamp01);
++        return (linear_to_srgb8(neutral), mapped);
+     }
+     let mut low = 0.0;
+     let mut high = c;
+@@ -184,7 +191,10 @@ pub fn oklab_to_srgb8_gamut_mapped(lab: [f32; 3]) -> [u8; 3] {
+             high = mid;
+         }
+     }
+-    linear_to_srgb8(oklab_to_linear_rgb(best).map(clamp01))
++    (
++        linear_to_srgb8(oklab_to_linear_rgb(best).map(clamp01)),
++        best,
++    )
+ }
+ 
+ #[inline]
+@@ -672,6 +682,38 @@ mod tests {
+         assert!(hue_delta < 5.0, "hue drift too large: {hue_delta}");
+     }
+ 
++    #[test]
++    fn gamut_mapped_coordinate_is_the_quantizer_input() {
++        let in_gamut = rgb8_to_oklab([80, 130, 190]);
++        let neutral = [1.2, 0.0, 0.0];
++        let compressed = [0.65, 0.4, 0.2];
++        let mut boundary = None;
++        for other in [0.05, 0.2, 0.4, 0.6, 0.8] {
++            for step in 1..10 {
++                let lab = linear_rgb_to_oklab([1.0 + EPSILON * (step as f32 / 10.0), other, 0.3]);
++                let linear = oklab_to_linear_rgb(lab);
++                if is_in_gamut_rgb(linear) && linear.iter().any(|&c| !(0.0..=1.0).contains(&c)) {
++                    boundary = Some(lab);
++                    break;
++                }
++            }
++        }
++        let boundary = boundary.expect("find a channel within the gamut epsilon, beyond the cube");
++        assert!(is_in_gamut_rgb(oklab_to_linear_rgb(in_gamut)));
++        assert!(!is_in_gamut_rgb(oklab_to_linear_rgb(neutral)));
++        assert!(!is_in_gamut_rgb(oklab_to_linear_rgb(compressed)));
++        let boundary_linear = oklab_to_linear_rgb(boundary);
++        assert!(is_in_gamut_rgb(boundary_linear));
++        assert!(boundary_linear.iter().any(|&c| !(0.0..=1.0).contains(&c)));
++
++        for lab in [in_gamut, neutral, compressed, boundary] {
++            let (bytes, mapped) = oklab_to_srgb8_gamut_mapped_with_oklab(lab);
++            let quantized = linear_to_srgb8(oklab_to_linear_rgb(mapped).map(clamp01));
++            assert_eq!(bytes, quantized, "mapped coordinate diverged for {lab:?}");
++            assert_eq!(bytes, oklab_to_srgb8_gamut_mapped(lab));
++        }
++    }
++
+     #[test]
+     fn oklab_reference_matches_high_precision() {
+         let samples = [

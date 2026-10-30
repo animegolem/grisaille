@@ -1,0 +1,22 @@
+   Compiling nowplayd v0.1.0 (/private/tmp/nowplayd-estate-review-9lb0n48j)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.03s
+warning: the following packages contain code that will be rejected by a future version of Rust: block v0.1.6
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/main.rs (target/debug/deps/nowplayd-459004ff2a726a11)
+
+running 1 test
+lifecycle: Connecting
+lifecycle: Connected
+REPRODUCED: idle EOF + shutdown requested, but blocked mutation prevents both clear and worker termination; events=["publish"]
+test estate_review::review_blocked_command_defers_shutdown_and_idle_disconnect ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.20s
+
+     Running tests/estate_review.rs (target/debug/deps/estate_review-cef9e80c76747680)
+
+running 1 test
+REPRODUCED: first artwork activation deleted unrelated family-photo.jpg in an accepted cache_dir
+test review_cache_cleanup_removes_unowned_images ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

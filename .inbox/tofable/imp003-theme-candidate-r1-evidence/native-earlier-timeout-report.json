@@ -1,0 +1,3227 @@
+{
+  "binary": "/Users/golem/git/grisaille/.workspaces/code-lead/primary/dist/Music Prototype.app/Contents/MacOS/music-ui",
+  "binary_sha256": "cad391b2cd5d4adb476b5d27a0a6c9b7711a91f0508bf9422c6ba1e813bb5463",
+  "fixture": "/Users/golem/git/grisaille/.workspaces/code-lead/primary/tests/fixtures/palette/host-ramp.json",
+  "fixture_sha256": "a4703b0f6d62100d963e9e053b16c05dbd9c19285cad9d3288306c4204d5b0c3",
+  "fixture_note": "SYNTHETIC host-path ramp, not a producer capture. Final sRGB bytes are the inputs; OKLCH uses the pinned D65 matrices and IEC sRGB EOTF. Contrast metadata is calculated from final bytes. The all-zero artwork hash is a synthetic label, not the demo artwork identity. This fixture does not close genuine-producer conformance or terminal-emulator display fidelity.",
+  "output": "/tmp/grisaille-imp003-native-complete-20261009",
+  "cases": [
+    {
+      "name": "gray-00",
+      "expectedBackground": "#000000",
+      "screenshot": "01-gray-00.png",
+      "sha256": "f487dae14cd136bb0dc8b814011dd15ba7de2ee50f6529b837b520df90daad9b",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          0,
+          0,
+          0
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-01",
+      "expectedBackground": "#010101",
+      "screenshot": "02-gray-01.png",
+      "sha256": "42754b914dcc171ddf8756cf24ab42acbef428c165277a492194cbc8b22e3f3c",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          1,
+          1,
+          1
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-0a",
+      "expectedBackground": "#0a0a0a",
+      "screenshot": "03-gray-0a.png",
+      "sha256": "2765ad65fa59d1beab0d9393b695d736a22a5dc338f39090d06d3833fcd8be99",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          10,
+          10,
+          10
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-0b",
+      "expectedBackground": "#0b0b0b",
+      "screenshot": "04-gray-0b.png",
+      "sha256": "d67b7fe8cabb73f634c472067ab9caaf6c7cd8090f717ef091d66d7cbd16a149",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          11,
+          11,
+          11
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-20",
+      "expectedBackground": "#202020",
+      "screenshot": "05-gray-20.png",
+      "sha256": "6a2d75959de57c67f73848107759661d5a2eb5da22c9274fa59205a4b220641e",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          32,
+          32,
+          32
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-40",
+      "expectedBackground": "#404040",
+      "screenshot": "06-gray-40.png",
+      "sha256": "fe2e4b8ba467d9cfe6026941c283da3197f6afd9049dbbe61995dd56a5a0bd41",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          64,
+          64,
+          64
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-60",
+      "expectedBackground": "#606060",
+      "screenshot": "07-gray-60.png",
+      "sha256": "378c451a632682b4d7bdff7e4fdc8fcfcf1261a1015755f28ef5ac91fd2b6842",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          96,
+          96,
+          96
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-80",
+      "expectedBackground": "#808080",
+      "screenshot": "08-gray-80.png",
+      "sha256": "7354a6177351db7ab9f1c6c05409ae3cb8fae8d8b1b1cf7b823654ea667b6dcd",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          128,
+          128,
+          128
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-a0",
+      "expectedBackground": "#a0a0a0",
+      "screenshot": "09-gray-a0.png",
+      "sha256": "0c90033e19cce7ea60bd3d8fed1683c000522cce0dd0d4937143c2f9285d1f04",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          160,
+          160,
+          160
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-c0",
+      "expectedBackground": "#c0c0c0",
+      "screenshot": "10-gray-c0.png",
+      "sha256": "b501e261a149fca30cce6a8cb9d0120bea5c81e58aea569887c4639ad4cc1c32",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          192,
+          192,
+          192
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-e0",
+      "expectedBackground": "#e0e0e0",
+      "screenshot": "11-gray-e0.png",
+      "sha256": "79b519707ca3625504afa347ea6d8e827944810e1e0c1797cc7ee82d97aee3c7",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          224,
+          224,
+          224
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    },
+    {
+      "name": "gray-ff",
+      "expectedBackground": "#ffffff",
+      "screenshot": "12-gray-ff.png",
+      "sha256": "ec112c90cc83afd1523135efec19a909aa5654bd70d7cedb9f302c9101a81fd1",
+      "sample": {
+        "size": [
+          2240,
+          1640
+        ],
+        "mode": "RGBA",
+        "profileKeys": [],
+        "point": [
+          10,
+          200
+        ],
+        "rgb": [
+          255,
+          255,
+          255
+        ]
+      },
+      "rootBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1120,
+        "height": 820
+      }
+    }
+  ],
+  "boundary": "Actual GPUIX native app/Metal screenshot path. Screenshot pixel encoding/profile is recorded; physical display calibration and real IME composition require separate evidence.",
+  "publications": [
+    {
+      "observedAtMs": 1791589110660,
+      "sha256": "6ed0bf9790076bf6ff0435da943460e29338d76f2ea5ed5b0fcbd7350ca19816"
+    },
+    {
+      "observedAtMs": 1791589111547,
+      "sha256": "6ed0bf9790076bf6ff0435da943460e29338d76f2ea5ed5b0fcbd7350ca19816"
+    },
+    {
+      "observedAtMs": 1791589111679,
+      "sha256": "16e38285126f27f1f25343ea4f1494e673a5cda4f69f2e2982e57cc6bd0cb396"
+    },
+    {
+      "observedAtMs": 1791589112317,
+      "sha256": "dd04c88390bb780ed5190d8eeb0bb180509b2bed292fcc07604adb4e9c62dc7b"
+    },
+    {
+      "observedAtMs": 1791589118568,
+      "sha256": "8a5549fd1e59a8a1c5ac8dd2cc7bc9aeaa9f5a79b0eecdc1fc03ea7d64943ea8"
+    },
+    {
+      "observedAtMs": 1791589122657,
+      "sha256": "ee8e353949730c8a4c26e51ee0149fc4ed7ded5b0ed152e1beb2a7f707cd6419"
+    },
+    {
+      "observedAtMs": 1791589127878,
+      "sha256": "b4aeb7f4c8d413f481e09bfb7b120998e6beba2f096fbe4b0e6adafd4aba59a6"
+    },
+    {
+      "observedAtMs": 1791589132092,
+      "sha256": "b125c22750795ed771d1030e1672d32510c2a9e57a242fe71c1f3599136382a1"
+    },
+    {
+      "observedAtMs": 1791589135301,
+      "sha256": "408bacbd755739b329977f8a5df65527ac7cb5d00a9d3e821cd7ec9834780a3e"
+    },
+    {
+      "observedAtMs": 1791589139495,
+      "sha256": "6751c957af9695a804874eded63815da9f734f8eba457978a607ce844cf75c75"
+    },
+    {
+      "observedAtMs": 1791589143684,
+      "sha256": "3ad7edc3af6b40e66542c3ed282cd8eb6138edfd316ced3999458c3f058fcd17"
+    },
+    {
+      "observedAtMs": 1791589146983,
+      "sha256": "85be5ce2fdc66ec706a20f90f8011fb8dbfd821a8ea910cacc3a9eb59f4973ce"
+    },
+    {
+      "observedAtMs": 1791589150270,
+      "sha256": "0e239b1061d38479136eabb3a1148f67d692f2101e4adec2c32c7bbdc5bd5f5a"
+    },
+    {
+      "observedAtMs": 1791589157266,
+      "sha256": "ca6f37e31daeb57176f0cc804416e5f8c472f885317319a48123abece076f2e1"
+    }
+  ],
+  "error": "Error: Error: getTree timed out after 10000ms; last sample undefined\n    at waitPaint (/Users/golem/git/grisaille/.workspaces/code-lead/primary/scripts/capture-theme-native.ts:62:29)\n    at processTicksAndRejections (native:7:39)",
+  "lastRoot": {
+    "id": 68,
+    "type": "div",
+    "testId": "music-root",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 1120,
+      "height": 820
+    },
+    "children": [
+      {
+        "id": 14,
+        "type": "div",
+        "bounds": {
+          "x": 94,
+          "y": 0,
+          "width": 1120,
+          "height": 55
+        },
+        "children": [
+          {
+            "id": 10,
+            "type": "div",
+            "bounds": {
+              "x": 94,
+              "y": 9,
+              "width": 905,
+              "height": 37
+            },
+            "children": [
+              {
+                "id": 3,
+                "type": "div",
+                "testId": "view-queue",
+                "bounds": {
+                  "x": 106,
+                  "y": 17,
+                  "width": 109,
+                  "height": 35
+                },
+                "children": [
+                  {
+                    "id": 2,
+                    "type": "text",
+                    "bounds": {
+                      "x": 106,
+                      "y": 17,
+                      "width": 87,
+                      "height": 21
+                    },
+                    "children": [
+                      {
+                        "id": 1,
+                        "type": "text",
+                        "text": "Now playing",
+                        "bounds": {
+                          "x": 106,
+                          "y": 17,
+                          "width": 87,
+                          "height": 21
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": 6,
+                "type": "div",
+                "testId": "view-lyrics",
+                "bounds": {
+                  "x": 223,
+                  "y": 17,
+                  "width": 69,
+                  "height": 35
+                },
+                "children": [
+                  {
+                    "id": 5,
+                    "type": "text",
+                    "bounds": {
+                      "x": 223,
+                      "y": 17,
+                      "width": 47,
+                      "height": 21
+                    },
+                    "children": [
+                      {
+                        "id": 4,
+                        "type": "text",
+                        "text": "Lyrics",
+                        "bounds": {
+                          "x": 223,
+                          "y": 17,
+                          "width": 47,
+                          "height": 21
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": 9,
+                "type": "div",
+                "testId": "view-library",
+                "bounds": {
+                  "x": 300,
+                  "y": 17,
+                  "width": 77,
+                  "height": 35
+                },
+                "children": [
+                  {
+                    "id": 8,
+                    "type": "text",
+                    "bounds": {
+                      "x": 300,
+                      "y": 17,
+                      "width": 55,
+                      "height": 21
+                    },
+                    "children": [
+                      {
+                        "id": 7,
+                        "type": "text",
+                        "text": "Library",
+                        "bounds": {
+                          "x": 300,
+                          "y": 17,
+                          "width": 55,
+                          "height": 21
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 13,
+            "type": "div",
+            "testId": "open-prompt",
+            "bounds": {
+              "x": 1027,
+              "y": 17,
+              "width": 85,
+              "height": 35
+            },
+            "children": [
+              {
+                "id": 12,
+                "type": "text",
+                "bounds": {
+                  "x": 1027,
+                  "y": 17,
+                  "width": 63,
+                  "height": 21
+                },
+                "children": [
+                  {
+                    "id": 11,
+                    "type": "text",
+                    "text": "Prompt :",
+                    "bounds": {
+                      "x": 1027,
+                      "y": 17,
+                      "width": 63,
+                      "height": 21
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 37,
+        "type": "div",
+        "bounds": {
+          "x": 22,
+          "y": 78,
+          "width": 1120,
+          "height": 658.5
+        },
+        "children": [
+          {
+            "id": 28,
+            "type": "div",
+            "bounds": {
+              "x": 22,
+              "y": 78,
+              "width": 678,
+              "height": 614.5
+            },
+            "children": [
+              {
+                "id": 19,
+                "type": "div",
+                "bounds": {
+                  "x": 22,
+                  "y": 78,
+                  "width": 678,
+                  "height": 24
+                },
+                "children": [
+                  {
+                    "id": 16,
+                    "type": "text",
+                    "bounds": {
+                      "x": 22,
+                      "y": 76,
+                      "width": 534,
+                      "height": 27.5
+                    },
+                    "children": [
+                      {
+                        "id": 15,
+                        "type": "text",
+                        "text": "Queue",
+                        "bounds": {
+                          "x": 22,
+                          "y": 76,
+                          "width": 534,
+                          "height": 27.5
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": 18,
+                    "type": "text",
+                    "bounds": {
+                      "x": 566,
+                      "y": 81,
+                      "width": 53,
+                      "height": 18
+                    },
+                    "children": [
+                      {
+                        "id": 17,
+                        "type": "text",
+                        "text": "7 tracks",
+                        "bounds": {
+                          "x": 566,
+                          "y": 81,
+                          "width": 53,
+                          "height": 18
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": 71,
+                    "type": "div",
+                    "testId": "remove-track",
+                    "bounds": {
+                      "x": 641,
+                      "y": 79.5,
+                      "width": 69,
+                      "height": 35
+                    },
+                    "children": [
+                      {
+                        "id": 70,
+                        "type": "text",
+                        "bounds": {
+                          "x": 641,
+                          "y": 79.5,
+                          "width": 47,
+                          "height": 21
+                        },
+                        "children": [
+                          {
+                            "id": 69,
+                            "type": "text",
+                            "text": "Remove",
+                            "bounds": {
+                              "x": 641,
+                              "y": 79.5,
+                              "width": 47,
+                              "height": 21
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": 20,
+                "type": "virtual-list",
+                "children": [
+                  {
+                    "id": 91,
+                    "type": "div",
+                    "testId": "queue-1",
+                    "bounds": {
+                      "x": 30,
+                      "y": 118,
+                      "width": 678,
+                      "height": 67
+                    },
+                    "children": [
+                      {
+                        "id": 74,
+                        "type": "div",
+                        "testId": "handle-1",
+                        "bounds": {
+                          "x": 30,
+                          "y": 127.5,
+                          "width": 18,
+                          "height": 48
+                        },
+                        "children": [
+                          {
+                            "id": 73,
+                            "type": "text",
+                            "bounds": {
+                              "x": 34.5,
+                              "y": 141,
+                              "width": 9,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 72,
+                                "type": "text",
+                                "text": "⠿",
+                                "bounds": {
+                                  "x": 34.5,
+                                  "y": 141,
+                                  "width": 9,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 76,
+                        "type": "text",
+                        "bounds": {
+                          "x": 58,
+                          "y": 142.5,
+                          "width": 18,
+                          "height": 18
+                        },
+                        "children": [
+                          {
+                            "id": 75,
+                            "type": "text",
+                            "text": "▸",
+                            "bounds": {
+                              "x": 58,
+                              "y": 142.5,
+                              "width": 18,
+                              "height": 18
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 78,
+                        "type": "div",
+                        "bounds": {
+                          "x": 86,
+                          "y": 129.5,
+                          "width": 44,
+                          "height": 44
+                        },
+                        "children": [
+                          {
+                            "id": 77,
+                            "type": "img",
+                            "bounds": {
+                              "x": 86,
+                              "y": 129.5,
+                              "width": 44,
+                              "height": 44
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 88,
+                        "type": "div",
+                        "bounds": {
+                          "x": 140,
+                          "y": 129,
+                          "width": 511,
+                          "height": 45
+                        },
+                        "children": [
+                          {
+                            "id": 80,
+                            "type": "text",
+                            "bounds": {
+                              "x": 140,
+                              "y": 129,
+                              "width": 511,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 79,
+                                "type": "text",
+                                "text": "Only Shallow",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 129,
+                                  "width": 511,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": 87,
+                            "type": "div",
+                            "bounds": {
+                              "x": 140,
+                              "y": 155,
+                              "width": 511,
+                              "height": 19
+                            },
+                            "children": [
+                              {
+                                "id": 82,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 155,
+                                  "width": 126,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 81,
+                                    "type": "text",
+                                    "text": "My Bloody Valentine",
+                                    "bounds": {
+                                      "x": 140,
+                                      "y": 155,
+                                      "width": 126,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 84,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 271,
+                                  "y": 155,
+                                  "width": 7,
+                                  "height": 19
+                                },
+                                "children": [
+                                  {
+                                    "id": 83,
+                                    "type": "text",
+                                    "text": "·",
+                                    "bounds": {
+                                      "x": 271,
+                                      "y": 155,
+                                      "width": 7,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 86,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 283,
+                                  "y": 155,
+                                  "width": 53,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 85,
+                                    "type": "text",
+                                    "text": "Loveless",
+                                    "bounds": {
+                                      "x": 283,
+                                      "y": 155,
+                                      "width": 53,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 90,
+                        "type": "text",
+                        "bounds": {
+                          "x": 661,
+                          "y": 141.5,
+                          "width": 29,
+                          "height": 19.5
+                        },
+                        "children": [
+                          {
+                            "id": 89,
+                            "type": "text",
+                            "text": "4:18",
+                            "bounds": {
+                              "x": 661,
+                              "y": 141.5,
+                              "width": 29,
+                              "height": 19.5
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": 111,
+                    "type": "div",
+                    "testId": "queue-2",
+                    "bounds": {
+                      "x": 30,
+                      "y": 186,
+                      "width": 678,
+                      "height": 67
+                    },
+                    "children": [
+                      {
+                        "id": 94,
+                        "type": "div",
+                        "testId": "handle-2",
+                        "bounds": {
+                          "x": 30,
+                          "y": 195.5,
+                          "width": 18,
+                          "height": 48
+                        },
+                        "children": [
+                          {
+                            "id": 93,
+                            "type": "text",
+                            "bounds": {
+                              "x": 34.5,
+                              "y": 209,
+                              "width": 9,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 92,
+                                "type": "text",
+                                "text": "⠿",
+                                "bounds": {
+                                  "x": 34.5,
+                                  "y": 209,
+                                  "width": 9,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 96,
+                        "type": "text",
+                        "bounds": {
+                          "x": 58,
+                          "y": 210.5,
+                          "width": 18,
+                          "height": 18
+                        },
+                        "children": [
+                          {
+                            "id": 95,
+                            "type": "text",
+                            "text": "02",
+                            "bounds": {
+                              "x": 58,
+                              "y": 210.5,
+                              "width": 18,
+                              "height": 18
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 98,
+                        "type": "div",
+                        "bounds": {
+                          "x": 86,
+                          "y": 197.5,
+                          "width": 44,
+                          "height": 44
+                        },
+                        "children": [
+                          {
+                            "id": 97,
+                            "type": "img",
+                            "bounds": {
+                              "x": 86,
+                              "y": 197.5,
+                              "width": 44,
+                              "height": 44
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 108,
+                        "type": "div",
+                        "bounds": {
+                          "x": 140,
+                          "y": 197,
+                          "width": 511,
+                          "height": 45
+                        },
+                        "children": [
+                          {
+                            "id": 100,
+                            "type": "text",
+                            "bounds": {
+                              "x": 140,
+                              "y": 197,
+                              "width": 511,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 99,
+                                "type": "text",
+                                "text": "Loomer",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 197,
+                                  "width": 511,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": 107,
+                            "type": "div",
+                            "bounds": {
+                              "x": 140,
+                              "y": 223,
+                              "width": 511,
+                              "height": 19
+                            },
+                            "children": [
+                              {
+                                "id": 102,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 223,
+                                  "width": 126,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 101,
+                                    "type": "text",
+                                    "text": "My Bloody Valentine",
+                                    "bounds": {
+                                      "x": 140,
+                                      "y": 223,
+                                      "width": 126,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 104,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 271,
+                                  "y": 223,
+                                  "width": 7,
+                                  "height": 19
+                                },
+                                "children": [
+                                  {
+                                    "id": 103,
+                                    "type": "text",
+                                    "text": "·",
+                                    "bounds": {
+                                      "x": 271,
+                                      "y": 223,
+                                      "width": 7,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 106,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 283,
+                                  "y": 223,
+                                  "width": 53,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 105,
+                                    "type": "text",
+                                    "text": "Loveless",
+                                    "bounds": {
+                                      "x": 283,
+                                      "y": 223,
+                                      "width": 53,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 110,
+                        "type": "text",
+                        "bounds": {
+                          "x": 661,
+                          "y": 209.5,
+                          "width": 29,
+                          "height": 19.5
+                        },
+                        "children": [
+                          {
+                            "id": 109,
+                            "type": "text",
+                            "text": "2:38",
+                            "bounds": {
+                              "x": 661,
+                              "y": 209.5,
+                              "width": 29,
+                              "height": 19.5
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": 131,
+                    "type": "div",
+                    "testId": "queue-3",
+                    "bounds": {
+                      "x": 30,
+                      "y": 254,
+                      "width": 678,
+                      "height": 67
+                    },
+                    "children": [
+                      {
+                        "id": 114,
+                        "type": "div",
+                        "testId": "handle-3",
+                        "bounds": {
+                          "x": 30,
+                          "y": 263.5,
+                          "width": 18,
+                          "height": 48
+                        },
+                        "children": [
+                          {
+                            "id": 113,
+                            "type": "text",
+                            "bounds": {
+                              "x": 34.5,
+                              "y": 277,
+                              "width": 9,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 112,
+                                "type": "text",
+                                "text": "⠿",
+                                "bounds": {
+                                  "x": 34.5,
+                                  "y": 277,
+                                  "width": 9,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 116,
+                        "type": "text",
+                        "bounds": {
+                          "x": 58,
+                          "y": 278.5,
+                          "width": 18,
+                          "height": 18
+                        },
+                        "children": [
+                          {
+                            "id": 115,
+                            "type": "text",
+                            "text": "08",
+                            "bounds": {
+                              "x": 58,
+                              "y": 278.5,
+                              "width": 18,
+                              "height": 18
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 118,
+                        "type": "div",
+                        "bounds": {
+                          "x": 86,
+                          "y": 265.5,
+                          "width": 44,
+                          "height": 44
+                        },
+                        "children": [
+                          {
+                            "id": 117,
+                            "type": "img",
+                            "bounds": {
+                              "x": 86,
+                              "y": 265.5,
+                              "width": 44,
+                              "height": 44
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 128,
+                        "type": "div",
+                        "bounds": {
+                          "x": 140,
+                          "y": 265,
+                          "width": 511,
+                          "height": 45
+                        },
+                        "children": [
+                          {
+                            "id": 120,
+                            "type": "text",
+                            "bounds": {
+                              "x": 140,
+                              "y": 265,
+                              "width": 511,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 119,
+                                "type": "text",
+                                "text": "Sometimes",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 265,
+                                  "width": 511,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": 127,
+                            "type": "div",
+                            "bounds": {
+                              "x": 140,
+                              "y": 291,
+                              "width": 511,
+                              "height": 19
+                            },
+                            "children": [
+                              {
+                                "id": 122,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 291,
+                                  "width": 126,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 121,
+                                    "type": "text",
+                                    "text": "My Bloody Valentine",
+                                    "bounds": {
+                                      "x": 140,
+                                      "y": 291,
+                                      "width": 126,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 124,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 271,
+                                  "y": 291,
+                                  "width": 7,
+                                  "height": 19
+                                },
+                                "children": [
+                                  {
+                                    "id": 123,
+                                    "type": "text",
+                                    "text": "·",
+                                    "bounds": {
+                                      "x": 271,
+                                      "y": 291,
+                                      "width": 7,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 126,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 283,
+                                  "y": 291,
+                                  "width": 53,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 125,
+                                    "type": "text",
+                                    "text": "Loveless",
+                                    "bounds": {
+                                      "x": 283,
+                                      "y": 291,
+                                      "width": 53,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 130,
+                        "type": "text",
+                        "bounds": {
+                          "x": 661,
+                          "y": 277.5,
+                          "width": 29,
+                          "height": 19.5
+                        },
+                        "children": [
+                          {
+                            "id": 129,
+                            "type": "text",
+                            "text": "5:19",
+                            "bounds": {
+                              "x": 661,
+                              "y": 277.5,
+                              "width": 29,
+                              "height": 19.5
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": 151,
+                    "type": "div",
+                    "testId": "queue-4",
+                    "bounds": {
+                      "x": 30,
+                      "y": 322,
+                      "width": 678,
+                      "height": 67
+                    },
+                    "children": [
+                      {
+                        "id": 134,
+                        "type": "div",
+                        "testId": "handle-4",
+                        "bounds": {
+                          "x": 30,
+                          "y": 331.5,
+                          "width": 18,
+                          "height": 48
+                        },
+                        "children": [
+                          {
+                            "id": 133,
+                            "type": "text",
+                            "bounds": {
+                              "x": 34.5,
+                              "y": 345,
+                              "width": 9,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 132,
+                                "type": "text",
+                                "text": "⠿",
+                                "bounds": {
+                                  "x": 34.5,
+                                  "y": 345,
+                                  "width": 9,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 136,
+                        "type": "text",
+                        "bounds": {
+                          "x": 58,
+                          "y": 346.5,
+                          "width": 18,
+                          "height": 18
+                        },
+                        "children": [
+                          {
+                            "id": 135,
+                            "type": "text",
+                            "text": "05",
+                            "bounds": {
+                              "x": 58,
+                              "y": 346.5,
+                              "width": 18,
+                              "height": 18
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 138,
+                        "type": "div",
+                        "bounds": {
+                          "x": 86,
+                          "y": 333.5,
+                          "width": 44,
+                          "height": 44
+                        },
+                        "children": [
+                          {
+                            "id": 137,
+                            "type": "img",
+                            "bounds": {
+                              "x": 86,
+                              "y": 333.5,
+                              "width": 44,
+                              "height": 44
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 148,
+                        "type": "div",
+                        "bounds": {
+                          "x": 140,
+                          "y": 333,
+                          "width": 511,
+                          "height": 45
+                        },
+                        "children": [
+                          {
+                            "id": 140,
+                            "type": "text",
+                            "bounds": {
+                              "x": 140,
+                              "y": 333,
+                              "width": 511,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 139,
+                                "type": "text",
+                                "text": "When You Sleep",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 333,
+                                  "width": 511,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": 147,
+                            "type": "div",
+                            "bounds": {
+                              "x": 140,
+                              "y": 359,
+                              "width": 511,
+                              "height": 19
+                            },
+                            "children": [
+                              {
+                                "id": 142,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 359,
+                                  "width": 126,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 141,
+                                    "type": "text",
+                                    "text": "My Bloody Valentine",
+                                    "bounds": {
+                                      "x": 140,
+                                      "y": 359,
+                                      "width": 126,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 144,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 271,
+                                  "y": 359,
+                                  "width": 7,
+                                  "height": 19
+                                },
+                                "children": [
+                                  {
+                                    "id": 143,
+                                    "type": "text",
+                                    "text": "·",
+                                    "bounds": {
+                                      "x": 271,
+                                      "y": 359,
+                                      "width": 7,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 146,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 283,
+                                  "y": 359,
+                                  "width": 53,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 145,
+                                    "type": "text",
+                                    "text": "Loveless",
+                                    "bounds": {
+                                      "x": 283,
+                                      "y": 359,
+                                      "width": 53,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 150,
+                        "type": "text",
+                        "bounds": {
+                          "x": 661,
+                          "y": 345.5,
+                          "width": 29,
+                          "height": 19.5
+                        },
+                        "children": [
+                          {
+                            "id": 149,
+                            "type": "text",
+                            "text": "4:12",
+                            "bounds": {
+                              "x": 661,
+                              "y": 345.5,
+                              "width": 29,
+                              "height": 19.5
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": 171,
+                    "type": "div",
+                    "testId": "queue-5",
+                    "bounds": {
+                      "x": 30,
+                      "y": 390,
+                      "width": 678,
+                      "height": 67
+                    },
+                    "children": [
+                      {
+                        "id": 154,
+                        "type": "div",
+                        "testId": "handle-5",
+                        "bounds": {
+                          "x": 30,
+                          "y": 399.5,
+                          "width": 18,
+                          "height": 48
+                        },
+                        "children": [
+                          {
+                            "id": 153,
+                            "type": "text",
+                            "bounds": {
+                              "x": 34.5,
+                              "y": 413,
+                              "width": 9,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 152,
+                                "type": "text",
+                                "text": "⠿",
+                                "bounds": {
+                                  "x": 34.5,
+                                  "y": 413,
+                                  "width": 9,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 156,
+                        "type": "text",
+                        "bounds": {
+                          "x": 58,
+                          "y": 414.5,
+                          "width": 18,
+                          "height": 18
+                        },
+                        "children": [
+                          {
+                            "id": 155,
+                            "type": "text",
+                            "text": "06",
+                            "bounds": {
+                              "x": 58,
+                              "y": 414.5,
+                              "width": 18,
+                              "height": 18
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 158,
+                        "type": "div",
+                        "bounds": {
+                          "x": 86,
+                          "y": 401.5,
+                          "width": 44,
+                          "height": 44
+                        },
+                        "children": [
+                          {
+                            "id": 157,
+                            "type": "img",
+                            "bounds": {
+                              "x": 86,
+                              "y": 401.5,
+                              "width": 44,
+                              "height": 44
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 168,
+                        "type": "div",
+                        "bounds": {
+                          "x": 140,
+                          "y": 401,
+                          "width": 511,
+                          "height": 45
+                        },
+                        "children": [
+                          {
+                            "id": 160,
+                            "type": "text",
+                            "bounds": {
+                              "x": 140,
+                              "y": 401,
+                              "width": 511,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 159,
+                                "type": "text",
+                                "text": "Love Ire & Song",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 401,
+                                  "width": 511,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": 167,
+                            "type": "div",
+                            "bounds": {
+                              "x": 140,
+                              "y": 427,
+                              "width": 511,
+                              "height": 19
+                            },
+                            "children": [
+                              {
+                                "id": 162,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 427,
+                                  "width": 80,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 161,
+                                    "type": "text",
+                                    "text": "Frank Turner",
+                                    "bounds": {
+                                      "x": 140,
+                                      "y": 427,
+                                      "width": 80,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 164,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 225,
+                                  "y": 427,
+                                  "width": 7,
+                                  "height": 19
+                                },
+                                "children": [
+                                  {
+                                    "id": 163,
+                                    "type": "text",
+                                    "text": "·",
+                                    "bounds": {
+                                      "x": 225,
+                                      "y": 427,
+                                      "width": 7,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 166,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 237,
+                                  "y": 427,
+                                  "width": 100,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 165,
+                                    "type": "text",
+                                    "text": "Love Ire & Song",
+                                    "bounds": {
+                                      "x": 237,
+                                      "y": 427,
+                                      "width": 100,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 170,
+                        "type": "text",
+                        "bounds": {
+                          "x": 661,
+                          "y": 413.5,
+                          "width": 29,
+                          "height": 19.5
+                        },
+                        "children": [
+                          {
+                            "id": 169,
+                            "type": "text",
+                            "text": "4:21",
+                            "bounds": {
+                              "x": 661,
+                              "y": 413.5,
+                              "width": 29,
+                              "height": 19.5
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": 191,
+                    "type": "div",
+                    "testId": "queue-6",
+                    "bounds": {
+                      "x": 30,
+                      "y": 458,
+                      "width": 678,
+                      "height": 67
+                    },
+                    "children": [
+                      {
+                        "id": 174,
+                        "type": "div",
+                        "testId": "handle-6",
+                        "bounds": {
+                          "x": 30,
+                          "y": 467.5,
+                          "width": 18,
+                          "height": 48
+                        },
+                        "children": [
+                          {
+                            "id": 173,
+                            "type": "text",
+                            "bounds": {
+                              "x": 34.5,
+                              "y": 481,
+                              "width": 9,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 172,
+                                "type": "text",
+                                "text": "⠿",
+                                "bounds": {
+                                  "x": 34.5,
+                                  "y": 481,
+                                  "width": 9,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 176,
+                        "type": "text",
+                        "bounds": {
+                          "x": 58,
+                          "y": 482.5,
+                          "width": 18,
+                          "height": 18
+                        },
+                        "children": [
+                          {
+                            "id": 175,
+                            "type": "text",
+                            "text": "01",
+                            "bounds": {
+                              "x": 58,
+                              "y": 482.5,
+                              "width": 18,
+                              "height": 18
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 178,
+                        "type": "div",
+                        "bounds": {
+                          "x": 86,
+                          "y": 469.5,
+                          "width": 44,
+                          "height": 44
+                        },
+                        "children": [
+                          {
+                            "id": 177,
+                            "type": "img",
+                            "bounds": {
+                              "x": 86,
+                              "y": 469.5,
+                              "width": 44,
+                              "height": 44
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 188,
+                        "type": "div",
+                        "bounds": {
+                          "x": 140,
+                          "y": 469,
+                          "width": 511,
+                          "height": 45
+                        },
+                        "children": [
+                          {
+                            "id": 180,
+                            "type": "text",
+                            "bounds": {
+                              "x": 140,
+                              "y": 469,
+                              "width": 511,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 179,
+                                "type": "text",
+                                "text": "Things Still Left to Say",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 469,
+                                  "width": 511,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": 187,
+                            "type": "div",
+                            "bounds": {
+                              "x": 140,
+                              "y": 495,
+                              "width": 511,
+                              "height": 19
+                            },
+                            "children": [
+                              {
+                                "id": 182,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 495,
+                                  "width": 53,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 181,
+                                    "type": "text",
+                                    "text": "Mal Blum",
+                                    "bounds": {
+                                      "x": 140,
+                                      "y": 495,
+                                      "width": 53,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 184,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 198,
+                                  "y": 495,
+                                  "width": 7,
+                                  "height": 19
+                                },
+                                "children": [
+                                  {
+                                    "id": 183,
+                                    "type": "text",
+                                    "text": "·",
+                                    "bounds": {
+                                      "x": 198,
+                                      "y": 495,
+                                      "width": 7,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 186,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 210,
+                                  "y": 495,
+                                  "width": 53,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 185,
+                                    "type": "text",
+                                    "text": "Pity Boy",
+                                    "bounds": {
+                                      "x": 210,
+                                      "y": 495,
+                                      "width": 53,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 190,
+                        "type": "text",
+                        "bounds": {
+                          "x": 661,
+                          "y": 481.5,
+                          "width": 29,
+                          "height": 19.5
+                        },
+                        "children": [
+                          {
+                            "id": 189,
+                            "type": "text",
+                            "text": "2:31",
+                            "bounds": {
+                              "x": 661,
+                              "y": 481.5,
+                              "width": 29,
+                              "height": 19.5
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": 211,
+                    "type": "div",
+                    "testId": "queue-7",
+                    "bounds": {
+                      "x": 30,
+                      "y": 526,
+                      "width": 678,
+                      "height": 67
+                    },
+                    "children": [
+                      {
+                        "id": 194,
+                        "type": "div",
+                        "testId": "handle-7",
+                        "bounds": {
+                          "x": 30,
+                          "y": 535.5,
+                          "width": 18,
+                          "height": 48
+                        },
+                        "children": [
+                          {
+                            "id": 193,
+                            "type": "text",
+                            "bounds": {
+                              "x": 34.5,
+                              "y": 549,
+                              "width": 9,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 192,
+                                "type": "text",
+                                "text": "⠿",
+                                "bounds": {
+                                  "x": 34.5,
+                                  "y": 549,
+                                  "width": 9,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 196,
+                        "type": "text",
+                        "bounds": {
+                          "x": 58,
+                          "y": 550.5,
+                          "width": 18,
+                          "height": 18
+                        },
+                        "children": [
+                          {
+                            "id": 195,
+                            "type": "text",
+                            "text": "03",
+                            "bounds": {
+                              "x": 58,
+                              "y": 550.5,
+                              "width": 18,
+                              "height": 18
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 198,
+                        "type": "div",
+                        "bounds": {
+                          "x": 86,
+                          "y": 537.5,
+                          "width": 44,
+                          "height": 44
+                        },
+                        "children": [
+                          {
+                            "id": 197,
+                            "type": "img",
+                            "bounds": {
+                              "x": 86,
+                              "y": 537.5,
+                              "width": 44,
+                              "height": 44
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 208,
+                        "type": "div",
+                        "bounds": {
+                          "x": 140,
+                          "y": 537,
+                          "width": 511,
+                          "height": 45
+                        },
+                        "children": [
+                          {
+                            "id": 200,
+                            "type": "text",
+                            "bounds": {
+                              "x": 140,
+                              "y": 537,
+                              "width": 511,
+                              "height": 21
+                            },
+                            "children": [
+                              {
+                                "id": 199,
+                                "type": "text",
+                                "text": "Boxcar",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 537,
+                                  "width": 511,
+                                  "height": 21
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": 207,
+                            "type": "div",
+                            "bounds": {
+                              "x": 140,
+                              "y": 563,
+                              "width": 511,
+                              "height": 19
+                            },
+                            "children": [
+                              {
+                                "id": 202,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 140,
+                                  "y": 563,
+                                  "width": 67,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 201,
+                                    "type": "text",
+                                    "text": "Jawbreaker",
+                                    "bounds": {
+                                      "x": 140,
+                                      "y": 563,
+                                      "width": 67,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 204,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 212,
+                                  "y": 563,
+                                  "width": 7,
+                                  "height": 19
+                                },
+                                "children": [
+                                  {
+                                    "id": 203,
+                                    "type": "text",
+                                    "text": "·",
+                                    "bounds": {
+                                      "x": 212,
+                                      "y": 563,
+                                      "width": 7,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "id": 206,
+                                "type": "text",
+                                "bounds": {
+                                  "x": 224,
+                                  "y": 563,
+                                  "width": 239,
+                                  "height": 18
+                                },
+                                "children": [
+                                  {
+                                    "id": 205,
+                                    "type": "text",
+                                    "text": "24 Hour Revenge Therapy (Remastered)",
+                                    "bounds": {
+                                      "x": 224,
+                                      "y": 563,
+                                      "width": 239,
+                                      "height": 18
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "id": 210,
+                        "type": "text",
+                        "bounds": {
+                          "x": 661,
+                          "y": 549.5,
+                          "width": 29,
+                          "height": 19.5
+                        },
+                        "children": [
+                          {
+                            "id": 209,
+                            "type": "text",
+                            "text": "1:55",
+                            "bounds": {
+                              "x": 661,
+                              "y": 549.5,
+                              "width": 29,
+                              "height": 19.5
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": 27,
+                "type": "div",
+                "bounds": {
+                  "x": 22,
+                  "y": 674.5,
+                  "width": 678,
+                  "height": 18
+                },
+                "children": [
+                  {
+                    "id": 24,
+                    "type": "text",
+                    "bounds": {
+                      "x": 22,
+                      "y": 674.5,
+                      "width": 605,
+                      "height": 18
+                    },
+                    "children": [
+                      {
+                        "id": 23,
+                        "type": "text",
+                        "text": "enter play · m move · ⌫ remove · o/i history",
+                        "bounds": {
+                          "x": 22,
+                          "y": 674.5,
+                          "width": 605,
+                          "height": 18
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": 26,
+                    "type": "text",
+                    "bounds": {
+                      "x": 627,
+                      "y": 674.5,
+                      "width": 73,
+                      "height": 18
+                    },
+                    "children": [
+                      {
+                        "id": 25,
+                        "type": "text",
+                        "text": "25:14 total",
+                        "bounds": {
+                          "x": 627,
+                          "y": 674.5,
+                          "width": 73,
+                          "height": 18
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 36,
+            "type": "div",
+            "bounds": {
+              "x": 751,
+              "y": 78,
+              "width": 371,
+              "height": 614.5
+            },
+            "children": [
+              {
+                "id": 30,
+                "type": "text",
+                "bounds": {
+                  "x": 751,
+                  "y": 78,
+                  "width": 347,
+                  "height": 18
+                },
+                "children": [
+                  {
+                    "id": 29,
+                    "type": "text",
+                    "text": "NOW PLAYING",
+                    "bounds": {
+                      "x": 751,
+                      "y": 78,
+                      "width": 347,
+                      "height": 18
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 33,
+                "type": "div",
+                "bounds": {
+                  "x": 751,
+                  "y": 114,
+                  "width": 348,
+                  "height": 348
+                },
+                "children": [
+                  {
+                    "id": 227,
+                    "type": "img",
+                    "bounds": {
+                      "x": 751,
+                      "y": 114,
+                      "width": 348,
+                      "height": 348
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 224,
+                "type": "div",
+                "bounds": {
+                  "x": 751,
+                  "y": 480,
+                  "width": 347,
+                  "height": 94
+                },
+                "children": [
+                  {
+                    "id": 218,
+                    "type": "div",
+                    "bounds": {
+                      "x": 751,
+                      "y": 480,
+                      "width": 288,
+                      "height": 94
+                    },
+                    "children": [
+                      {
+                        "id": 213,
+                        "type": "text",
+                        "bounds": {
+                          "x": 751,
+                          "y": 480,
+                          "width": 288,
+                          "height": 29
+                        },
+                        "children": [
+                          {
+                            "id": 212,
+                            "type": "text",
+                            "text": "Only Shallow",
+                            "bounds": {
+                              "x": 751,
+                              "y": 480,
+                              "width": 288,
+                              "height": 29
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 215,
+                        "type": "text",
+                        "bounds": {
+                          "x": 751,
+                          "y": 520,
+                          "width": 288,
+                          "height": 21
+                        },
+                        "children": [
+                          {
+                            "id": 214,
+                            "type": "text",
+                            "text": "My Bloody Valentine",
+                            "bounds": {
+                              "x": 751,
+                              "y": 520,
+                              "width": 288,
+                              "height": 21
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 217,
+                        "type": "text",
+                        "bounds": {
+                          "x": 751,
+                          "y": 552,
+                          "width": 288,
+                          "height": 21
+                        },
+                        "children": [
+                          {
+                            "id": 216,
+                            "type": "text",
+                            "text": "Loveless",
+                            "bounds": {
+                              "x": 751,
+                              "y": 552,
+                              "width": 288,
+                              "height": 21
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": 223,
+                    "type": "div",
+                    "bounds": {
+                      "x": 1051,
+                      "y": 480,
+                      "width": 47,
+                      "height": 94
+                    },
+                    "children": [
+                      {
+                        "id": 220,
+                        "type": "text",
+                        "bounds": {
+                          "x": 1071,
+                          "y": 480,
+                          "width": 27,
+                          "height": 18
+                        },
+                        "children": [
+                          {
+                            "id": 219,
+                            "type": "text",
+                            "text": "1991",
+                            "bounds": {
+                              "x": 1071,
+                              "y": 480,
+                              "width": 27,
+                              "height": 18
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": 222,
+                        "type": "text",
+                        "bounds": {
+                          "x": 1051,
+                          "y": 508,
+                          "width": 47,
+                          "height": 18
+                        },
+                        "children": [
+                          {
+                            "id": 221,
+                            "type": "text",
+                            "text": "Track 1",
+                            "bounds": {
+                              "x": 1051,
+                              "y": 508,
+                              "width": 47,
+                              "height": 18
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 62,
+        "type": "div",
+        "bounds": {
+          "x": 15,
+          "y": 715.5,
+          "width": 1120,
+          "height": 72.5
+        },
+        "children": [
+          {
+            "id": 40,
+            "type": "div",
+            "bounds": {
+              "x": 15,
+              "y": 732.5,
+              "width": 38,
+              "height": 38
+            },
+            "children": [
+              {
+                "id": 228,
+                "type": "img",
+                "bounds": {
+                  "x": 15,
+                  "y": 732.5,
+                  "width": 38,
+                  "height": 38
+                }
+              }
+            ]
+          },
+          {
+            "id": 45,
+            "type": "div",
+            "bounds": {
+              "x": 67,
+              "y": 730.5,
+              "width": 220,
+              "height": 42.5
+            },
+            "children": [
+              {
+                "id": 42,
+                "type": "text",
+                "bounds": {
+                  "x": 67,
+                  "y": 730.5,
+                  "width": 220,
+                  "height": 19.5
+                },
+                "children": [
+                  {
+                    "id": 41,
+                    "type": "text",
+                    "text": "Only Shallow",
+                    "bounds": {
+                      "x": 67,
+                      "y": 730.5,
+                      "width": 220,
+                      "height": 19.5
+                    }
+                  }
+                ]
+              },
+              {
+                "id": 226,
+                "type": "text",
+                "bounds": {
+                  "x": 67,
+                  "y": 754,
+                  "width": 220,
+                  "height": 18
+                },
+                "children": [
+                  {
+                    "id": 225,
+                    "type": "text",
+                    "text": "My Bloody Valentine",
+                    "bounds": {
+                      "x": 67,
+                      "y": 754,
+                      "width": 220,
+                      "height": 18
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 48,
+            "type": "div",
+            "testId": "previous",
+            "bounds": {
+              "x": 313,
+              "y": 741,
+              "width": 38,
+              "height": 35
+            },
+            "children": [
+              {
+                "id": 47,
+                "type": "text",
+                "bounds": {
+                  "x": 313,
+                  "y": 741,
+                  "width": 16,
+                  "height": 21
+                },
+                "children": [
+                  {
+                    "id": 46,
+                    "type": "text",
+                    "text": "|‹",
+                    "bounds": {
+                      "x": 313,
+                      "y": 741,
+                      "width": 16,
+                      "height": 21
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 51,
+            "type": "div",
+            "testId": "toggle",
+            "bounds": {
+              "x": 367,
+              "y": 741,
+              "width": 54,
+              "height": 35
+            },
+            "children": [
+              {
+                "id": 50,
+                "type": "text",
+                "bounds": {
+                  "x": 367,
+                  "y": 741,
+                  "width": 32,
+                  "height": 21
+                },
+                "children": [
+                  {
+                    "id": 49,
+                    "type": "text",
+                    "text": "Play",
+                    "bounds": {
+                      "x": 367,
+                      "y": 741,
+                      "width": 32,
+                      "height": 21
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 54,
+            "type": "div",
+            "testId": "next",
+            "bounds": {
+              "x": 437,
+              "y": 741,
+              "width": 38,
+              "height": 35
+            },
+            "children": [
+              {
+                "id": 53,
+                "type": "text",
+                "bounds": {
+                  "x": 437,
+                  "y": 741,
+                  "width": 16,
+                  "height": 21
+                },
+                "children": [
+                  {
+                    "id": 52,
+                    "type": "text",
+                    "text": "›|",
+                    "bounds": {
+                      "x": 437,
+                      "y": 741,
+                      "width": 16,
+                      "height": 21
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 56,
+            "type": "text",
+            "bounds": {
+              "x": 479,
+              "y": 742.5,
+              "width": 27,
+              "height": 18
+            },
+            "children": [
+              {
+                "id": 55,
+                "type": "text",
+                "text": "1:23",
+                "bounds": {
+                  "x": 479,
+                  "y": 742.5,
+                  "width": 27,
+                  "height": 18
+                }
+              }
+            ]
+          },
+          {
+            "id": 59,
+            "type": "div",
+            "testId": "seek",
+            "bounds": {
+              "x": 520,
+              "y": 739.5,
+              "width": 544,
+              "height": 24
+            },
+            "children": [
+              {
+                "id": 58,
+                "type": "div",
+                "bounds": {
+                  "x": 521,
+                  "y": 750.5,
+                  "width": 542,
+                  "height": 2
+                },
+                "children": [
+                  {
+                    "id": 57,
+                    "type": "div",
+                    "bounds": {
+                      "x": 521,
+                      "y": 750.5,
+                      "width": 174.5,
+                      "height": 2
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 61,
+            "type": "text",
+            "bounds": {
+              "x": 1078,
+              "y": 742.5,
+              "width": 27,
+              "height": 18
+            },
+            "children": [
+              {
+                "id": 60,
+                "type": "text",
+                "text": "4:18",
+                "bounds": {
+                  "x": 1078,
+                  "y": 742.5,
+                  "width": 27,
+                  "height": 18
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 67,
+        "type": "div",
+        "bounds": {
+          "x": 18,
+          "y": 788,
+          "width": 1120,
+          "height": 32
+        },
+        "children": [
+          {
+            "id": 64,
+            "type": "text",
+            "bounds": {
+              "x": 18,
+              "y": 795,
+              "width": 888,
+              "height": 18
+            },
+            "children": [
+              {
+                "id": 63,
+                "type": "text",
+                "text": "Sample library · playback is simulated",
+                "bounds": {
+                  "x": 18,
+                  "y": 795,
+                  "width": 888,
+                  "height": 18
+                }
+              }
+            ]
+          },
+          {
+            "id": 66,
+            "type": "text",
+            "bounds": {
+              "x": 916,
+              "y": 795,
+              "width": 186,
+              "height": 18
+            },
+            "children": [
+              {
+                "id": 65,
+                "type": "text",
+                "text": "Demo · simulated · 105 songs",
+                "bounds": {
+                  "x": 916,
+                  "y": 795,
+                  "width": 186,
+                  "height": 18
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "stderr": "",
+  "state": [
+    {
+      "name": "demo-gui-af2bdbe1aa9b6ec1.json",
+      "sha256": "a8d5cddd9186ca6d153d1171c2ecc3124b0f742ff1891c9dd477534bbb920c41"
+    }
+  ],
+  "journal": [
+    {
+      "name": "2026-10-09.jsonl",
+      "sha256": "639bfc06f6dc2ae0b4654960799a8456b249366ab68408fbad920d15dab6513a"
+    }
+  ],
+  "pixelSamples": [
+    {
+      "name": "gray-00",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-01",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-0a",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          10,
+          10,
+          10
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-0b",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          11,
+          11,
+          11
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-20",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          32,
+          32,
+          32
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-40",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          64,
+          64,
+          64
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-60",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          96,
+          96,
+          96
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-80",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          128,
+          128,
+          128
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-a0",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          160,
+          160,
+          160
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-c0",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          192,
+          192,
+          192
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-e0",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          224,
+          224,
+          224
+        ]
+      ],
+      "exact": true
+    },
+    {
+      "name": "gray-ff",
+      "size": [
+        2240,
+        1640
+      ],
+      "mode": "RGBA",
+      "profileKeys": [],
+      "samplePoint": [
+        10,
+        200
+      ],
+      "rgb": [
+        [
+          255,
+          255,
+          255
+        ]
+      ],
+      "exact": true
+    }
+  ],
+  "passed": false
+}

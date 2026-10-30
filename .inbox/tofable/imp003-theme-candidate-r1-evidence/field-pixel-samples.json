@@ -1,0 +1,64 @@
+[
+  {
+    "file": "/tmp/grisaille-imp003-native-candidate-20261009/input-before.png",
+    "sha256": "0d1d4b14081062885af15432c1044ca70d9e57da5fbfe63a36593b7550315a42",
+    "size": [
+      2240,
+      1640
+    ],
+    "mode": "RGBA",
+    "profileKeys": [],
+    "crop": [
+      518,
+      95,
+      1642,
+      167
+    ],
+    "expectedForeground": [
+      248,
+      215,
+      0
+    ],
+    "exactForegroundPixels": 3033
+  },
+  {
+    "file": "/tmp/grisaille-imp003-native-candidate-20261009/input-after.png",
+    "sha256": "feba22b090b758145305e39c96a6ca97b88366b62c971605b44eb33896954c8e",
+    "size": [
+      2240,
+      1640
+    ],
+    "mode": "RGBA",
+    "profileKeys": [],
+    "crop": [
+      518,
+      95,
+      1642,
+      167
+    ],
+    "expectedForeground": [
+      0,
+      0,
+      0
+    ],
+    "exactForegroundPixels": 2677
+  },
+  {
+    "file": "/tmp/grisaille-imp003-ime-r4-20261009/composition-completed.png",
+    "sha256": "3e2d440ccb2cca88ece6d6453ea6d1e47199286ec65e6043ebe958c14d7f37d4",
+    "crop": [
+      537,
+      509,
+      541,
+      561
+    ],
+    "expectedCaret": [
+      0,
+      0,
+      0
+    ],
+    "matchingPixels": 208,
+    "totalPixels": 208,
+    "interpretation": "Vertical caret bar after white palette publication; same native input ID 346 and committed \u00e9 recorded in interactive.json."
+  }
+]

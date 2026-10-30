@@ -1,0 +1,15 @@
+{
+  "schema": "craske-sae-clamp-v1/holder-commitment",
+  "private_draw_sha256": "a1c7336bd369eb938d81fd6e856ef0e39eba34cf2247afac806d7edac204b8b9",
+  "oracle_commitment_sha256": "e54c94046fac23bdf289ed7fb9b9f7847e2e554b72cb7298c4c3c2a5cc7872f4",
+  "envelope_sha256": "52fed0701ca9be67f1aa22c58bec0e661e7221cb541ac21a68b5f74efb980c25",
+  "cell_count": 22,
+  "kind_counts": {
+    "captured": 2,
+    "clamp": 12,
+    "decode": 1,
+    "encode": 1,
+    "invalid": 4,
+    "unsupported": 2
+  }
+}

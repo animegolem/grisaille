@@ -1,0 +1,6 @@
+{
+  "schema": "craske-seqlogprob-v1/holder-commitment",
+  "private_draw_sha256": "4df0edbd82d63aab9a09f60388e87bb10770c1ee27ec1724718747350f0fe163",
+  "oracle_commitment_sha256": "f28ad467567a77004b526fc99148d0fec3ffd7529ed4ffb2018b91544f59f176",
+  "envelope_sha256": "359fad564e121febc43d82b2c2b2a2b31324bd7b8a45647733c193d8bfb17fac"
+}

@@ -1,0 +1,21 @@
+{
+  "wave": "A (disc4)",
+  "signed_by": "labile (director, craske-PAT)",
+  "date": "2026-10-10",
+  "signature_id": "7856d755eec90563771f5c60f42aac28f75f33f88f55d99a1b5e621051dc773b",
+  "director_signature": "7856d755eec90563771f5c60f42aac28f75f33f88f55d99a1b5e621051dc773b",
+  "signature_id_rule": "sha256('labile|wave-a|2026-10-10|<brief_sha256>|<manifest_sha256>|<inventory_sha256>')",
+  "signed_brief_path": "RAG/design/wave-a-runner-brief-r1-SIGNED-2026-10-10.md",
+  "signed_brief_sha256": "be2ce3a60a387c12a8ae2a18ed48913ba3902f9d8a03677d8f5754be77c475e9",
+  "manifest_sha256": "fad96f1b645128eca1181a10d7ba0cd1f51668b19bfe29ba2386c22484ea7711",
+  "inventory_sha256": "cd4b3f971b5e7730501d5dff73959dda4e0df6f95e0e6552653a7dc42adcac7b",
+  "archive_sha256": "e26c677a997bde75227fe4244a41dcde1881233c7b80d9bf469c17b69d47e97c",
+  "signed_amendment_sha256": "ad4696db852b55ea4ea501d8867d237f76135ea0d956ffff0170952f123f1bf1",
+  "canonical_base": "56fcb1a1c6ed38bce94dfed25f20fd926dccc4e3",
+  "reviewed_candidate": "18c851c111fbfac759425f9dc35bf807c7345cb4",
+  "owner_runner_seat": "sonnet",
+  "transport_address": null,
+  "transport_note": "live transport address and owner provenance are recorded separately by the owner; this file binds artifacts only",
+  "scope": "Wave A pre-registration as run: 96 cells, 72 primary + 144 secondary trajectories; CPU float32 only; no Gemma arm, no rented run; Wave B held by CP-08",
+  "dispatch": "HELD until the owner's verified Sonnet transport exists"
+}

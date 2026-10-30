@@ -1,0 +1,9 @@
+EXHAUSTIVE 16777216 before/after route mismatches=[0, 0, 0]; before changed=[0, 0, 0]; after changed=[0, 0, 0]
+continuous N=250000 legacy_differences=0 paired_quantization_differences=0 compressed=236441 outside_strict_cube=236077 lch_reexpression_differences=0
+OKLCH_REEXPRESSION centroid: input=[0.7189761, -0.17126995, 0.1321782] mapped=[0.7189761, -0.17126995, 0.1321782] lch=[0.7189761, 0.21634342, 142.34071] bytes=[58, 196, 50] reexpressed=[57, 196, 50]
+OKLCH_REEXPRESSION centroid: input=[0.9053503, -0.11228561, 0.18462622] mapped=[0.9053503, -0.11228561, 0.18462622] lch=[0.9053503, 0.21609002, 121.307045] bytes=[203, 244, 15] reexpressed=[203, 244, 14]
+centroid N=250000 legacy_differences=0 paired_quantization_differences=0 compressed=2439 outside_strict_cube=2439 lch_reexpression_differences=5
+BOUNDARY input=[1.2, 0.0, 0.0] mapped=[1.2, 0.0, 0.0] linear=[1.7280002, 1.7280002, 1.7280002] clamped_linear=[1.0, 1.0, 1.0] bytes=[255, 255, 255]
+BOUNDARY input=[-0.2, 0.0, 0.0] mapped=[-0.2, 0.0, 0.0] linear=[-0.008000002, -0.008, -0.008] clamped_linear=[0.0, 0.0, 0.0] bytes=[0, 0, 0]
+BOUNDARY input=[0.65, 0.4, 0.2] mapped=[0.65, 0.2109667, 0.10548336] linear=[1.0000007, 0.03471533, 0.036707893] clamped_linear=[1.0, 0.03471533, 0.036707893] bytes=[255, 52, 54]
+EPSILON lab=[0.67715997, 0.23416454, -0.00522995] linear=[1.0000006, 0.04999999, 0.29999983] paired=([255, 63, 149], [0.67715997, 0.23416454, -0.00522995])

@@ -1,0 +1,27 @@
+{
+  "wave": "A (disc4)",
+  "recorded_by": "labile (director)",
+  "date": "2026-10-10",
+  "binds_authorization_sha256": "1ba4000f1ff3cd00a4bed58e62d8f0ec14c4a0ffa7dc7f10f275bfc194adc526",
+  "authorization_commit": "1756009",
+  "runner": {
+    "logical_role": "owner_runner_seat: sonnet",
+    "session_name": "sonnet-mechinterp",
+    "kind": "Claude Code Sonnet session over Remote Control",
+    "bridge_session_id": "session_01KNux5ueqE1thngUWzi4hAv",
+    "machine": "owner's Linux desktop, hostname fedora, TITAN RTX 24 GB, Podman 5.8.4, no CUDA toolkit (runner's own report, unverified)",
+    "gpu_headroom_snapshot": "20250 MiB free of 24576 MiB after ComfyUI stopped (quire, single snapshot; interchange/to-labile/titan-headroom-snapshot-r1.md)"
+  },
+  "lane": {
+    "kind": "shared-file (owner's NAS)",
+    "mac_path": "/Volumes/nasnet/Agent-Folder/craske-PAT-wave-a/",
+    "linux_path": "/run/user/1000/gvfs/smb-share:server=192.168.0.16,share=nasnet/Agent-Folder/craske-PAT-wave-a/",
+    "contents_verified_by_director": {
+      "archive_sha256": "e26c677a997bde75227fe4244a41dcde1881233c7b80d9bf469c17b69d47e97c",
+      "signed_brief_sha256": "be2ce3a60a387c12a8ae2a18ed48913ba3902f9d8a03677d8f5754be77c475e9",
+      "authorization_sha256": "1ba4000f1ff3cd00a4bed58e62d8f0ec14c4a0ffa7dc7f10f275bfc194adc526"
+    }
+  },
+  "provenance": "owner set up the runner and said so in quire's session ~14:00 CDT 2026-10-10; the owner told this seat the same day that Sonnet was being set up as the test runner on his desktop; relay via quire (wD:p2) over Claude Messenger at Astra's request",
+  "hold": "RELEASED CONDITIONALLY: dispatch is authorized upon a preflight report showing head 18c851c, clean git status, verify_bundle pass over all 65 inputs, 47/47 contract tests passing on the Linux runner, and recorded platform/package versions. A failing or partial preflight returns to review; no repair of signed inputs in place. CPU float32 only per the brief; the GPU is not used by Wave A."
+}
